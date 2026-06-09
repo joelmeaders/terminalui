@@ -11,12 +11,43 @@ body {
 	margin: 0;
 }
 
+body::before {
+	content: "";
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	/* allows clicking through */
+
+	background: repeating-linear-gradient(to bottom,
+			rgba(255, 176, 0, 0.05) 0px,
+			rgba(255, 176, 0, 0.05) 1px,
+			rgba(0, 0, 0, 0.15) 2px);
+
+	mix-blend-mode: screen;
+	z-index: 9999;
+	/* sits above everything */
+}
+
 body.terminal {
 	height: 100vh;
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
 }
+
+/* body.terminal::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+
+	background: repeating-linear-gradient(to bottom,
+			rgba(255, 176, 0, 0.05) 0px,
+			rgba(255, 176, 0, 0.05) 1px,
+			rgba(0, 0, 0, 0.1) 2px);
+
+	mix-blend-mode: screen;
+} */
 
 h1,
 h2,
@@ -28,12 +59,28 @@ h6 {
 	margin: 0;
 	padding: 0;
 	font-family: var(--t-header-primary-font-family);
+
+	filter: drop-shadow(0 0 .1em rgba(var(--t-color-secondary-rgb), .5));
 }
 
 h1 {
 	font-size: 4rem;
 	line-height: 3rem;
 	font-family: var(--t-header-secondary-font-family);
+
+	&::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+
+		background: repeating-linear-gradient(to bottom,
+				rgba(255, 176, 0, 0.1) 0px,
+				rgba(255, 176, 0, 0.2) 1px,
+				rgba(0, 0, 0, 0.5) 2px);
+
+		mix-blend-mode: screen;
+	}
 }
 
 h2 {
@@ -90,8 +137,11 @@ button {
 	background-color: var(--t-background, var(--t-color-primary));
 	color: var(--t-color-dark);
 	cursor: pointer;
+	overflow: hidden;
+	position: relative;
 
-	&:hover {
+	&:hover,
+	&:focus {
 		background-color: var(--t-background-hover, var(--t-color-secondary));
 	}
 }
@@ -110,16 +160,19 @@ button.lg {
 
 .success {
 	--t-background: var(--t-color-success);
+	--t-background-hover: var(--t-color-success-tint);
 	color: var(--t-color-dark);
 }
 
 .warning {
 	--t-background: var(--t-color-warning);
+	--t-background-hover: var(--t-color-warning-tint);
 	color: var(--t-color-dark);
 }
 
 .error {
 	--t-background: var(--t-color-error);
+	--t-background-hover: var(--t-color-error-tint);
 	color: var(--t-color-light);
 }
 
@@ -127,7 +180,7 @@ div.toolbar-content-container {
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-	border: 2px solid var(--t-color-primary);
+	border: 4px solid var(--t-background, var(--t-color-primary));
 	border-top: 0px;
 
 	&>main {
@@ -176,17 +229,17 @@ ul.toolbar {
 
 	button {
 		margin: 0;
+		padding-inline: 4px;
 
 		&:hover,
 		&:focus {
-			box-shadow: inset 0 -4px 0 0 var(--t-color-tertiary);
+			box-shadow: inset 0 -2px 0 0 var(--t-color-tertiary);
 		}
 	}
 }
 
 ul.toolbar.sm {
 	button {
-		padding-inline: 2px;
 
 		&:hover,
 		&:focus {
@@ -199,5 +252,39 @@ ul.toolbar.lg {
 	button {
 		height: 40px;
 		padding-inline: 10px;
+
+		&:hover,
+		&:focus {
+			box-shadow: inset 0 -4px 0 0 var(--t-color-tertiary);
+		}
+	}
+}
+
+.input-wrapper {
+	display: flex;
+	flex-direction: row;
+	gap: 4px;
+	margin: 8px 0;
+	padding: 4px 8px;
+	border: 3px solid var(--t-color-primary);
+	width: fit-content;
+
+	/* // Better shadow than text shadow for input, since it can be multiple lines and text-shadow doesn't work well with that */
+	filter: drop-shadow(0 0 .2em rgba(var(--t-color-secondary-rgb), .5));
+
+	label {
+		font-size: 16px;
+		font-weight: 700;
+	}
+
+	input {
+		font-size: 16px;
+		background-color: transparent;
+		border: none;
+		font-family: var(--t-text-font-family);
+		color: var(--t-color-light);
+
+		outline: none;
+		caret-color: var(--t-color-primary);
 	}
 }

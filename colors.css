@@ -1,4 +1,5 @@
 :root {
+	/* MAKE TINTS AND SHADES have more contrast */
 	--t-color-primary: #FFAE00;
 	--t-color-primary-rgb: 255, 174, 0;
 	--t-color-primary-contrast: #000000;
