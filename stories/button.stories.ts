@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import { expect, userEvent, fn } from 'storybook/test';
+import '../src/components/button';
+import '../src/components/input';
 const meta = {
   title: 'Components/Button',
   component: 't-button',
@@ -22,7 +24,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Action button with native keyboard behavior. Use a native `<button class="t-native" type="submit">` for forms. Slots: default label. CSS part: `button`. Events: native `click`.',
+          'Button with native keyboard behavior. type defaults to button and also supports submit/reset. Set name and value for submitter data. Use the form attribute for an external form. Submit uses a temporary native button, exposed as event.submitter. Read new FormData(form, event.submitter) to include its value. A canceled click prevents its action. Slots: default label. CSS part: button. Event: native click.',
       },
     },
   },
@@ -57,3 +59,26 @@ export const Disabled: Story = {
   },
 };
 export const Loading: Story = { args: { loading: true, label: 'Processing' } };
+export const FormActions: Story = {
+  render: () =>
+    html`<form
+      @submit=${(event: SubmitEvent) => {
+        event.preventDefault();
+        const form = event.currentTarget as HTMLFormElement;
+        form.querySelector('output')!.textContent = JSON.stringify(
+          Object.fromEntries(new FormData(form, event.submitter)),
+        );
+      }}
+    >
+      <t-input label="Callsign" name="callsign" value="Explorer" required></t-input>
+      <t-button type="submit" name="action" value="save">Save</t-button>
+      <t-button type="reset" variant="secondary">Reset</t-button
+      ><output aria-live="polite"></output>
+    </form>`,
+  play: async ({ canvasElement }) => {
+    await userEvent.click(
+      canvasElement.querySelector('t-button')!.shadowRoot!.querySelector('button')!,
+    );
+    await expect(canvasElement.querySelector('output')).toHaveTextContent('"action":"save"');
+  },
+};

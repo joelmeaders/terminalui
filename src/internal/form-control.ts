@@ -51,12 +51,17 @@ export const fieldStyles = [
       color: var(--t-danger);
     }
     :host([invalid]) input,
-    :host([invalid]) select {
+    :host([invalid]) select,
+    :host([invalid]) textarea {
       border-color: var(--t-danger);
     }
     abbr {
       color: var(--t-accent);
       text-decoration: none;
+    }
+    textarea:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
     }
   `,
 ];
@@ -74,20 +79,29 @@ export abstract class FormControl extends TerminalElement {
     invalid: { type: Boolean, reflect: true },
     fieldsetDisabled: { state: true },
   };
+  /** Submitted field name. Use the `form` attribute to associate an external form. */
   name = '';
+  /** Current field value. The initial value is restored by form reset. */
   value = '';
+  /** Accessible label for the native control. */
   label = '';
+  /** Supporting text associated with the native control. */
   help = '';
+  /** Application validation message. An empty string clears the error. */
   error = '';
   disabled = false;
   required = false;
   invalid = false;
   protected fieldsetDisabled = false;
   protected internals = this.attachInternals();
+  protected initialValue = '';
+  protected customValidationMessage = '';
   protected get control() {
-    return this.renderRoot.querySelector<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >('input,select,textarea');
+    return (
+      this.renderRoot?.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+        'input,select,textarea',
+      ) ?? null
+    );
   }
   protected get isDisabled() {
     return this.disabled || this.fieldsetDisabled;
@@ -98,6 +112,9 @@ export abstract class FormControl extends TerminalElement {
       this.invalid = true;
     });
   }
+  protected firstUpdated() {
+    this.initialValue = this.value;
+  }
   protected updated(_changed: PropertyValues) {
     this.syncForm();
   }
@@ -106,7 +123,12 @@ export abstract class FormControl extends TerminalElement {
     if (!control) return;
     this.internals.setFormValue(this.isDisabled ? null : this.value);
     if (this.isDisabled) this.internals.setValidity({});
-    else if (this.error) this.internals.setValidity({ customError: true }, this.error, control);
+    else if (this.error || this.customValidationMessage)
+      this.internals.setValidity(
+        { customError: true },
+        this.error || this.customValidationMessage,
+        control,
+      );
     else this.internals.setValidity(control.validity, control.validationMessage, control);
   }
   protected handleInput(event: Event) {
@@ -114,18 +136,24 @@ export abstract class FormControl extends TerminalElement {
     this.value = (event.target as HTMLInputElement).value;
     this.invalid = false;
     this.syncForm();
-    this.emit('input');
+    this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
   }
   protected handleChange(event: Event) {
     event.stopPropagation();
-    this.emit('change');
+    this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
   }
   formDisabledCallback(disabled: boolean) {
     this.fieldsetDisabled = disabled;
+    // Attribute reflection can invoke this during a Lit update. Schedule a later
+    // render so an own-disabled toggle cannot leave the native control stale.
+    if (this.control) this.control.disabled = disabled;
+    queueMicrotask(() => this.requestUpdate());
   }
   formResetCallback() {
-    this.value = this.getAttribute('value') ?? '';
+    this.value = this.getAttribute('value') ?? this.initialValue;
+    if (this.control) this.control.value = this.value;
     this.invalid = false;
+    this.syncForm();
   }
   formStateRestoreCallback(state: string | File | FormData | null) {
     if (typeof state === 'string') this.value = state;
@@ -138,6 +166,15 @@ export abstract class FormControl extends TerminalElement {
   }
   get validationMessage() {
     return this.internals.validationMessage;
+  }
+  get willValidate() {
+    return this.internals.willValidate;
+  }
+  /** Set a custom constraint error. Pass an empty string to clear it. */
+  setCustomValidity(message: string) {
+    this.customValidationMessage = message;
+    this.syncForm();
+    this.requestUpdate();
   }
   checkValidity() {
     return this.internals.checkValidity();

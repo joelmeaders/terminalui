@@ -5,7 +5,9 @@
   "type": "module",
   "description": "Terminal-inspired Lit components for the everyday web.",
   "files": [
-    "dist"
+    "dist",
+    "docs",
+    "examples"
   ],
   "sideEffects": [
     "**/*.css",
@@ -22,8 +24,30 @@
       "types": "./dist/components/*.d.ts",
       "import": "./dist/components/*.js"
     },
-    "./themes.css": "./dist/themes.css",
-    "./terminal.js": "./dist/terminal.js"
+    "./themes.css": {
+      "types": "./dist/themes.css.d.ts",
+      "default": "./dist/themes.css"
+    },
+    "./terminal.js": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/terminal.js"
+    },
+    "./react": {
+      "types": "./dist/adapters/react.d.ts",
+      "import": "./dist/adapters/react.js"
+    },
+    "./vue": {
+      "types": "./dist/adapters/vue.d.ts",
+      "import": "./dist/adapters/vue.js"
+    },
+    "./angular": {
+      "types": "./dist/adapters/angular.d.ts",
+      "import": "./dist/adapters/angular.js"
+    },
+    "./custom-elements.json": "./dist/custom-elements.json",
+    "./vscode.html-custom-data.json": "./dist/vscode.html-custom-data.json",
+    "./catalog.json": "./dist/catalog.json",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "dev": "vite --host 127.0.0.1",
@@ -31,16 +55,20 @@
     "build": "node scripts/build.mjs",
     "build:demo": "vite build",
     "build:site": "npm run build:demo && npm run build:storybook && node scripts/site.mjs",
-    "storybook": "storybook dev -p 6006 --host 127.0.0.1 --no-open",
-    "build:storybook": "storybook build",
+    "storybook": "npm run build && storybook dev -p 6006 --host 127.0.0.1 --no-open",
+    "build:storybook": "npm run build && storybook build",
     "test": "playwright test",
     "test:stories": "vitest run --config vitest.config.ts",
     "size": "node scripts/size.mjs",
-    "check": "npm run format:check && npm run typecheck && npm run build && npm test && npm run test:stories && npm run test:production && npm run size",
+    "check": "npm run build && npm run format:check && npm run typecheck && npm test && npm run test:stories && npm run test:production && npm run size && npm run test:package",
     "preview": "vite preview --host 127.0.0.1",
     "test:production": "npm run build:site && playwright test --config playwright.production.config.ts",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "metadata": "node scripts/metadata.mjs",
+    "test:package": "node scripts/verify-package.mjs",
+    "prepack": "npm run build",
+    "test:behavior": "playwright test --grep-invert \"screenshot|visual\""
   },
   "dependencies": {
     "lit": "3.3.3"
@@ -48,10 +76,13 @@
   "devDependencies": {
     "@angular/common": "22.1.7",
     "@angular/compiler": "22.1.7",
+    "@angular/compiler-cli": "22.1.7",
     "@angular/core": "22.1.7",
     "@angular/forms": "22.1.7",
     "@angular/platform-browser": "22.1.7",
     "@axe-core/playwright": "4.13.0",
+    "@custom-elements-manifest/analyzer": "0.11.0",
+    "@lit/react": "1.0.8",
     "@playwright/test": "1.63.0",
     "@storybook/addon-a11y": "10.6.0",
     "@storybook/addon-docs": "10.6.0",
@@ -67,9 +98,41 @@
     "react-dom": "19.3.0",
     "rxjs": "7.8.2",
     "storybook": "10.6.0",
-    "typescript": "5.9.3",
+    "typescript": "6.0.3",
     "vite": "8.3.0",
     "vitest": "4.1.11",
     "vue": "3.5.43"
+  },
+  "license": "UNLICENSED",
+  "engines": {
+    "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
+  },
+  "customElements": "./dist/custom-elements.json",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "peerDependencies": {
+    "@lit/react": "^1.0.8",
+    "react": "^19.0.0",
+    "vue": "^3.5.0",
+    "@angular/core": "^22.1.0",
+    "@angular/forms": "^22.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@lit/react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    },
+    "@angular/core": {
+      "optional": true
+    },
+    "@angular/forms": {
+      "optional": true
+    }
   }
 }

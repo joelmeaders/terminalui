@@ -6,6 +6,7 @@ export class TCheckbox extends FormControl {
     checked: { type: Boolean, reflect: true },
     switch: { type: Boolean, reflect: true },
   };
+  /** Current checked state. Unchecked controls do not submit a value. */
   checked = false;
   switch = false;
   value = 'on';
@@ -64,9 +65,9 @@ export class TCheckbox extends FormControl {
       }
     `,
   ];
-  connectedCallback() {
-    if (!this.hasUpdated) this.defaultChecked = this.hasAttribute('checked');
-    super.connectedCallback();
+  protected firstUpdated() {
+    super.firstUpdated();
+    this.defaultChecked = this.checked;
   }
   protected syncForm() {
     super.syncForm();
@@ -80,11 +81,13 @@ export class TCheckbox extends FormControl {
     this.checked = (event.target as HTMLInputElement).checked;
     this.invalid = false;
     this.syncForm();
-    this.emit('input');
+    this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
   }
   formResetCallback() {
     this.checked = this.defaultChecked;
+    if (this.control) (this.control as HTMLInputElement).checked = this.checked;
     this.invalid = false;
+    this.syncForm();
   }
   formStateRestoreCallback(state: string | File | FormData | null) {
     this.checked = state === 'checked';
@@ -109,7 +112,7 @@ export class TCheckbox extends FormControl {
       </p>`;
   }
 }
-customElements.define('t-checkbox', TCheckbox);
+if (!customElements.get('t-checkbox')) customElements.define('t-checkbox', TCheckbox);
 declare global {
   interface HTMLElementTagNameMap {
     't-checkbox': TCheckbox;

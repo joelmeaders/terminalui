@@ -20,6 +20,47 @@ test('production demo retains component registration and working interactions', 
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
+  expect(
+    await page.evaluate(() =>
+      [
+        't-button',
+        't-input',
+        't-select',
+        't-checkbox',
+        't-card',
+        't-badge',
+        't-alert',
+        't-progress',
+        't-accordion',
+        't-tabs',
+        't-dialog',
+        't-tooltip',
+        't-textarea',
+        't-radio-group',
+        't-range',
+        't-switch',
+        't-combobox',
+        't-file-input',
+        't-menu',
+        't-breadcrumb',
+        't-pagination',
+        't-table',
+        't-drawer',
+        't-tree',
+        't-icon',
+        't-icon-button',
+        't-spinner',
+        't-skeleton',
+        't-divider',
+        't-avatar',
+        't-empty-state',
+        't-stack',
+        't-grid',
+        't-popover',
+        't-toast',
+      ].every((tag) => !!customElements.get(tag)),
+    ),
+  ).toBe(true);
   await page.getByRole('button', { name: 'Initialize', exact: false }).click();
   await expect(page.locator('.event-console')).toContainText('Primary action activated.');
   await page.getByRole('button', { name: 'Paper', exact: true }).click();

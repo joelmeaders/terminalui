@@ -1,11 +1,12 @@
 import { build } from 'esbuild';
 import { gzipSync, brotliCompressSync } from 'node:zlib';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
+const count = (await readdir('src/components')).filter((file) => file.endsWith('.ts')).length;
 const scenarios = {
   'One button': 'import "./src/components/button.ts";',
   'Form controls':
     'import "./src/components/input.ts"; import "./src/components/select.ts"; import "./src/components/checkbox.ts";',
-  'All 12 components': 'import "./src/index.ts";',
+  [`All ${count} components`]: 'import "./src/index.ts";',
 };
 console.log('Production JS including Lit. CSS themes and fonts excluded.');
 for (const [name, contents] of Object.entries(scenarios)) {
@@ -19,7 +20,8 @@ for (const [name, contents] of Object.entries(scenarios)) {
   });
   const bytes = result.outputFiles[0].contents;
   const gzipBytes = gzipSync(bytes).length;
-  const budget = name === 'One button' ? 8000 : name === 'Form controls' ? 9500 : 12500;
+  // The complete catalog includes collection, overlay, and form behaviors. Keep small imports strict.
+  const budget = name === 'One button' ? 8000 : name === 'Form controls' ? 9500 : 35000;
   if (bytes.length === 0 || gzipBytes > budget)
     throw new Error(`${name} exceeds its ${budget} B gzip budget or has no output.`);
   console.log(

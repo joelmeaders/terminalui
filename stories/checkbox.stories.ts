@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import { expect, userEvent } from 'storybook/test';
+import '../src/components/checkbox';
 const meta = {
   title: 'Components/Checkbox',
   component: 't-checkbox',
@@ -41,3 +42,12 @@ export const Default: Story = {
 export const Checked: Story = { args: { checked: true } };
 export const Switch: Story = { args: { switch: true, checked: true } };
 export const Disabled: Story = { args: { disabled: true } };
+export const Required: Story = {
+  args: { required: true },
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-checkbox')!;
+    await expect(host.checkValidity()).toBe(false);
+    await userEvent.click(host.shadowRoot!.querySelector('input')!);
+    await expect(host.checkValidity()).toBe(true);
+  },
+};

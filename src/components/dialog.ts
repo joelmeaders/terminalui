@@ -1,5 +1,6 @@
 import { css, html, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
+import { containModalTab } from '../internal/modal-focus';
 /** Modal native dialog with Escape and focus return. Emits t-close. @slot - Body. @slot footer - Actions. */
 export class TDialog extends TerminalElement {
   static properties = { open: { type: Boolean, reflect: true }, heading: {} };
@@ -86,6 +87,7 @@ export class TDialog extends TerminalElement {
       part="dialog"
       aria-labelledby="title"
       @close=${this.onClose}
+      @keydown=${(event: KeyboardEvent) => containModalTab(event, event.currentTarget as HTMLDialogElement)}
       @cancel=${() => {
         this.open = false;
       }}

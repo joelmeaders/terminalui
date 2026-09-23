@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import { expect, userEvent } from 'storybook/test';
+import '../src/components/input';
 const meta = {
   title: 'Components/Input',
   component: 't-input',
@@ -20,7 +21,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Form-associated input with `value`, `name`, `label`, `help`, `required`, `disabled`, `readonly`, `type`, and `autocomplete`. Use `label` to name the internal input. Emits composed `input` and `change` events. CSS part: `input`. Supports native FormData, validation, and reset.',
+          'Form-associated input with value, name, label, help, required, disabled, readonly, type, autocomplete, min, max, step, pattern, minlength, maxlength, and multiple (email). Supports text, email, password, search, tel, url, number, date, datetime-local, month, time, week, and color. Use label to name the internal input. Emits standard composed input/change events. CSS part: input. Supports FormData, validation, reset, external forms, and Enter submission.',
       },
     },
   },
@@ -55,5 +56,29 @@ export const Email: Story = {
     label: 'Email address',
     placeholder: 'crew@example.com',
     help: 'Uses native email validation.',
+  },
+};
+export const NumberConstraints: Story = {
+  render: () =>
+    html`<t-input
+      type="number"
+      label="Worker count"
+      value="3"
+      min="2"
+      max="10"
+      step="2"
+      help="An even number from 2 to 10."
+    ></t-input>`,
+  play: async ({ canvasElement }) => {
+    await expect(canvasElement.querySelector('t-input')!.checkValidity()).toBe(false);
+  },
+};
+export const Date: Story = {
+  args: {
+    type: 'date',
+    label: 'Start date',
+    value: '2026-09-23',
+    placeholder: '',
+    help: 'Uses the browser date picker.',
   },
 };

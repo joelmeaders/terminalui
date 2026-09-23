@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import { expect, userEvent } from 'storybook/test';
+import '../src/components/select';
 const options = [
   { value: '', label: 'Choose a destination' },
   { value: 'web', label: 'Website' },
@@ -43,3 +44,12 @@ export const Selected: Story = { args: { value: 'web' } };
 export const Required: Story = { args: { required: true } };
 export const Disabled: Story = { args: { disabled: true } };
 export const Invalid: Story = { args: { error: 'Choose a destination.' } };
+export const ReactiveOptions: Story = {
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-select')!;
+    host.options = [{ value: 'new', label: 'New destination' }];
+    host.value = 'new';
+    await host.updateComplete;
+    await expect(host.shadowRoot!.querySelector('select')).toHaveValue('new');
+  },
+};

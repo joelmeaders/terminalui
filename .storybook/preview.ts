@@ -1,8 +1,11 @@
 import type { Preview } from '@storybook/web-components-vite';
+import { setCustomElementsManifest } from '@storybook/web-components-vite';
+import manifest from '../dist/custom-elements.json';
 import { html } from 'lit';
 import { themes } from 'storybook/theming';
 import '../src/index';
 import '../src/themes.css';
+setCustomElementsManifest(manifest);
 const preview: Preview = {
   globalTypes: {
     theme: {

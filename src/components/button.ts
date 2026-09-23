@@ -1,18 +1,70 @@
 import { css, html } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 
-/** An action button. Use a native button for submit/reset semantics. @slot Default - Button label. */
+/** An action, submit, or reset button. Submit uses a temporary native submitter. @slot Default - Button label. */
 export class TButton extends TerminalElement {
+  static formAssociated = true;
   static properties = {
     variant: { reflect: true },
     disabled: { type: Boolean, reflect: true },
     loading: { type: Boolean, reflect: true },
     size: { reflect: true },
+    type: { reflect: true },
+    name: { reflect: true },
+    value: {},
+    fieldsetDisabled: { state: true },
   };
   variant = 'primary';
   disabled = false;
   loading = false;
   size = 'medium';
+  /** Button action. Defaults to button to prevent accidental submission. */
+  type: 'button' | 'submit' | 'reset' = 'button';
+  /** Submitter field name and value, included only when this button submits. */
+  name = '';
+  value = '';
+  private internals = this.attachInternals();
+  private fieldsetDisabled = false;
+  get form() {
+    return this.internals.form;
+  }
+  private get isDisabled() {
+    return this.disabled || this.loading || this.fieldsetDisabled;
+  }
+  constructor() {
+    super();
+    this.addEventListener('click', (event) => {
+      if (this.isDisabled) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
+      }
+      // Run after listeners can cancel the composed click.
+      setTimeout(() => {
+        if (event.defaultPrevented || this.isDisabled || !this.form) return;
+        if (this.type === 'reset') this.form.reset();
+        if (this.type !== 'submit') return;
+        const proxy = document.createElement('button');
+        proxy.type = 'submit';
+        proxy.name = this.name;
+        proxy.value = this.value;
+        proxy.hidden = true;
+        const form = this.form;
+        form.append(proxy);
+        try {
+          form.requestSubmit(proxy);
+        } finally {
+          proxy.remove();
+        }
+      }, 0);
+    });
+  }
+  formDisabledCallback(disabled: boolean) {
+    this.fieldsetDisabled = disabled;
+    const button = this.renderRoot?.querySelector('button');
+    if (button) button.disabled = disabled || this.loading;
+    queueMicrotask(() => this.requestUpdate());
+  }
   static styles = [
     baseStyles,
     css`
@@ -88,14 +140,14 @@ export class TButton extends TerminalElement {
     return html`<button
       part="button"
       type="button"
-      ?disabled=${this.disabled || this.loading}
+      ?disabled=${this.isDisabled}
       aria-busy=${this.loading ? 'true' : 'false'}
     >
       ${this.loading ? html`<span class="spinner" aria-hidden="true"></span>` : ''}<slot></slot>
     </button>`;
   }
 }
-customElements.define('t-button', TButton);
+if (!customElements.get('t-button')) customElements.define('t-button', TButton);
 declare global {
   interface HTMLElementTagNameMap {
     't-button': TButton;

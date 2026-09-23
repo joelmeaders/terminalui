@@ -146,11 +146,11 @@
 .t-screen[data-scanlines='subtle'],
 .t-screen[data-effects='crt'],
 :root[data-effects='crt'] {
-  --t-scanline-opacity: 0.045;
+  --t-scanline-opacity: 0.12;
 }
 .t-screen[data-scanlines='pronounced'],
 :root[data-effects='crt'][data-scanlines='pronounced'] {
-  --t-scanline-opacity: 0.09;
+  --t-scanline-opacity: 0.28;
 }
 .t-screen:is([data-scanlines='subtle'], [data-scanlines='pronounced'], [data-effects='crt'])::after,
 :root[data-effects='crt']::after {
@@ -163,8 +163,12 @@
   background: repeating-linear-gradient(
     0deg,
     transparent 0 calc(var(--t-scanline-spacing, 4px) - 1px),
-    rgb(0 0 0 / var(--t-scanline-opacity, 0.045)) calc(var(--t-scanline-spacing, 4px) - 1px)
-      var(--t-scanline-spacing, 4px)
+    color-mix(
+        in srgb,
+        var(--t-scanline-color, var(--t-accent)) calc(var(--t-scanline-opacity, 0.12) * 100%),
+        transparent
+      )
+      calc(var(--t-scanline-spacing, 4px) - 1px) var(--t-scanline-spacing, 4px)
   );
 }
 :root[data-effects='crt']::after {

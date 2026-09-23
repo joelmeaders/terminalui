@@ -8,7 +8,9 @@
     "useDefineForClassFields": false,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["node", "vite/client"]
+    "types": ["node", "vite/client"],
+    "experimentalDecorators": true,
+    "resolveJsonModule": true
   },
   "include": ["src", "demo", "examples", "stories", ".storybook", "tests", "*.ts"]
 }

@@ -2,6 +2,7 @@ import { html, render } from 'lit';
 import '../src/index';
 import '../src/themes.css';
 import './style.css';
+import { library } from './library';
 import type { TDialog } from '../src/index';
 
 const themes = [
@@ -94,7 +95,7 @@ function draw() {
             >Documentation <span aria-hidden="true">↗</span></a
           >
         </nav>
-        <span class="release"><i></i> V0.1 / PROOF OF CONCEPT</span>
+        <span class="release"><i></i> V0.1 / COMPONENT LIBRARY</span>
       </header>
       <div class="shell">
         <aside class="sidebar" aria-label="Component navigation">
@@ -108,6 +109,7 @@ function draw() {
           <a class="directory" href="#feedback"><span>03</span> Feedback <small>03</small></a>
           <a class="directory" href="#navigation"><span>04</span> Navigation <small>02</small></a>
           <a class="directory" href="#overlays"><span>05</span> Overlays <small>02</small></a>
+          <a class="directory" href="#library"><span>06</span> Application kit <small>23</small></a>
           <div class="sidebar-note">
             <span class="crosshair" aria-hidden="true">＋</span>
             <p>FAMILIAR CONTROLS.<br />DIFFERENT ATMOSPHERE.</p>
@@ -127,7 +129,7 @@ function draw() {
                 websites and applications.
               </p>
               <div class="hero-meta">
-                <span>12 COMPONENTS</span><b>+</b><span>06 THEMES</span><b>+</b
+                <span>35 COMPONENTS</span><b>+</b><span>06 THEMES</span><b>+</b
                 ><span>ONE SHARED SYSTEM</span>
               </div>
             </div>
@@ -236,8 +238,8 @@ function draw() {
                 </select>
               </label>
               <p>
-                Scanlines apply to the calibration display and event log. Each screen can have its
-                own setting.
+                Scanlines apply to this preview, the calibration display, and the event log. Each
+                screen can have its own setting.
               </p>
               <button
                 class="t-native"
@@ -251,6 +253,11 @@ function draw() {
               >
                 Reset display styles
               </button>
+            </div>
+            <div class="scanline-preview t-screen" data-scanlines=${scanlines}>
+              <span>DISPLAY PREVIEW / ${scanlines.toUpperCase()}</span>
+              <strong>THE SIGNAL IS CLEAR.</strong>
+              <span>Static texture. No flicker. Your chosen palette.</span>
             </div>
           </details>
           <div class="section-heading">
@@ -436,6 +443,7 @@ function draw() {
             ><span>${formMessage || 'Awaiting input. Try a component above.'}</span
             ><span class="cursor" aria-hidden="true">▌</span>
           </div>
+          ${library(draw, action)}
           <footer class="page-footer">
             <span>TERMINAL KIT / V0.1.0</span><span>MODERN PRIMITIVES. ANALOG CHARACTER.</span
             ><a href=${storybookUrl} target="_blank" rel="noreferrer"

@@ -17,3 +17,25 @@ for (const framework of ['plain', 'react', 'vue', 'angular']) {
     expect(errors).toEqual([]);
   });
 }
+
+for (const framework of ['react', 'vue', 'angular']) {
+  test(`${framework}: optional adapter supports checked, disabled, and model reset`, async ({
+    page,
+  }) => {
+    await page.goto(`/examples/${framework}.html`);
+    const name = page.getByRole('textbox', { name: 'Name', exact: true });
+    await name.fill('Edited');
+    await page.getByRole('checkbox', { name: 'Subscribe', exact: true }).check();
+    await expect(page.getByTestId('checked')).toHaveText('true');
+    await page.getByRole('button', { name: 'Toggle disabled', exact: true }).click();
+    await expect(name).toBeDisabled();
+    await page.getByRole('button', { name: 'Toggle disabled', exact: true }).click();
+    await expect(name).toBeEnabled();
+    if (framework === 'angular') await expect(page.getByTestId('touched')).toHaveText('true');
+    await page.getByRole('button', { name: 'Reset from app', exact: true }).click();
+    await expect(name).toHaveValue('Initial');
+    await expect(page.getByRole('checkbox', { name: 'Subscribe', exact: true })).not.toBeChecked();
+    await expect(page.getByTestId('checked')).toHaveText('false');
+    if (framework === 'angular') await expect(page.getByTestId('touched')).toHaveText('false');
+  });
+}

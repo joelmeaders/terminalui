@@ -9,8 +9,17 @@ export interface SelectOption {
 /** Native select with a reactive options property and standard form participation. */
 export class TSelect extends FormControl {
   static properties = { options: { attribute: false } };
+  /** Available choices. Replace this array to update options. */
   options: SelectOption[] = [];
   static styles = fieldStyles;
+  protected syncForm() {
+    super.syncForm();
+    const select = this.control as HTMLSelectElement | null;
+    const option = select?.selectedOptions[0];
+    this.internals.setFormValue(
+      this.isDisabled || !option || option.disabled ? null : option.value,
+    );
+  }
   render() {
     return html`<label
         ><span class="label"
@@ -38,7 +47,7 @@ export class TSelect extends FormControl {
     super.updated(changed);
   }
 }
-customElements.define('t-select', TSelect);
+if (!customElements.get('t-select')) customElements.define('t-select', TSelect);
 declare global {
   interface HTMLElementTagNameMap {
     't-select': TSelect;
