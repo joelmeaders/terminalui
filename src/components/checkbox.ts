@@ -32,7 +32,8 @@ export class TCheckbox extends FormControl {
         appearance: none;
         width: 36px;
         height: 20px;
-        border: 1px solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-border);
+        box-shadow: var(--_t-edge-glow);
         background: var(--t-raised);
         position: relative;
       }
@@ -43,15 +44,15 @@ export class TCheckbox extends FormControl {
         height: 12px;
         background: var(--t-muted);
         position: absolute;
-        top: 3px;
-        left: 3px;
+        top: calc(4px - var(--t-line-width, 1px));
+        left: calc(4px - var(--t-line-width, 1px));
       }
       :host([switch]) input:checked {
         border-color: var(--t-accent);
       }
       :host([switch]) input:checked::before {
         background: var(--t-accent);
-        left: 19px;
+        left: calc(20px - var(--t-line-width, 1px));
       }
       @media (forced-colors: active) {
         :host([switch]) input {

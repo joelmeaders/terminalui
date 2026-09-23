@@ -29,8 +29,9 @@ export class TAlert extends TerminalElement {
         --notice: var(--t-danger);
       }
       .notice {
-        border: 1px solid var(--t-border);
-        border-left: 3px solid var(--notice);
+        border: var(--t-line-width, 1px) solid var(--t-border);
+        box-shadow: var(--_t-edge-glow);
+        border-left: var(--t-emphasis-width, 3px) solid var(--notice);
         padding: 14px 16px;
         display: flex;
         align-items: flex-start;

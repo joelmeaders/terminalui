@@ -143,11 +143,26 @@ test('demo preferences persist and form submission reports real values', async (
 for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {
   test(`theme ${theme}: automated accessibility and responsive layout`, async ({ page }) => {
     await page.goto('/');
-    await page.locator('html').evaluate((el, theme) => (el.dataset.theme = theme), theme);
+    await page
+      .getByRole('button', { name: theme[0].toUpperCase() + theme.slice(1), exact: true })
+      .click();
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
       .analyze();
     expect(results.violations).toEqual([]);
+    await page.getByRole('checkbox', { name: 'Bold lines', exact: true }).check();
+    await page.locator('.display-settings summary').click();
+    await page.getByRole('combobox', { name: 'Phosphor glow', exact: true }).selectOption('strong');
+    await page
+      .getByRole('combobox', { name: 'Screen scanlines', exact: true })
+      .selectOption('pronounced');
+    expect(
+      (
+        await new AxeBuilder({ page })
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+          .analyze()
+      ).violations,
+    ).toEqual([]);
     await page.setViewportSize({ width: 390, height: 844 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,

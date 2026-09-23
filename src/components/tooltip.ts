@@ -17,7 +17,8 @@ export class TTooltip extends TerminalElement {
         width: 28px;
         height: 28px;
         background: transparent;
-        border: 1px solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-border);
+        box-shadow: var(--_t-edge-glow);
         color: var(--t-accent);
         font-size: 12px;
       }
@@ -28,12 +29,14 @@ export class TTooltip extends TerminalElement {
         left: 0;
         width: 220px;
         max-width: calc(100vw - 48px);
-        border: 1px solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-border);
         padding: 10px 12px;
         background: var(--t-raised);
         color: var(--t-text);
         font-size: 11px;
-        box-shadow: 0 5px 20px #0004;
+        box-shadow:
+          var(--_t-edge-glow),
+          0 5px 20px #0004;
       }
     `,
   ];

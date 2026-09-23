@@ -24,7 +24,8 @@ export class TProgress extends TerminalElement {
       progress {
         display: block;
         appearance: none;
-        border: 1px solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-border);
+        box-shadow: var(--_t-edge-glow);
         width: 100%;
         height: 12px;
         background: var(--t-bg);

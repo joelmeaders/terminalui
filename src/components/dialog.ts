@@ -10,13 +10,15 @@ export class TDialog extends TerminalElement {
     baseStyles,
     css`
       dialog {
-        border: 1px solid var(--t-accent);
+        border: var(--t-line-width, 1px) solid var(--t-accent);
         padding: 0;
         background: var(--t-surface);
         color: var(--t-text);
         width: min(520px, calc(100vw - 32px));
         max-height: calc(100dvh - 32px);
-        box-shadow: 0 24px 100px #0008;
+        box-shadow:
+          var(--_t-edge-glow),
+          0 24px 100px #0008;
       }
       dialog::backdrop {
         background: rgb(0 0 0 / 0.72);
@@ -26,7 +28,7 @@ export class TDialog extends TerminalElement {
         gap: 20px;
         align-items: center;
         justify-content: space-between;
-        border-bottom: 1px solid var(--t-border);
+        border-bottom: var(--t-divider-width, 1px) solid var(--t-border);
         padding: 14px 20px;
         background: var(--t-raised);
       }

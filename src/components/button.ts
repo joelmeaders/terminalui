@@ -26,7 +26,8 @@ export class TButton extends TerminalElement {
         gap: 10px;
         min-height: var(--t-control-height, 42px);
         padding: 9px 17px;
-        border: 1px solid var(--t-accent);
+        border: var(--t-line-width, 1px) solid var(--t-accent);
+        box-shadow: var(--_t-edge-glow);
         border-radius: 0;
         color: var(--t-on-accent);
         background: var(--t-accent);

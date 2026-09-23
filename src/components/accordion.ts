@@ -10,7 +10,8 @@ export class TAccordion extends TerminalElement {
     css`
       :host {
         display: block;
-        border: 1px solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-border);
+        box-shadow: var(--_t-edge-glow);
         background: var(--t-surface);
       }
       summary {

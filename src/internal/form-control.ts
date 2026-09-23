@@ -23,7 +23,8 @@ export const fieldStyles = [
       width: 100%;
       min-height: var(--t-control-height, 42px);
       padding: 10px 12px;
-      border: 1px solid var(--t-border);
+      border: var(--t-line-width, 1px) solid var(--t-border);
+      box-shadow: var(--_t-edge-glow);
       border-radius: 0;
       background: var(--t-bg);
       color: var(--t-text);

@@ -14,14 +14,26 @@ const themes = [
 ];
 let theme = 'amber';
 let compact = false;
-let effects = false;
+let lines = 'standard';
+let glow = 'off';
+let scanlines = 'off';
 let formMessage = '';
 let saved = false;
 try {
   const prefs = JSON.parse(localStorage.getItem('terminal-kit') || '{}');
   theme = themes.some((t) => t.id === prefs.theme) ? prefs.theme : 'amber';
   compact = !!prefs.compact;
-  effects = !!prefs.effects;
+  lines = prefs.lines === 'bold' ? 'bold' : 'standard';
+  glow = ['off', 'subtle', 'strong'].includes(prefs.glow)
+    ? prefs.glow
+    : prefs.effects
+      ? 'subtle'
+      : 'off';
+  scanlines = ['off', 'subtle', 'pronounced'].includes(prefs.scanlines)
+    ? prefs.scanlines
+    : prefs.effects
+      ? 'subtle'
+      : 'off';
 } catch {
   /* Storage is optional. */
 }
@@ -42,9 +54,13 @@ function preferences() {
   const root = document.documentElement;
   root.dataset.theme = theme;
   root.dataset.density = compact ? 'compact' : 'comfortable';
-  root.dataset.effects = effects ? 'crt' : 'clean';
+  root.dataset.lines = lines;
+  root.dataset.glow = glow;
   try {
-    localStorage.setItem('terminal-kit', JSON.stringify({ theme, compact, effects }));
+    localStorage.setItem(
+      'terminal-kit',
+      JSON.stringify({ theme, compact, lines, glow, scanlines }),
+    );
   } catch {
     /* Work without persistence. */
   }
@@ -115,7 +131,7 @@ function draw() {
                 ><span>ONE SHARED SYSTEM</span>
               </div>
             </div>
-            <div class="hero-instrument" aria-hidden="true">
+            <div class="hero-instrument t-screen" data-scanlines=${scanlines} aria-hidden="true">
               <div class="instrument-top"><span>DISPLAY CALIBRATION</span><span>CH / 01</span></div>
               <svg viewBox="0 0 320 136" fill="none">
                 <defs>
@@ -164,13 +180,13 @@ function draw() {
               <label
                 ><input
                   type="checkbox"
-                  .checked=${effects}
+                  .checked=${lines === 'bold'}
                   @change=${(e: Event) => {
-                    effects = (e.target as HTMLInputElement).checked;
+                    lines = (e.target as HTMLInputElement).checked ? 'bold' : 'standard';
                     preferences();
                   }}
                 />
-                CRT texture</label
+                Bold lines</label
               ><label
                 ><input
                   type="checkbox"
@@ -184,6 +200,59 @@ function draw() {
               >
             </div>
           </section>
+          <details class="display-settings">
+            <summary>Display effects <span>GLOW / SCANLINES</span></summary>
+            <div class="display-options">
+              <label
+                >Phosphor glow
+                <select
+                  class="t-native"
+                  .value=${glow}
+                  @change=${(event: Event) => {
+                    glow = (event.target as HTMLSelectElement).value;
+                    preferences();
+                  }}
+                >
+                  <option value="off" ?selected=${glow === 'off'}>Off</option>
+                  <option value="subtle" ?selected=${glow === 'subtle'}>Subtle</option>
+                  <option value="strong" ?selected=${glow === 'strong'}>Strong</option>
+                </select>
+              </label>
+              <label
+                >Screen scanlines
+                <select
+                  class="t-native"
+                  .value=${scanlines}
+                  @change=${(event: Event) => {
+                    scanlines = (event.target as HTMLSelectElement).value;
+                    preferences();
+                  }}
+                >
+                  <option value="off" ?selected=${scanlines === 'off'}>Off</option>
+                  <option value="subtle" ?selected=${scanlines === 'subtle'}>Subtle</option>
+                  <option value="pronounced" ?selected=${scanlines === 'pronounced'}>
+                    Pronounced
+                  </option>
+                </select>
+              </label>
+              <p>
+                Scanlines apply to the calibration display and event log. Each screen can have its
+                own setting.
+              </p>
+              <button
+                class="t-native"
+                type="button"
+                @click=${() => {
+                  lines = 'standard';
+                  glow = 'off';
+                  scanlines = 'off';
+                  preferences();
+                }}
+              >
+                Reset display styles
+              </button>
+            </div>
+          </details>
           <div class="section-heading">
             <h2>Component inventory</h2>
             <span><span class="status-dot"></span> LIVE / INTERACTIVE</span>
@@ -357,7 +426,12 @@ function draw() {
               ></t-card
             >
           </div>
-          <div class="event-console" role="status" aria-live="polite">
+          <div
+            class="event-console t-screen"
+            data-scanlines=${scanlines}
+            role="status"
+            aria-live="polite"
+          >
             <span class="console-prefix">&gt; EVENT LOG</span
             ><span>${formMessage || 'Awaiting input. Try a component above.'}</span
             ><span class="cursor" aria-hidden="true">▌</span>

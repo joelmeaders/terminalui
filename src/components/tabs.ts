@@ -20,7 +20,7 @@ export class TTabs extends TerminalElement {
       [role='tablist'] {
         display: flex;
         gap: 0;
-        border-bottom: 1px solid var(--t-border);
+        border-bottom: var(--t-divider-width, 1px) solid var(--t-border);
         overflow-x: auto;
         padding: 4px 4px 0;
       }
@@ -28,7 +28,7 @@ export class TTabs extends TerminalElement {
         flex: none;
         background: transparent;
         border: 0;
-        border-bottom: 2px solid transparent;
+        border-bottom: var(--t-selection-width, 2px) solid transparent;
         color: var(--t-muted);
         padding: 12px 18px;
         font-size: 11px;
@@ -38,6 +38,7 @@ export class TTabs extends TerminalElement {
       button[aria-selected='true'] {
         color: var(--t-accent);
         border-bottom-color: var(--t-accent);
+        box-shadow: var(--_t-edge-glow);
         background: var(--t-raised);
       }
       button:focus-visible {

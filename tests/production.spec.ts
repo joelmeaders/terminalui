@@ -1,4 +1,19 @@
 import { test, expect } from '@playwright/test';
+for (const width of [1440, 390]) {
+  test(`default component appearance: ${width}`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/');
+    // Keep the original vertical raster alignment; the new settings row is outside this reference.
+    await page.locator('.display-settings').evaluate((el: HTMLElement) => {
+      el.style.display = 'none';
+    });
+    await expect(page.locator('.component-grid')).toHaveScreenshot(`base-components-${width}.png`, {
+      animations: 'disabled',
+      maxDiffPixelRatio: 0.002,
+    });
+  });
+}
+
 test('production demo retains component registration and working interactions', async ({
   page,
 }) => {
@@ -10,7 +25,9 @@ test('production demo retains component registration and working interactions', 
   await page.getByRole('button', { name: 'Paper', exact: true }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper');
   await page.getByRole('textbox', { name: 'Callsign', exact: false }).fill('PRODUCTION');
-  await page.getByRole('combobox').selectOption('application');
+  await page
+    .getByRole('combobox', { name: 'Destination', exact: false })
+    .selectOption('application');
   await page.getByRole('textbox', { name: 'Callsign', exact: false }).press('Enter');
   await expect(page.locator('.event-console')).toContainText('PRODUCTION / application');
   expect(errors).toEqual([]);
@@ -24,6 +41,12 @@ test('built Storybook serves documentation and the real component canvas', async
   await expect(page.getByRole('textbox')).toBeVisible();
   await page.getByRole('textbox').fill('Built story');
   await expect(page.getByRole('textbox')).toHaveValue('Built story');
+  await page.goto(
+    '/storybook/iframe.html?id=components-button--secondary&viewMode=story&globals=theme:phosphor;lines:bold;glow:subtle;scanlines:pronounced',
+  );
+  await expect(page.locator('t-button button')).toHaveCSS('border-top-width', '2px');
+  await expect(page.locator('.t-screen')).toHaveAttribute('data-glow', 'subtle');
+  await expect(page.locator('.t-screen')).toHaveAttribute('data-scanlines', 'pronounced');
 });
 
 for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {
@@ -57,3 +80,43 @@ test('visual reference: mobile and dialog', async ({ page }) => {
     maxDiffPixelRatio: 0.002,
   });
 });
+
+for (const profile of [
+  { name: 'bold-amber', theme: 'Amber', glow: 'off', scanlines: 'off', width: 1440 },
+  {
+    name: 'phosphor-screen',
+    theme: 'Phosphor',
+    glow: 'subtle',
+    scanlines: 'pronounced',
+    width: 1440,
+  },
+  {
+    name: 'paper-effects-mobile',
+    theme: 'Paper',
+    glow: 'strong',
+    scanlines: 'pronounced',
+    width: 390,
+  },
+]) {
+  test(`visual effects: ${profile.name}`, async ({ page }) => {
+    await page.setViewportSize({ width: profile.width, height: 1000 });
+    await page.goto('/');
+    await page.getByRole('button', { name: profile.theme, exact: true }).click();
+    await page.getByRole('checkbox', { name: 'Bold lines', exact: true }).check();
+    await page.locator('.display-settings summary').click();
+    await page
+      .getByRole('combobox', { name: 'Phosphor glow', exact: true })
+      .selectOption(profile.glow);
+    await page
+      .getByRole('combobox', { name: 'Screen scanlines', exact: true })
+      .selectOption(profile.scanlines);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+    await expect(page).toHaveScreenshot(`${profile.name}.png`, {
+      fullPage: true,
+      animations: 'disabled',
+      maxDiffPixelRatio: 0.002,
+    });
+  });
+}

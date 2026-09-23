@@ -15,7 +15,8 @@ export class TBadge extends TerminalElement {
         align-items: center;
         gap: 7px;
         padding: 3px 8px;
-        border: 1px solid currentColor;
+        border: var(--t-line-width, 1px) solid currentColor;
+        box-shadow: var(--_t-edge-glow);
         color: var(--t-muted);
         font-size: 10px;
         line-height: 1.4;

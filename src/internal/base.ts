@@ -7,6 +7,10 @@ export const baseStyles = css`
     color: var(--t-text, #eee9d9);
     font-size: var(--t-font-size, 14px);
     line-height: 1.5;
+    --_t-edge-glow: 0 0 var(--t-glow-blur, 0px)
+      color-mix(in srgb, var(--t-accent) var(--t-glow-strength, 0%), transparent);
+    text-shadow: 0 0 var(--t-glow-blur, 0px)
+      color-mix(in srgb, currentColor var(--t-glow-strength, 0%), transparent);
   }
   *,
   *::before,
@@ -21,6 +25,7 @@ export const baseStyles = css`
   select,
   textarea {
     font: inherit;
+    text-shadow: inherit;
   }
   button {
     cursor: pointer;
@@ -45,6 +50,11 @@ export const baseStyles = css`
     }
   }
   @media (forced-colors: active) {
+    :host,
+    * {
+      text-shadow: none !important;
+      box-shadow: none !important;
+    }
     button,
     input,
     select {

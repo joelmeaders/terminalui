@@ -7,7 +7,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Terminal Kit is a Lit proof of concept with 12 components and six themes. Choose a theme or density from the toolbar. Stories show supported states and execute interaction checks. See the repository README for browser, React, Vue, and Angular examples and the POC limitations.',
+          'Terminal Kit is a Lit proof of concept with 12 components and six themes. Choose palette, density, line weight, glow, and scanlines from the toolbar. The Appearance stories show presets and local overrides. See the repository README for browser, React, Vue, and Angular examples and the POC limitations.',
       },
     },
   },

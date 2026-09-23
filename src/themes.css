@@ -93,20 +93,105 @@
   --t-control-height: 34px;
   --t-space: 12px;
 }
-[data-effects='crt'] {
-  text-shadow: 0 0 9px color-mix(in srgb, var(--t-accent) 18%, transparent);
+[data-density='comfortable'] {
+  --t-control-height: 42px;
+  --t-space: 16px;
 }
-[data-effects='crt']::after {
+
+/* Appearance axes are independent of palettes. Omission keeps the original look. */
+:root,
+[data-lines='standard'] {
+  --t-line-width: 1px;
+  --t-divider-width: 1px;
+  --t-emphasis-width: 3px;
+  --t-selection-width: 2px;
+}
+[data-lines='bold'] {
+  --t-line-width: 2px;
+  --t-divider-width: 2px;
+  --t-emphasis-width: 4px;
+  --t-selection-width: 3px;
+}
+:root,
+[data-glow='off'] {
+  --t-glow-blur: 0px;
+  --t-glow-strength: 0%;
+}
+[data-effects='crt']:not([data-glow]),
+[data-glow='subtle'] {
+  --t-glow-blur: 5px;
+  --t-glow-strength: 22%;
+}
+[data-glow='strong'] {
+  --t-glow-blur: 9px;
+  --t-glow-strength: 40%;
+}
+/* Resolve palette colors at the surface, so nested palettes also tint their glow. */
+[data-theme],
+[data-glow],
+[data-effects='crt'],
+.t-native,
+.t-screen {
+  --_t-edge-glow: 0 0 var(--t-glow-blur, 0px)
+    color-mix(in srgb, var(--t-accent) var(--t-glow-strength, 0%), transparent);
+  text-shadow: 0 0 var(--t-glow-blur, 0px)
+    color-mix(in srgb, currentColor var(--t-glow-strength, 0%), transparent);
+}
+
+/* Texture is painted once over an explicit surface, never over each control. */
+.t-screen {
+  position: relative;
+  isolation: isolate;
+}
+.t-screen[data-scanlines='subtle'],
+.t-screen[data-effects='crt'],
+:root[data-effects='crt'] {
+  --t-scanline-opacity: 0.045;
+}
+.t-screen[data-scanlines='pronounced'],
+:root[data-effects='crt'][data-scanlines='pronounced'] {
+  --t-scanline-opacity: 0.09;
+}
+.t-screen:is([data-scanlines='subtle'], [data-scanlines='pronounced'], [data-effects='crt'])::after,
+:root[data-effects='crt']::after {
   content: '';
-  position: fixed;
+  position: absolute;
   inset: 0;
   pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0 calc(var(--t-scanline-spacing, 4px) - 1px),
+    rgb(0 0 0 / var(--t-scanline-opacity, 0.045)) calc(var(--t-scanline-spacing, 4px) - 1px)
+      var(--t-scanline-spacing, 4px)
+  );
+}
+:root[data-effects='crt']::after {
+  position: fixed;
   z-index: 100;
-  background: repeating-linear-gradient(0deg, transparent 0 3px, rgb(0 0 0 / 0.045) 3px 4px);
+}
+.t-screen[data-scanlines='off']::after,
+:root[data-effects='crt'][data-scanlines='off']::after,
+.t-screen:is([data-scanlines='subtle'], [data-scanlines='pronounced'], [data-effects='crt']):not(
+    [data-scanlines='off']
+  )
+  .t-screen::after,
+:root[data-effects='crt']:not([data-scanlines='off']) .t-screen::after {
+  display: none;
 }
 @media (forced-colors: active) {
-  [data-effects='crt']::after {
+  .t-screen::after,
+  :root[data-effects='crt']::after {
     display: none;
+  }
+  [data-theme],
+  [data-glow],
+  [data-effects],
+  .t-native,
+  .t-screen {
+    text-shadow: none !important;
+    box-shadow: none !important;
   }
 }
 
@@ -116,7 +201,8 @@
   font: inherit;
   color: var(--t-text);
   background: var(--t-bg);
-  border: 1px solid var(--t-border);
+  border: var(--t-line-width, 1px) solid var(--t-border);
+  box-shadow: var(--_t-edge-glow);
   border-radius: 0;
   padding: 10px 12px;
   min-height: var(--t-control-height);

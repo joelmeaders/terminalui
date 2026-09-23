@@ -131,11 +131,58 @@ Palettes: `amber`, `phosphor`, `ice`, `lunar`, `signal`, and `paper`. Apply `dat
 }
 ```
 
-The complete token set is in [src/themes.css](src/themes.css). Use documented CSS parts for targeted changes, for example `t-card::part(body)`. Set `data-density="compact"` for smaller controls. The optional `data-effects="crt"` setting is designed for the document root and adds static scanlines. It is off by default. Fonts use local system fallbacks, with no external font downloads.
+The complete token set is in [src/themes.css](src/themes.css). Use documented CSS parts for targeted changes, for example `t-card::part(body)`. Fonts use local system fallbacks, with no external font downloads.
+
+### Display styles
+
+Appearance settings are independent. Omitting them preserves the base appearance.
+
+| Setting          | Values                                  | Scope                                |
+| ---------------- | --------------------------------------- | ------------------------------------ |
+| `data-theme`     | The six palettes above                  | Page, subtree, or component          |
+| `data-lines`     | `standard` (default), `bold`            | Inherited borders and dividers       |
+| `data-glow`      | `off` (default), `subtle`, `strong`     | Inherited text and surface glow      |
+| `data-density`   | `comfortable` (default), `compact`      | Inherited spacing and control height |
+| `data-scanlines` | `off` (default), `subtle`, `pronounced` | One explicit `.t-screen` region      |
+
+```html
+<main data-theme="phosphor" data-lines="bold" data-glow="subtle">
+  <t-button>Initialize</t-button>
+  <section class="t-screen" data-scanlines="subtle">
+    <t-card>System telemetry</t-card>
+  </section>
+  <section data-lines="standard" data-glow="off">
+    <t-input label="Clear editing area"></t-input>
+  </section>
+</main>
+```
+
+Change an attribute to update the display. This needs no JavaScript configuration service, framework adapter, or component re-render. Line and glow settings also work on individual custom elements and `.t-native` controls. A nested palette supplies its own glow color. Focus outlines remain distinct from decorative borders.
+
+Scanlines use one static overlay on the `.t-screen` surface. The surface creates a positioning and stacking context, but does not clip overflowing tooltips or focus outlines. The overlay stays within its bounds and does not intercept pointer input. Nested screens do not add another overlay when an ancestor screen already has texture. An inner `data-scanlines="off"` cannot erase its ancestor's overlay; place clear content outside that screen. Native modal dialogs appear above screen overlays.
+
+The existing `data-effects="crt"` attribute remains a convenience preset for subtle glow and scanlines. On the document root it retains a viewport overlay. On `.t-screen` it applies to that region. Explicit `data-glow` and `data-scanlines` values override the preset. Prefer the independent settings for new integrations.
+
+For custom styling, adjust the public variables in your own selector or inline style:
+
+| Variable               | Standard/off value | Bold/subtle value            |
+| ---------------------- | ------------------ | ---------------------------- |
+| `--t-line-width`       | `1px`              | `2px`                        |
+| `--t-divider-width`    | `1px`              | `2px`                        |
+| `--t-emphasis-width`   | `3px`              | `4px`                        |
+| `--t-selection-width`  | `2px`              | `3px`                        |
+| `--t-glow-blur`        | `0px`              | `5px` (strong: `9px`)        |
+| `--t-glow-strength`    | `0%`               | `22%` (strong: `40%`)        |
+| `--t-scanline-opacity` | No overlay         | `0.045` (pronounced: `0.09`) |
+| `--t-scanline-spacing` | `4px`              | `4px`                        |
+
+Variables beginning with `--_t-` are internal. Glow and scanlines turn off in forced-colors mode. The effects do not animate. Review text contrast and focus visibility when creating custom presets.
+
+The demo exposes **Bold lines** beside the palettes and **Display effects** below them. Scanlines apply to the calibration display and event log. Preferences persist locally; saved CRT preferences migrate automatically. **Reset display styles** restores standard lines and removes glow and scanlines while keeping palette and density.
 
 ## Storybook and verification
 
-Storybook includes 43 stories across all twelve components, an introduction, and a complete form pattern. Its toolbar changes palette and density. Docs describe slots, events, CSS parts, and form behavior. Stories include interaction checks, and the accessibility addon is configured to fail tests on detected violations.
+Storybook includes 49 stories across all twelve components, introductions, appearance examples, and a complete form pattern. Its toolbar changes palette, density, line weight, glow, and screen scanlines. Appearance stories also demonstrate local overrides and the CRT preset. Docs describe slots, events, CSS parts, and form behavior. Stories include interaction checks, and the accessibility addon is configured to fail tests on detected violations.
 
 ```sh
 npm run typecheck
@@ -149,7 +196,7 @@ npm run format:check
 
 `npm run check` runs the full validation sequence. No tests contact application backends or alter external data.
 
-Production tests also compare saved screenshots for all six palettes, a mobile layout, and a modal dialog. The committed reference images use Playwright Chromium on Windows. Review intentional visual changes before regenerating references with `npx playwright test --config playwright.production.config.ts --update-snapshots`. Other operating systems need their own reviewed reference images.
+Production tests compare saved screenshots for all six palettes, a mobile layout, a modal dialog, and selected display styles. Separate component-area references preserve the original appearance at desktop and mobile sizes. Browser tests cover nested overrides, texture boundaries, persistence, forced colors, and accessibility with effects enabled. The committed reference images use Playwright Chromium on Windows. Review intentional visual changes before regenerating references with `npx playwright test --config playwright.production.config.ts --update-snapshots`. Other operating systems need their own reviewed reference images.
 
 `npm run build:site` creates a combined static demo and Storybook in `demo-dist/`. `npm run preview` serves it locally. The core package output remains separate in `dist/`; consumers do not download Storybook.
 

@@ -7,7 +7,8 @@ export class TCard extends TerminalElement {
     css`
       :host {
         display: block;
-        border: 1px solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-border);
+        box-shadow: var(--_t-edge-glow);
         background: var(--t-surface);
       }
       .heading {
@@ -15,7 +16,7 @@ export class TCard extends TerminalElement {
         justify-content: space-between;
         align-items: center;
         padding: 12px var(--t-space);
-        border-bottom: 1px solid var(--t-border);
+        border-bottom: var(--t-divider-width, 1px) solid var(--t-border);
         background: var(--t-raised);
         font-size: 11px;
         letter-spacing: 0.12em;
@@ -26,7 +27,7 @@ export class TCard extends TerminalElement {
       }
       .footer {
         padding: 12px var(--t-space);
-        border-top: 1px solid var(--t-border);
+        border-top: var(--t-divider-width, 1px) solid var(--t-border);
         color: var(--t-muted);
         font-size: 11px;
       }
