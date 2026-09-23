@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Component test fixture</title>
+    <link rel="stylesheet" href="/src/themes.css" />
+  </head>
+  <body
+    style="background: var(--t-bg); color: var(--t-text); font-family: var(--t-font); padding: 32px"
+  >
+    <main id="fixture"></main>
+    <script type="module">
+      import '/src/index.ts';
+      document.body.dataset.ready = 'true';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+body {
+  background: var(--t-bg);
+  color: var(--t-text);
+  font: 14px/1.6 var(--t-font);
+  padding: 32px;
+}
+main {
+  max-width: 520px;
+  margin: auto;
+}
+t-button,
+output {
+  display: block;
+  margin-top: 20px;
+}

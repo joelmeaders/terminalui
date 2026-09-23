@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en" data-theme="amber">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Terminal Kit — Plain HTML</title>
+    <link rel="stylesheet" href="../dist/themes.css" />
+  </head>
+  <body
+    style="background: var(--t-bg); color: var(--t-text); font-family: var(--t-font); padding: 32px"
+  >
+    <main>
+      <h1>Plain HTML</h1>
+      <form>
+        <t-input label="Name" name="name" value="Initial"></t-input
+        ><t-button id="update">Update from app</t-button
+        ><button class="t-native" type="submit">Save</button><output>Initial</output>
+      </form>
+    </main>
+    <script type="module">
+      import '../dist/terminal.js';
+      const input = document.querySelector('t-input');
+      const output = document.querySelector('output');
+      input.addEventListener('input', () => (output.textContent = input.value));
+      document.querySelector('#update').addEventListener('click', () => {
+        input.value = 'Updated';
+        output.textContent = input.value;
+      });
+      document.querySelector('form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        output.textContent = `Saved: ${new FormData(event.target).get('name')}`;
+      });
+    </script>
+  </body>
+</html>

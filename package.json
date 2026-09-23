@@ -1,0 +1,75 @@
+{
+  "name": "@terminal-kit/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Terminal-inspired Lit components for the everyday web.",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css",
+    "**/components/*",
+    "**/index.*",
+    "**/terminal.js"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./components/*": {
+      "types": "./dist/components/*.d.ts",
+      "import": "./dist/components/*.js"
+    },
+    "./themes.css": "./dist/themes.css",
+    "./terminal.js": "./dist/terminal.js"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "build": "node scripts/build.mjs",
+    "build:demo": "vite build",
+    "build:site": "npm run build:demo && npm run build:storybook && node scripts/site.mjs",
+    "storybook": "storybook dev -p 6006 --host 127.0.0.1 --no-open",
+    "build:storybook": "storybook build",
+    "test": "playwright test",
+    "test:stories": "vitest run --config vitest.config.ts",
+    "size": "node scripts/size.mjs",
+    "check": "npm run format:check && npm run typecheck && npm run build && npm test && npm run test:stories && npm run test:production && npm run size",
+    "preview": "vite preview --host 127.0.0.1",
+    "test:production": "npm run build:site && playwright test --config playwright.production.config.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "lit": "3.3.3"
+  },
+  "devDependencies": {
+    "@angular/common": "22.1.7",
+    "@angular/compiler": "22.1.7",
+    "@angular/core": "22.1.7",
+    "@angular/forms": "22.1.7",
+    "@angular/platform-browser": "22.1.7",
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.63.0",
+    "@storybook/addon-a11y": "10.6.0",
+    "@storybook/addon-docs": "10.6.0",
+    "@storybook/addon-vitest": "10.6.0",
+    "@storybook/web-components-vite": "10.6.0",
+    "@types/node": "26.6.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitest/browser-playwright": "4.1.11",
+    "esbuild": "0.28.2",
+    "prettier": "3.9.9",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "rxjs": "7.8.2",
+    "storybook": "10.6.0",
+    "typescript": "5.9.3",
+    "vite": "8.3.0",
+    "vitest": "4.1.11",
+    "vue": "3.5.43"
+  }
+}

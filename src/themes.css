@@ -1,0 +1,134 @@
+:root,
+[data-theme='amber'] {
+  color-scheme: dark;
+  --t-bg: #121411;
+  --t-surface: #191d18;
+  --t-raised: #20261e;
+  --t-text: #eee9d9;
+  --t-muted: #aaae9e;
+  --t-border: #59614e;
+  --t-accent: #f5ba5b;
+  --t-on-accent: #19180e;
+  --t-focus: #ffe0a2;
+  --t-success: #b4d995;
+  --t-warning: #f5ba5b;
+  --t-danger: #ff9a89;
+  --t-font: 'IBM Plex Mono', 'Cascadia Code', 'SFMono-Regular', Consolas, monospace;
+  --t-font-size: 14px;
+  --t-control-height: 42px;
+  --t-space: 16px;
+}
+[data-theme='phosphor'] {
+  --t-bg: #0d1610;
+  --t-surface: #132019;
+  --t-raised: #1c2c20;
+  --t-text: #ddf2dc;
+  --t-muted: #a0bea3;
+  --t-border: #52785b;
+  --t-accent: #a6ed91;
+  --t-on-accent: #122012;
+  --t-focus: #d0ffc2;
+  --t-success: #a6ed91;
+  --t-warning: #f4d281;
+  --t-danger: #ffa396;
+}
+[data-theme='ice'] {
+  --t-bg: #10181c;
+  --t-surface: #17232a;
+  --t-raised: #20303a;
+  --t-text: #e0edf2;
+  --t-muted: #a2bcc9;
+  --t-border: #577787;
+  --t-accent: #8edbe9;
+  --t-on-accent: #11232a;
+  --t-focus: #ccf7ff;
+  --t-success: #a9dda9;
+  --t-warning: #f6d287;
+  --t-danger: #ffa69b;
+}
+[data-theme='lunar'] {
+  --t-bg: #17171c;
+  --t-surface: #212128;
+  --t-raised: #2c2c35;
+  --t-text: #eeedf4;
+  --t-muted: #b6b3c5;
+  --t-border: #747180;
+  --t-accent: #c6baf2;
+  --t-on-accent: #201a32;
+  --t-focus: #e8dfff;
+  --t-success: #b0dfbd;
+  --t-warning: #edd58c;
+  --t-danger: #ffaaa4;
+}
+[data-theme='signal'] {
+  --t-bg: #11191a;
+  --t-surface: #182325;
+  --t-raised: #223033;
+  --t-text: #e6edeb;
+  --t-muted: #a6bdb9;
+  --t-border: #577b77;
+  --t-accent: #eef2e8;
+  --t-on-accent: #15231f;
+  --t-focus: #b6f2df;
+  --t-success: #a9dfc8;
+  --t-warning: #f0ce83;
+  --t-danger: #ffa49b;
+}
+[data-theme='paper'] {
+  color-scheme: light;
+  --t-bg: #edeadd;
+  --t-surface: #f8f5ea;
+  --t-raised: #e2dfd1;
+  --t-text: #252d27;
+  --t-muted: #56614f;
+  --t-border: #828774;
+  --t-accent: #3b5038;
+  --t-on-accent: #fffdf3;
+  --t-focus: #304f94;
+  --t-success: #28633c;
+  --t-warning: #79520d;
+  --t-danger: #a43127;
+}
+[data-density='compact'] {
+  --t-control-height: 34px;
+  --t-space: 12px;
+}
+[data-effects='crt'] {
+  text-shadow: 0 0 9px color-mix(in srgb, var(--t-accent) 18%, transparent);
+}
+[data-effects='crt']::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgb(0 0 0 / 0.045) 3px 4px);
+}
+@media (forced-colors: active) {
+  [data-effects='crt']::after {
+    display: none;
+  }
+}
+
+/* Optional native controls use the same tokens as the custom elements. */
+.t-native {
+  box-sizing: border-box;
+  font: inherit;
+  color: var(--t-text);
+  background: var(--t-bg);
+  border: 1px solid var(--t-border);
+  border-radius: 0;
+  padding: 10px 12px;
+  min-height: var(--t-control-height);
+  accent-color: var(--t-accent);
+}
+.t-native:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: 3px;
+}
+button.t-native {
+  cursor: pointer;
+  background: var(--t-accent);
+  color: var(--t-on-accent);
+  font-weight: 600;
+}
