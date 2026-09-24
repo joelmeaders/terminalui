@@ -1,5 +1,5 @@
 import { html } from 'lit';
-import type { TDrawer, TToast } from '../src/index';
+import type { SpinnerType, TDrawer, TToast } from '../src/index';
 
 const destinations = [
   { value: 'archive', label: 'Archive' },
@@ -19,6 +19,20 @@ let saved = '';
 let notificationCountdown: TToast['countdown'] = 'bar';
 let notificationUnit: TToast['countdownUnit'] = 'seconds';
 let notificationDuration = 5000;
+let spinnerType: SpinnerType = 'ring';
+let spinnerSteps: 6 | 8 = 8;
+const spinnerOptions = [
+  { value: 'ring', label: 'Modern / Ring' },
+  { value: 'dots', label: 'Modern / Dots' },
+  { value: 'bars', label: 'Modern / Bars' },
+  { value: 'pulse', label: 'Modern / Pulse' },
+  { value: 'orbit', label: 'Modern / Orbit' },
+  { value: 'cursor', label: 'Terminal / Cursor' },
+  { value: 'cursor-box', label: 'Terminal / Cursor box' },
+  { value: 'arrow', label: 'Terminal / Stepped arrow' },
+  { value: 'pixels', label: 'Terminal / Pixels' },
+  { value: 'blocks', label: 'Terminal / Blocks' },
+];
 
 export function library(refresh: () => void, log: (message: string) => void) {
   return html`
@@ -259,9 +273,40 @@ export function library(refresh: () => void, log: (message: string) => void) {
           ><span slot="heading">12 / Loading & empty states</span>
           <t-stack
             ><div class="row">
-              <t-spinner label="Loading example" size="small"></t-spinner
+              <t-spinner
+                label="Loading example"
+                size="large"
+                .type=${spinnerType}
+                .steps=${spinnerSteps}
+              ></t-spinner
               ><span class="tiny">LOADING PREVIEW</span>
             </div>
+            <t-select
+              label="Spinner style"
+              .value=${spinnerType}
+              .options=${spinnerOptions}
+              @change=${(event: Event) => {
+                spinnerType = (event.currentTarget as HTMLSelectElement).value as SpinnerType;
+                refresh();
+              }}
+            ></t-select>
+            ${
+              spinnerType === 'arrow'
+                ? html`<t-select
+                    label="Arrow positions"
+                    .value=${String(spinnerSteps)}
+                    .options=${[
+                      { value: '8', label: '8 positions' },
+                      { value: '6', label: '6 positions' },
+                    ]}
+                    @change=${(event: Event) => {
+                      spinnerSteps = Number((event.currentTarget as HTMLSelectElement).value) as
+                        6 | 8;
+                      refresh();
+                    }}
+                  ></t-select>`
+                : ''
+            }
             <t-skeleton></t-skeleton><t-skeleton style="--t-skeleton-width:65%"></t-skeleton
             ><t-divider></t-divider
             ><t-empty-state heading="No pending tasks"

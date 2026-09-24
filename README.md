@@ -51,7 +51,7 @@ Storybook is at **http://127.0.0.1:6006**. The workbench's documentation links p
 | `t-tree`              | Hierarchical navigation          | `items`, `value`, `expandedIds`, `label`                                                  |
 | `t-icon`              | Built-in or registered SVG icon  | `name`, `label`, `size`                                                                   |
 | `t-icon-button`       | Icon action                      | `name`, `label`, `size`, `pressed`, `disabled`                                            |
-| `t-spinner`           | Loading indicator                | `label`, `size`                                                                           |
+| `t-spinner`           | Loading indicator                | `label`, `size`, `type`, `steps`                                                          |
 | `t-skeleton`          | Loading placeholder              | `shape`, `animated`                                                                       |
 | `t-divider`           | Content separator                | `vertical`                                                                                |
 | `t-avatar`            | Image or initials                | `name`, `src`, `size`                                                                     |
@@ -138,6 +138,8 @@ select.value = 'web';
 dialog.show(openButton); // Explicit opener also handles pointer activation in WebKit.
 toast.show('Settings saved.', saveButton); // Optional opener for focus return after dismissal.
 ```
+
+Spinners support ten styles through `type`: `ring` (default), `dots`, `bars`, `pulse`, `orbit`, `cursor`, `cursor-box`, `arrow`, `pixels`, and `blocks`. The arrow uses six or eight fixed positions with `steps="6|8"`. All styles inherit theme colors and respect motion preferences. See the [spinner guide](docs/spinners.md) for sizes, styling, status labels, and examples.
 
 Notification countdowns share the auto-dismiss timer:
 
@@ -265,7 +267,7 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 7.9 KB gzip for one button, 9.3 KB for the original three form controls, and 38.5 KB for registration of all 50 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.1 KB gzip. The complete-catalog budget is 42 KB after this expansion; the original 8 KB button and 9.5 KB form budgets remain unchanged. Importing and using more exported APIs adds their code.
+The local size check measures about 7.9 KB gzip for one button, 9.3 KB for the original three form controls, and 39.5 KB for registration of all 50 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.1 KB gzip. The complete-catalog budget is 42 KB after this expansion; the original 8 KB button and 9.5 KB form budgets remain unchanged. Importing and using more exported APIs adds their code.
 
 ## Storybook and verification
 

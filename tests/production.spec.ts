@@ -151,6 +151,35 @@ test('built Storybook serves documentation and the real component canvas', async
   await expect(page.locator('t-button .spinner')).toHaveCSS('animation-name', 'none');
 });
 
+test('built spinner styles work in the demo selector and Storybook gallery', async ({ page }) => {
+  await page.goto('/#status-components');
+  const spinner = page.locator('#status-components t-spinner');
+  for (const type of [
+    'ring',
+    'dots',
+    'bars',
+    'pulse',
+    'orbit',
+    'cursor',
+    'cursor-box',
+    'arrow',
+    'pixels',
+    'blocks',
+  ]) {
+    await page.getByRole('combobox', { name: 'Spinner style', exact: true }).selectOption(type);
+    await expect(spinner.locator(`[part=indicator].${type}`)).toBeVisible();
+    await expect(spinner.getByRole('status')).toHaveText('Loading example');
+  }
+  await page.getByRole('combobox', { name: 'Spinner style', exact: true }).selectOption('arrow');
+  await page.getByRole('combobox', { name: 'Arrow positions', exact: true }).selectOption('6');
+  await expect(spinner.locator('.arrow')).toHaveCSS('animation-timing-function', 'steps(6)');
+  await page.goto('/storybook/iframe.html?id=components-spinner--motion-off&viewMode=story');
+  await expect(page.getByRole('status')).toHaveCount(10);
+  for (const item of await page.locator('t-spinner .indicator,t-spinner .item').all())
+    await expect(item).toHaveCSS('animation-name', 'none');
+});
+
+// Earlier page references remain available alongside the reviewed spinner-selector layout.
 for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {
   test(`visual reference: ${theme}`, async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
@@ -158,7 +187,7 @@ for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {
     await page
       .getByRole('button', { name: theme[0].toUpperCase() + theme.slice(1), exact: true })
       .click();
-    await expect(page).toHaveScreenshot(`${theme}-desktop.png`, {
+    await expect(page).toHaveScreenshot(`spinner-${theme}-desktop.png`, {
       fullPage: true,
       animations: 'disabled',
       maxDiffPixelRatio: 0.002,
@@ -170,7 +199,7 @@ test('visual reference: mobile and dialog', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await expect(page.getByRole('button', { name: 'Save configuration', exact: true })).toBeVisible();
-  await expect(page).toHaveScreenshot('amber-mobile.png', {
+  await expect(page).toHaveScreenshot('spinner-amber-mobile.png', {
     fullPage: true,
     animations: 'disabled',
     maxDiffPixelRatio: 0.002,
@@ -215,7 +244,7 @@ for (const profile of [
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
-    await expect(page).toHaveScreenshot(`${profile.name}.png`, {
+    await expect(page).toHaveScreenshot(`spinner-${profile.name}.png`, {
       fullPage: true,
       animations: 'disabled',
       maxDiffPixelRatio: 0.002,
