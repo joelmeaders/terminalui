@@ -26,7 +26,7 @@ export class TFileInput extends FormControl {
         margin-right: 12px;
         color: var(--t-text);
         background: var(--t-raised);
-        border: var(--t-line-width, 1px) solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
       }
     `,
   ];
@@ -69,7 +69,7 @@ export class TFileInput extends FormControl {
   render() {
     return html`<label
         ><span class="label"
-          >${this.label}${this.required ? html` <abbr title="required">*</abbr>` : nothing}</span
+          >${this.label}${this.required ? html` <abbr title="required" aria-hidden="true">*</abbr>` : nothing}</span
         >
         <input
           part="input"
@@ -80,13 +80,11 @@ export class TFileInput extends FormControl {
           ?disabled=${this.isDisabled}
           ?required=${this.required}
           aria-describedby="help"
-          aria-invalid=${this.invalid || !!this.error ? 'true' : 'false'}
+          aria-invalid=${this.hasVisibleError ? 'true' : 'false'}
           @input=${this.handleInput}
           @change=${this.handleChange}
       /></label>
-      <p id="help" class="help ${this.invalid || this.error ? 'error' : ''}">
-        ${this.error || (this.invalid ? this.validationMessage : this.help)}
-      </p>`;
+      ${this.renderDescription()}`;
   }
 }
 if (!customElements.get('t-file-input')) customElements.define('t-file-input', TFileInput);

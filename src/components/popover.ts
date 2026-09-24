@@ -39,7 +39,7 @@ export class TPopover extends TerminalElement {
         padding: 9px 14px;
         color: var(--t-accent);
         background: var(--t-surface);
-        border: var(--t-line-width, 1px) solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
         box-shadow: var(--_t-edge-glow);
       }
       [popover] {
@@ -51,7 +51,7 @@ export class TPopover extends TerminalElement {
         overflow: auto;
         color: var(--t-text);
         background: var(--t-raised);
-        border: var(--t-line-width, 1px) solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
         box-shadow:
           var(--_t-edge-glow),
           0 8px 32px #0005;

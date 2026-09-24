@@ -50,9 +50,10 @@ export class TRadioGroup extends FormControl {
   ];
   protected get control() {
     return (
-      this.renderRoot?.querySelector<HTMLInputElement>(
-        'input:checked:not(:disabled), input:not(:disabled), input',
-      ) ?? null
+      this.renderRoot?.querySelector<HTMLInputElement>('input:checked:not(:disabled)') ??
+      this.renderRoot?.querySelector<HTMLInputElement>('input:not(:disabled)') ??
+      this.renderRoot?.querySelector<HTMLInputElement>('input') ??
+      null
     );
   }
   protected syncForm() {
@@ -76,13 +77,9 @@ export class TRadioGroup extends FormControl {
     this.syncForm();
   }
   render() {
-    return html`<fieldset
-        ?disabled=${this.isDisabled}
-        aria-describedby="help"
-        aria-invalid=${this.invalid || !!this.error ? 'true' : 'false'}
-      >
+    return html`<fieldset ?disabled=${this.isDisabled}>
         <legend>
-          ${this.label}${this.required ? html` <abbr title="required">*</abbr>` : nothing}
+          ${this.label}${this.required ? html` <abbr title="required" aria-hidden="true">*</abbr>` : nothing}
         </legend>
         <div class="options">
           ${this.options.map(
@@ -96,6 +93,8 @@ export class TRadioGroup extends FormControl {
                   .checked=${this.value === option.value}
                   ?disabled=${option.disabled || this.isDisabled}
                   ?required=${this.required}
+                  aria-describedby="help"
+                  aria-invalid=${this.hasVisibleError ? 'true' : 'false'}
                   @input=${this.handleInput}
                   @change=${this.handleChange}
                 />${option.label}</label
@@ -103,9 +102,7 @@ export class TRadioGroup extends FormControl {
           )}
         </div>
       </fieldset>
-      <p id="help" class="help ${this.invalid || this.error ? 'error' : ''}">
-        ${this.error || (this.invalid ? this.validationMessage : this.help)}
-      </p>`;
+      ${this.renderDescription()}`;
   }
 }
 if (!customElements.get('t-radio-group')) customElements.define('t-radio-group', TRadioGroup);

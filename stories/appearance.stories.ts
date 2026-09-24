@@ -22,7 +22,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Colors, line weight, glow, and density are independent inherited settings. These examples use local overrides, adjustable with Controls. A .t-screen surface paints scanlines once over its contents. Nested screens do not add another overlay when an ancestor screen already has texture. An overlay covers its entire region, so place clear content outside that region. The default appearance is unchanged. Effects are static and disappear in forced-colors mode.',
+          'Colors, line weight, glow, and density are independent inherited settings. These examples use local overrides, adjustable with Controls. A .t-screen surface paints scanlines behind its contents; opaque child surfaces cover the texture. Nested screens do not add another texture when an ancestor screen already has one. Default effects are off. Effects are static and disappear in forced-colors mode or with an increased-contrast preference. Custom colors and opacity need a new contrast check.',
       },
     },
   },

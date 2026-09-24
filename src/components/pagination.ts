@@ -59,7 +59,7 @@ export class TPagination extends TerminalElement {
       button {
         color: var(--t-text);
         background: var(--t-surface);
-        border: var(--t-line-width, 1px) solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
         padding: 6px 10px;
         min-width: 36px;
         box-shadow: var(--_t-edge-glow);

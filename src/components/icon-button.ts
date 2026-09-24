@@ -32,7 +32,7 @@ export class TIconButton extends TerminalElement {
         padding: 6px;
         background: var(--t-surface);
         color: var(--t-accent);
-        border: var(--t-line-width, 1px) solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
         box-shadow: var(--_t-edge-glow);
       }
       button:hover:not(:disabled),

@@ -1,4 +1,4 @@
-import { css, type PropertyValues, type PropertyDeclarations } from 'lit';
+import { css, html, type PropertyValues, type PropertyDeclarations } from 'lit';
 import { TerminalElement, baseStyles } from './base';
 
 export const fieldStyles = [
@@ -23,7 +23,7 @@ export const fieldStyles = [
       width: 100%;
       min-height: var(--t-control-height, 42px);
       padding: 10px 12px;
-      border: var(--t-line-width, 1px) solid var(--t-border);
+      border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
       box-shadow: var(--_t-edge-glow);
       border-radius: 0;
       background: var(--t-bg);
@@ -50,9 +50,9 @@ export const fieldStyles = [
     .error {
       color: var(--t-danger);
     }
-    :host([invalid]) input,
-    :host([invalid]) select,
-    :host([invalid]) textarea {
+    input[aria-invalid='true'],
+    select[aria-invalid='true'],
+    textarea[aria-invalid='true'] {
       border-color: var(--t-danger);
     }
     abbr {
@@ -62,6 +62,16 @@ export const fieldStyles = [
     textarea:disabled {
       cursor: not-allowed;
       opacity: 0.55;
+    }
+    @media (forced-colors: active) {
+      textarea {
+        border-color: ButtonText !important;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline-color: Highlight;
+      }
     }
   `,
 ];
@@ -106,6 +116,24 @@ export abstract class FormControl extends TerminalElement {
   protected get isDisabled() {
     return this.disabled || this.fieldsetDisabled;
   }
+  protected get hasVisibleError() {
+    return this.invalid || !!this.error || !!this.customValidationMessage;
+  }
+  /** One description node also announces changed messages without a duplicate alert. */
+  protected renderDescription() {
+    const message =
+      this.error ||
+      this.customValidationMessage ||
+      (this.invalid ? this.validationMessage : this.help);
+    return html`<p
+      id="help"
+      class="help ${this.hasVisibleError ? 'error' : ''}"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      ${message}
+    </p>`;
+  }
   constructor() {
     super();
     this.addEventListener('invalid', () => {
@@ -117,6 +145,8 @@ export abstract class FormControl extends TerminalElement {
   }
   protected updated(_changed: PropertyValues) {
     this.syncForm();
+    if (this.internals.validity.valid && this.invalid && !_changed.has('invalid'))
+      this.invalid = false;
   }
   protected syncForm() {
     const control = this.control;
@@ -174,6 +204,7 @@ export abstract class FormControl extends TerminalElement {
   setCustomValidity(message: string) {
     this.customValidationMessage = message;
     this.syncForm();
+    if (this.internals.validity.valid) this.invalid = false;
     this.requestUpdate();
   }
   checkValidity() {

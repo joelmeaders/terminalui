@@ -3,14 +3,18 @@ for (const width of [1440, 390]) {
   test(`default component appearance: ${width}`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto('/');
-    // Keep the original vertical raster alignment; the new settings row is outside this reference.
+    // Original base-components references remain in git history and this directory.
+    // These references include the intentional accessibility contrast corrections.
     await page.locator('.display-settings').evaluate((el: HTMLElement) => {
       el.style.display = 'none';
     });
-    await expect(page.locator('.component-grid')).toHaveScreenshot(`base-components-${width}.png`, {
-      animations: 'disabled',
-      maxDiffPixelRatio: 0.002,
-    });
+    await expect(page.locator('.component-grid')).toHaveScreenshot(
+      `accessible-components-${width}.png`,
+      {
+        animations: 'disabled',
+        maxDiffPixelRatio: 0.002,
+      },
+    );
   });
 }
 

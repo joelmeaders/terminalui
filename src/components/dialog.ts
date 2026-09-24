@@ -24,7 +24,12 @@ export class TDialog extends TerminalElement {
       dialog::backdrop {
         background: rgb(0 0 0 / 0.72);
       }
+      dialog[open] {
+        display: flex;
+        flex-direction: column;
+      }
       header {
+        flex: none;
         display: flex;
         gap: 20px;
         align-items: center;
@@ -43,16 +48,21 @@ export class TDialog extends TerminalElement {
         background: transparent;
         border: 0;
         font-size: 22px;
-        width: 32px;
-        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        flex: none;
       }
       .body {
+        min-height: 0;
+        overflow: auto;
         padding: 24px;
         font-size: 13px;
       }
       footer {
+        flex: none;
         padding: 0 24px 24px;
         display: flex;
+        flex-wrap: wrap;
         gap: 12px;
         justify-content: flex-end;
       }

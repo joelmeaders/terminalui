@@ -145,8 +145,14 @@ test('scanline preview uses visible palette stripes and resets to a clear surfac
   const preview = page.locator('.scanline-preview');
   await expect(preview).toBeVisible();
   expect(await preview.evaluate((el) => getComputedStyle(el, '::after').backgroundImage)).toContain(
-    '0.28',
+    '0.12',
   );
+  expect(await preview.evaluate((el) => getComputedStyle(el, '::after').zIndex)).toBe('-1');
+  expect(
+    await preview.evaluate((el) =>
+      getComputedStyle(el).getPropertyValue('--t-scanline-width').trim(),
+    ),
+  ).toBe('2px');
   await expect(preview).toHaveAttribute('data-scanlines', 'pronounced');
   await page.getByRole('button', { name: 'Reset display styles' }).click();
   expect(await preview.evaluate((el) => getComputedStyle(el, '::after').display)).toBe('none');

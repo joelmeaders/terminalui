@@ -58,8 +58,8 @@ export class TToast extends TerminalElement {
       }
       button {
         flex: none;
-        width: 32px;
-        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
         border: 0;
         color: var(--t-text);
         background: transparent;

@@ -58,6 +58,7 @@
     "storybook": "npm run build && storybook dev -p 6006 --host 127.0.0.1 --no-open",
     "build:storybook": "npm run build && storybook build",
     "test": "playwright test",
+    "test:a11y": "playwright test tests/accessibility-contrast.spec.ts tests/accessibility-layout.spec.ts tests/forms-accessibility.spec.ts",
     "test:stories": "vitest run --config vitest.config.ts",
     "size": "node scripts/size.mjs",
     "check": "npm run build && npm run format:check && npm run typecheck && npm test && npm run test:stories && npm run test:production && npm run size && npm run test:package",

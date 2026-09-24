@@ -7,6 +7,7 @@
   --t-text: #eee9d9;
   --t-muted: #aaae9e;
   --t-border: #59614e;
+  --t-control-border: #849074;
   --t-accent: #f5ba5b;
   --t-on-accent: #19180e;
   --t-focus: #ffe0a2;
@@ -25,6 +26,7 @@
   --t-text: #ddf2dc;
   --t-muted: #a0bea3;
   --t-border: #52785b;
+  --t-control-border: #779d7c;
   --t-accent: #a6ed91;
   --t-on-accent: #122012;
   --t-focus: #d0ffc2;
@@ -39,6 +41,7 @@
   --t-text: #e0edf2;
   --t-muted: #a2bcc9;
   --t-border: #577787;
+  --t-control-border: #7b9dac;
   --t-accent: #8edbe9;
   --t-on-accent: #11232a;
   --t-focus: #ccf7ff;
@@ -53,6 +56,7 @@
   --t-text: #eeedf4;
   --t-muted: #b6b3c5;
   --t-border: #747180;
+  --t-control-border: #9794a4;
   --t-accent: #c6baf2;
   --t-on-accent: #201a32;
   --t-focus: #e8dfff;
@@ -67,6 +71,7 @@
   --t-text: #e6edeb;
   --t-muted: #a6bdb9;
   --t-border: #577b77;
+  --t-control-border: #7b9f9b;
   --t-accent: #eef2e8;
   --t-on-accent: #15231f;
   --t-focus: #b6f2df;
@@ -80,14 +85,15 @@
   --t-surface: #f8f5ea;
   --t-raised: #e2dfd1;
   --t-text: #252d27;
-  --t-muted: #56614f;
+  --t-muted: #45523f;
   --t-border: #828774;
+  --t-control-border: #626851;
   --t-accent: #3b5038;
   --t-on-accent: #fffdf3;
   --t-focus: #304f94;
-  --t-success: #28633c;
-  --t-warning: #79520d;
-  --t-danger: #a43127;
+  --t-success: #235d36;
+  --t-warning: #704a08;
+  --t-danger: #982b22;
 }
 [data-density='compact'] {
   --t-control-height: 34px;
@@ -138,45 +144,48 @@
     color-mix(in srgb, currentColor var(--t-glow-strength, 0%), transparent);
 }
 
-/* Texture is painted once over an explicit surface, never over each control. */
-.t-screen {
+/* Texture stays behind content. Opaque child surfaces protect their own colors. */
+.t-screen,
+:root[data-effects='crt'] > body {
   position: relative;
   isolation: isolate;
 }
 .t-screen[data-scanlines='subtle'],
 .t-screen[data-effects='crt'],
 :root[data-effects='crt'] {
-  --t-scanline-opacity: 0.12;
+  --t-scanline-opacity: 0.06;
+  --t-scanline-width: 1px;
 }
 .t-screen[data-scanlines='pronounced'],
 :root[data-effects='crt'][data-scanlines='pronounced'] {
-  --t-scanline-opacity: 0.28;
+  --t-scanline-opacity: 0.12;
+  --t-scanline-width: 2px;
 }
 .t-screen:is([data-scanlines='subtle'], [data-scanlines='pronounced'], [data-effects='crt'])::after,
-:root[data-effects='crt']::after {
+:root[data-effects='crt'] > body::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
-  z-index: 1;
+  z-index: -1;
   background: repeating-linear-gradient(
     0deg,
-    transparent 0 calc(var(--t-scanline-spacing, 4px) - 1px),
+    transparent 0 calc(var(--t-scanline-spacing, 4px) - var(--t-scanline-width, 1px)),
     color-mix(
         in srgb,
-        var(--t-scanline-color, var(--t-accent)) calc(var(--t-scanline-opacity, 0.12) * 100%),
+        var(--t-scanline-color, var(--t-accent)) calc(var(--t-scanline-opacity, 0.06) * 100%),
         transparent
       )
-      calc(var(--t-scanline-spacing, 4px) - 1px) var(--t-scanline-spacing, 4px)
+      calc(var(--t-scanline-spacing, 4px) - var(--t-scanline-width, 1px))
+      var(--t-scanline-spacing, 4px)
   );
 }
-:root[data-effects='crt']::after {
+:root[data-effects='crt'] > body::after {
   position: fixed;
-  z-index: 100;
 }
 .t-screen[data-scanlines='off']::after,
-:root[data-effects='crt'][data-scanlines='off']::after,
+:root[data-effects='crt'][data-scanlines='off'] > body::after,
 .t-screen:is([data-scanlines='subtle'], [data-scanlines='pronounced'], [data-effects='crt']):not(
     [data-scanlines='off']
   )
@@ -184,9 +193,9 @@
 :root[data-effects='crt']:not([data-scanlines='off']) .t-screen::after {
   display: none;
 }
-@media (forced-colors: active) {
+@media (forced-colors: active), (prefers-contrast: more) {
   .t-screen::after,
-  :root[data-effects='crt']::after {
+  :root[data-effects='crt'] > body::after {
     display: none;
   }
   [data-theme],
@@ -205,7 +214,7 @@
   font: inherit;
   color: var(--t-text);
   background: var(--t-bg);
-  border: var(--t-line-width, 1px) solid var(--t-border);
+  border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
   box-shadow: var(--_t-edge-glow);
   border-radius: 0;
   padding: 10px 12px;

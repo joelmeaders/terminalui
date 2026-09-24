@@ -31,7 +31,7 @@ export class TRange extends FormControl {
         justify-content: space-between;
         gap: 12px;
       }
-      output {
+      .value {
         color: var(--t-accent);
       }
     `,
@@ -49,7 +49,7 @@ export class TRange extends FormControl {
   render() {
     return html`<label for="range" class="label"
         ><span>${this.label}</span
-        >${this.showValue ? html`<output for="range">${this.value}</output>` : ''}</label
+        >${this.showValue ? html`<span class="value" aria-hidden="true">${this.value}</span>` : ''}</label
       >
       <input
         id="range"
@@ -61,13 +61,11 @@ export class TRange extends FormControl {
         .value=${this.value}
         ?disabled=${this.isDisabled}
         aria-describedby="help"
-        aria-invalid=${this.invalid || !!this.error ? 'true' : 'false'}
+        aria-invalid=${this.hasVisibleError ? 'true' : 'false'}
         @input=${this.handleInput}
         @change=${this.handleChange}
       />
-      <p id="help" class="help ${this.invalid || this.error ? 'error' : ''}">
-        ${this.error || (this.invalid ? this.validationMessage : this.help)}
-      </p>`;
+      ${this.renderDescription()}`;
   }
 }
 if (!customElements.get('t-range')) customElements.define('t-range', TRange);

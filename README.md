@@ -186,9 +186,9 @@ Appearance settings are independent. Omitting them preserves the base appearance
 
 Change an attribute to update the display. This needs no JavaScript configuration service, framework adapter, or component re-render. Line and glow settings also work on individual custom elements and `.t-native` controls. A nested palette supplies its own glow color. Focus outlines remain distinct from decorative borders.
 
-Scanlines use one static overlay on the `.t-screen` surface. Their color follows the palette accent unless you set `--t-scanline-color`. The surface creates a positioning and stacking context, but does not clip overflowing tooltips or focus outlines. The overlay stays within its bounds and does not intercept pointer input. Nested screens do not add another overlay when an ancestor screen already has texture. An inner `data-scanlines="off"` cannot erase its ancestor's overlay; place clear content outside that screen. Native modal dialogs appear above screen overlays.
+Scanlines use one static texture behind the content of a `.t-screen` surface. Their color follows the palette accent unless you set `--t-scanline-color`. The surface creates a positioning and stacking context without clipping tooltips or focus outlines. Opaque child surfaces cover the texture, which protects control interiors from color blending. Nested screens do not add another texture when an ancestor screen already has one. An inner `data-scanlines="off"` cannot erase a visible ancestor backdrop; give clear content an opaque background or place it outside that screen.
 
-The existing `data-effects="crt"` attribute remains a convenience preset for subtle glow and scanlines. On the document root it retains a viewport overlay. On `.t-screen` it applies to that region. Explicit `data-glow` and `data-scanlines` values override the preset. Prefer the independent settings for new integrations.
+The existing `data-effects="crt"` attribute remains a convenience preset for subtle glow and scanlines. On the document root it uses a fixed backdrop inside the body. On `.t-screen` it applies to that region. Both now paint behind content; earlier foreground overlays reduced text contrast. Explicit `data-glow` and `data-scanlines` values override the preset. Prefer the independent settings for new integrations.
 
 For custom styling, adjust the public variables in your own selector or inline style:
 
@@ -200,11 +200,14 @@ For custom styling, adjust the public variables in your own selector or inline s
 | `--t-selection-width`  | `2px`                   | `3px`                         |
 | `--t-glow-blur`        | `0px`                   | `5px` (strong: `9px`)         |
 | `--t-glow-strength`    | `0%`                    | `22%` (strong: `40%`)         |
-| `--t-scanline-opacity` | No overlay              | `0.12` (pronounced: `0.28`)   |
+| `--t-scanline-opacity` | No texture              | `0.06` (pronounced: `0.12`)   |
+| `--t-scanline-width`   | `1px`                   | `1px` (pronounced: `2px`)     |
 | `--t-scanline-color`   | Palette accent fallback | Custom CSS color, if supplied |
 | `--t-scanline-spacing` | `4px`                   | `4px`                         |
 
-Variables beginning with `--_t-` are internal. Glow and scanlines turn off in forced-colors mode. The effects do not animate. Review text contrast and focus visibility when creating custom presets.
+Variables beginning with `--_t-` are internal. Glow and scanlines turn off in forced-colors mode and with an increased-contrast preference. The effects do not animate. The default stripe opacity and width balance visibility with text contrast. Recheck composited text and control contrast when overriding colors or opacity.
+
+Use `--t-control-border` for essential control boundaries. Each palette supplies a value tested against its background, surface, raised surface, and default scanline backgrounds. `--t-border` remains the decorative panel and divider color. Custom palettes must set both tokens; the fallback to `--t-border` supports older integrations but does not guarantee sufficient contrast.
 
 The demo exposes **Bold lines** beside the palettes and **Display effects** below them. Display effects includes an immediate preview of palette-colored scanlines. Scanlines also apply to the calibration display and event log. Preferences persist locally; saved CRT preferences migrate automatically. **Reset display styles** restores standard lines and removes glow and scanlines while keeping palette and density.
 
@@ -216,6 +219,7 @@ Storybook includes stories for all 35 components, introductions, appearance exam
 npm run build
 npm run typecheck
 npm test                 # Chromium, Firefox, WebKit; components and framework examples
+npm run test:a11y        # Contrast, forms, reflow, simulated text enlargement and spacing
 npm run test:stories     # Storybook + Vitest in Chromium, including accessibility checks
 npm run test:production  # Builds combined site and tests compiled demo/Storybook
 npm run test:package     # External tarball install, types, adapters, Angular AOT, registration
@@ -227,13 +231,15 @@ npm run format:check
 
 The package check installs the tarball into an external temporary consumer. It checks strict NodeNext types, individual exports, framework isolation, Angular AOT compilation, and standalone registration. The size check retains separate budgets for one button, the original three form controls, and the complete catalog. CI configuration runs browser and package checks on Linux and production screenshot checks on Windows. A configured workflow does not establish a remote CI result.
 
-Production tests compare saved screenshots for all six palettes, a mobile layout, a modal dialog, and selected display styles. Separate component-area references preserve the original appearance at desktop and mobile sizes. Browser tests cover nested overrides, texture boundaries, persistence, forced colors, and accessibility with effects enabled. The committed reference images use Playwright Chromium on Windows. Review intentional visual changes before regenerating references with `npx playwright test --config playwright.production.config.ts --update-snapshots`. Other operating systems need their own reviewed reference images.
+Production tests compare saved screenshots for all six palettes, a mobile layout, a modal dialog, and selected display styles. Component-area references include the accessibility contrast corrections; the original `base-components` images remain as historical references. Browser tests cover nested overrides, texture boundaries, persistence, forced colors, and accessibility with effects enabled. The committed reference images use Playwright Chromium on Windows. Review intentional visual changes before regenerating references with `npx playwright test --config playwright.production.config.ts --update-snapshots`. Other operating systems need their own reviewed reference images.
+
+Accessibility requirements are part of [AGENTS.md](AGENTS.md). The [accessibility evidence and manual test guide](docs/accessibility.md) separates automated coverage from pending NVDA, VoiceOver, real zoom, and physical-device checks. A narrow viewport and injected font sizes do not establish real browser zoom or screen-reader support.
 
 `npm run build:site` creates a combined static demo and Storybook in `demo-dist/`. `npm run preview` serves it locally. The core package output remains separate in `dist/`; consumers do not download Storybook.
 
 ## Supported scope
 
-- Automated checks cover the shipped themes and representative interactions. Manual screen-reader certification is not complete. The library is not WCAG certified.
+- Automated checks cover the shipped themes and representative interactions. Manual screen-reader validation remains pending. The library does not claim WCAG conformance.
 - The kit requires modern browsers with custom elements, Shadow DOM, ElementInternals, native dialogs, and the Popover API. There are no legacy polyfills.
 - Server rendering and hydration are not implemented. This is a browser component kit.
 - React 19, Vue 3, and Angular 22 adapters have concrete consumer checks. Other framework versions and third-party form libraries require application-specific verification.

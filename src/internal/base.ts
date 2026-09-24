@@ -60,12 +60,14 @@ export const baseStyles = css`
       scroll-behavior: auto !important;
     }
   }
-  @media (forced-colors: active) {
+  @media (forced-colors: active), (prefers-contrast: more) {
     :host,
     * {
       text-shadow: none !important;
       box-shadow: none !important;
     }
+  }
+  @media (forced-colors: active) {
     button,
     input,
     select,

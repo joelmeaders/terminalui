@@ -42,7 +42,7 @@ export class TTextarea extends FormControl {
   render() {
     return html`<label
         ><span class="label"
-          >${this.label}${this.required ? html` <abbr title="required">*</abbr>` : nothing}</span
+          >${this.label}${this.required ? html` <abbr title="required" aria-hidden="true">*</abbr>` : nothing}</span
         >
         <textarea
           part="textarea"
@@ -55,15 +55,13 @@ export class TTextarea extends FormControl {
           ?disabled=${this.isDisabled}
           ?readonly=${this.readonly}
           ?required=${this.required}
-          aria-invalid=${this.invalid || !!this.error ? 'true' : 'false'}
+          aria-invalid=${this.hasVisibleError ? 'true' : 'false'}
           aria-describedby="help"
           @input=${this.handleInput}
           @change=${this.handleChange}
         ></textarea>
       </label>
-      <p id="help" class="help ${this.invalid || this.error ? 'error' : ''}">
-        ${this.error || (this.invalid ? this.validationMessage : this.help)}
-      </p>`;
+      ${this.renderDescription()}`;
   }
 }
 if (!customElements.get('t-textarea')) customElements.define('t-textarea', TTextarea);

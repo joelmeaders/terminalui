@@ -117,13 +117,13 @@ test('CRT remains a convenience preset with explicit overrides and forced-colors
     el.dataset.effects = 'crt';
   });
   expect(
-    await page.locator('html').evaluate((el) => getComputedStyle(el, '::after').position),
+    await page.locator('body').evaluate((el) => getComputedStyle(el, '::after').position),
   ).toBe('fixed');
   await page.locator('html').evaluate((el) => {
     el.dataset.glow = 'off';
     el.dataset.scanlines = 'off';
   });
-  expect(await page.locator('html').evaluate((el) => getComputedStyle(el, '::after').display)).toBe(
+  expect(await page.locator('body').evaluate((el) => getComputedStyle(el, '::after').display)).toBe(
     'none',
   );
   await page.locator('#screen').evaluate((el) => {

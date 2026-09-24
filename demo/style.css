@@ -286,6 +286,7 @@ h1 span {
 }
 .swatches {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   flex: 1;
 }
@@ -296,7 +297,7 @@ h1 span {
   align-items: center;
   justify-content: center;
   flex: 1;
-  min-width: 55px;
+  min-width: max-content;
   padding: 9px 6px;
   background: transparent;
   color: var(--t-muted);
@@ -589,9 +590,6 @@ pre {
   .theme-label {
     min-width: 120px;
   }
-  .swatch {
-    min-width: 44px;
-  }
   .tab-overview {
     grid-template-columns: 1fr 250px;
     gap: 20px;
@@ -694,9 +692,6 @@ pre {
     width: 100%;
     margin-top: 8px;
     justify-content: space-between;
-  }
-  .swatch {
-    min-width: 0;
   }
   t-card::part(body) {
     padding: 17px;

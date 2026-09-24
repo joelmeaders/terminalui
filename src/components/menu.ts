@@ -47,7 +47,7 @@ export class TMenu extends TerminalElement {
         padding: var(--t-space-2, 8px) var(--t-space-3, 12px);
       }
       .trigger {
-        border: var(--t-line-width, 1px) solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
         box-shadow: var(--_t-edge-glow);
       }
       [role='menu'] {
@@ -58,7 +58,7 @@ export class TMenu extends TerminalElement {
         width: max-content;
         overflow: auto;
         background: var(--t-surface);
-        border: var(--t-line-width, 1px) solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
         padding: 4px;
         box-shadow:
           var(--_t-edge-glow),
@@ -78,7 +78,7 @@ export class TMenu extends TerminalElement {
         outline-offset: -2px;
       }
       [role='separator'] {
-        border-top: var(--t-divider-width, 1px) solid var(--t-border);
+        border-top: var(--t-divider-width, 1px) solid var(--t-control-border, var(--t-border));
         margin: 4px;
       }
     `,

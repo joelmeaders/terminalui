@@ -37,6 +37,9 @@ export class TBreadcrumb extends TerminalElement {
         align-items: baseline;
       }
       a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
         color: var(--t-accent);
         text-underline-offset: 3px;
       }

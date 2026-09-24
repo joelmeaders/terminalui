@@ -36,10 +36,10 @@ export class TTooltip extends TerminalElement {
         position: relative;
       }
       button {
-        width: 28px;
-        height: 28px;
+        min-width: 28px;
+        min-height: 28px;
         background: transparent;
-        border: var(--t-line-width, 1px) solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
         box-shadow: var(--_t-edge-glow);
         color: var(--t-accent);
         font-size: 12px;

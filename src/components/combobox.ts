@@ -38,7 +38,7 @@ export class TCombobox extends FormControl {
         overflow: auto;
         padding: 0;
         margin: 0;
-        border: var(--t-line-width, 1px) solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
         box-shadow: var(--_t-edge-glow);
         background: var(--t-bg);
         color: var(--t-text);
@@ -67,6 +67,20 @@ export class TCombobox extends FormControl {
         padding: 8px;
         font-size: 12px;
         color: var(--t-muted);
+      }
+      @media (forced-colors: active) {
+        .list {
+          border-color: ButtonText;
+        }
+        [role='option'][data-active] {
+          border-color: Highlight;
+          background: Highlight;
+          color: HighlightText;
+        }
+        [role='option'][aria-disabled='true'] {
+          color: GrayText;
+          opacity: 1;
+        }
       }
     `,
   ];
@@ -161,9 +175,13 @@ export class TCombobox extends FormControl {
   }
   private onKeydown(event: KeyboardEvent) {
     if (event.isComposing || this.isDisabled) return;
+    if (event.ctrlKey || event.metaKey || event.shiftKey) {
+      this.active = -1;
+      return;
+    }
     if (
       ['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key) &&
-      (this.open || event.key.startsWith('Arrow'))
+      ((this.open && this.active >= 0) || event.key.startsWith('Arrow'))
     ) {
       event.preventDefault();
       this.open = true;
@@ -195,6 +213,8 @@ export class TCombobox extends FormControl {
       event.stopPropagation();
       this.open = false;
       this.active = -1;
+    } else if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+      this.active = -1;
     }
   }
   private onBlur() {
@@ -218,7 +238,7 @@ export class TCombobox extends FormControl {
     return html`<div class="control">
         <label
           ><span class="label"
-            >${this.label}${this.required ? html` <abbr title="required">*</abbr>` : nothing}</span
+            >${this.label}${this.required ? html` <abbr title="required" aria-hidden="true">*</abbr>` : nothing}</span
           >
           <input
             part="input"
@@ -234,14 +254,17 @@ export class TCombobox extends FormControl {
             aria-autocomplete="list"
             aria-activedescendant=${ifDefined(this.open && this.active >= 0 ? `option-${this.active}` : undefined)}
             aria-describedby="help"
-            aria-invalid=${this.invalid || !!this.error ? 'true' : 'false'}
+            aria-invalid=${this.hasVisibleError ? 'true' : 'false'}
             @input=${this.handleInput}
             @change=${(event: Event) => event.stopPropagation()}
             @focus=${() => {
               if (!this.isDisabled) this.open = true;
             }}
             @click=${() => {
-              if (!this.isDisabled) this.open = true;
+              if (!this.isDisabled) {
+                this.open = true;
+                this.active = -1;
+              }
             }}
             @blur=${this.onBlur}
             @keydown=${this.onKeydown}
@@ -281,9 +304,7 @@ export class TCombobox extends FormControl {
           </div>
         </div>
       </div>
-      <p id="help" class="help ${this.invalid || this.error ? 'error' : ''}">
-        ${this.error || (this.invalid ? this.validationMessage : this.help)}
-      </p>`;
+      ${this.renderDescription()}`;
   }
 }
 if (!customElements.get('t-combobox')) customElements.define('t-combobox', TCombobox);

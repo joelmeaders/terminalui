@@ -33,7 +33,7 @@ export class TCheckbox extends FormControl {
         appearance: none;
         width: 36px;
         height: 20px;
-        border: var(--t-line-width, 1px) solid var(--t-border);
+        border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
         box-shadow: var(--_t-edge-glow);
         background: var(--t-raised);
         position: relative;
@@ -102,14 +102,12 @@ export class TCheckbox extends FormControl {
           ?disabled=${this.isDisabled}
           ?required=${this.required}
           aria-describedby="help"
-          aria-invalid=${this.invalid || !!this.error ? 'true' : 'false'}
+          aria-invalid=${this.hasVisibleError ? 'true' : 'false'}
           @input=${this.handleInput}
           @change=${this.handleChange}
         />${this.label}</label
       >
-      <p id="help" class="help ${this.invalid || this.error ? 'error' : ''}">
-        ${this.error || (this.invalid ? this.validationMessage : this.help)}
-      </p>`;
+      ${this.renderDescription()}`;
   }
 }
 if (!customElements.get('t-checkbox')) customElements.define('t-checkbox', TCheckbox);

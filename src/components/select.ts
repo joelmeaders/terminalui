@@ -23,23 +23,21 @@ export class TSelect extends FormControl {
   render() {
     return html`<label
         ><span class="label"
-          >${this.label}${this.required ? html` <abbr title="required">*</abbr>` : nothing}</span
+          >${this.label}${this.required ? html` <abbr title="required" aria-hidden="true">*</abbr>` : nothing}</span
         >
         <select
           part="select"
           ?disabled=${this.isDisabled}
           ?required=${this.required}
           aria-describedby="help"
-          aria-invalid=${this.invalid || !!this.error ? 'true' : 'false'}
+          aria-invalid=${this.hasVisibleError ? 'true' : 'false'}
           @input=${this.handleInput}
           @change=${this.handleChange}
         >
           ${this.options.map((o) => html`<option value=${o.value} ?selected=${o.value === this.value} ?disabled=${o.disabled}>${o.label}</option>`)}
         </select></label
       >
-      <p id="help" class="help ${this.invalid || this.error ? 'error' : ''}">
-        ${this.error || (this.invalid ? this.validationMessage : this.help)}
-      </p>`;
+      ${this.renderDescription()}`;
   }
   protected updated(changed: Map<PropertyKey, unknown>) {
     const select = this.control as HTMLSelectElement;

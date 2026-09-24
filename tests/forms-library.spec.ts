@@ -443,6 +443,7 @@ test('combobox escapes clipping, follows its anchor, and stays within viewport e
     element.scrollTop = 12;
   });
   await expect.poll(async () => (await panel.boundingBox())!.y).toBeLessThan(box!.y - 10);
+  await page.keyboard.press('ArrowDown');
   await page.keyboard.press('End');
   await expect(input).toHaveAttribute('aria-activedescendant', 'option-19');
   await page.keyboard.press('Enter');
