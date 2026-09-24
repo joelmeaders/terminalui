@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en" data-theme="amber">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Typography test fixture</title>
+    <link rel="stylesheet" href="/src/themes.css" />
+    <link rel="stylesheet" href="/src/typography.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 24px;
+        background: var(--t-bg);
+        color: var(--t-text);
+      }
+      .override {
+        font-size: 23px;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="fixture" class="t-prose">
+      <p class="t-eyebrow">Field manual</p>
+      <h1>A clear signal.</h1>
+      <p class="t-lead">Readable content in every palette.</p>
+      <p>
+        Keep <strong>important text</strong>, <em>emphasis</em>, and
+        <a href="#notes" id="first-link">useful links</a> in native HTML.
+      </p>
+      <h2 id="notes">Reading notes</h2>
+      <h3>Details</h3>
+      <h4>More detail</h4>
+      <h5>A small section</h5>
+      <h6>A nested section</h6>
+      <h2 class="t-h1" id="visual-heading">A large section heading</h2>
+      <p class="t-text-small">Small supporting text.</p>
+      <p class="t-text-medium">Medium body text.</p>
+      <p class="t-text-large">Large body text.</p>
+      <p class="t-muted">Muted text remains readable.</p>
+      <p>
+        <mark>Highlighted text</mark> with <code>data-theme</code>, <kbd>Tab</kbd>, and
+        <samp>READY</samp>.
+      </p>
+      <p>
+        <abbr title="Application programming interface">API</abbr> means application programming
+        interface. <small>A short note.</small>
+      </p>
+      <ul>
+        <li>Choose a palette.</li>
+        <li>
+          Check the keyboard flow.
+          <ol>
+            <li>Focus a link.</li>
+            <li>Follow it.</li>
+          </ol>
+        </li>
+      </ul>
+      <dl>
+        <dt>Signal</dt>
+        <dd>A reported state.</dd>
+      </dl>
+      <blockquote>
+        <p>Keep information readable.</p>
+        <footer>— <cite>Design notes</cite></footer>
+      </blockquote>
+      <pre
+        tabindex="0"
+        role="region"
+        aria-label="Example command"
+      ><code>terminal connect --workspace orbital --profile engineering --output human-readable --read-only --verbose
+status: ready</code></pre>
+      <p>
+        <a href="#notes" id="long-link"
+          >https://example.com/a-long-documentation-path-with-a-continuous-identifier-abcdefghijklmnopqrstuvwxyz0123456789</a
+        >
+      </p>
+      <hr />
+      <p class="override">Application CSS can override the base styles.</p>
+    </main>
+    <aside id="unstyled">
+      <h2>Unstyled heading</h2>
+      <p>Unstyled paragraph with <a href="#notes">a native link</a>.</p>
+    </aside>
+  </body>
+</html>

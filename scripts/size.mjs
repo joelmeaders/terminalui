@@ -44,3 +44,10 @@ const css = await readFile('src/themes.css');
 console.log(
   `All six themes: raw ${css.length} B | gzip ${gzipSync(css).length} B | Brotli ${brotliCompressSync(css).length} B`,
 );
+const typography = await readFile('src/typography.css');
+const typographyGzip = gzipSync(typography).length;
+if (typographyGzip > 2500)
+  throw new Error(`Typography: ${typographyGzip} B exceeds its 2500 B gzip budget.`);
+console.log(
+  `Optional typography CSS: raw ${typography.length} B | gzip ${typographyGzip} B | Brotli ${brotliCompressSync(typography).length} B`,
+);

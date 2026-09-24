@@ -30,6 +30,16 @@ const { guides } = await import(
   `data:text/javascript;base64,${Buffer.from(catalogBundle.outputFiles[0].text).toString('base64')}`
 );
 const { components, exampleFor } = examples;
+const typographyBundle = await build({
+  entryPoints: ['.storybook/docs/typography.ts'],
+  bundle: true,
+  write: false,
+  platform: 'node',
+  format: 'esm',
+});
+const { typographyExampleFor } = await import(
+  `data:text/javascript;base64,${Buffer.from(typographyBundle.outputFiles[0].text).toString('base64')}`
+);
 assert.deepEqual(
   Object.keys(guides).sort(),
   components.map((c) => c.tagName).sort(),
@@ -84,13 +94,18 @@ for (const component of components) {
     tag,
     docsId: title.toLowerCase().replaceAll('/', '-').replaceAll(' ', '-') + '--docs',
   });
+}
+entries.push({ tag: 'typography', docsId: 'introduction-typography--docs' });
+for (const { tag } of entries) {
+  const renderExample = (framework) =>
+    tag === 'typography' ? typographyExampleFor(framework) : exampleFor(tag, framework);
   await writeFile(
     join(out, `${tag}.html`),
-    `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>${tag} example</title></head><body>${exampleFor(tag, 'html')}</body></html>`,
+    `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>${tag} example</title></head><body>${renderExample('html')}</body></html>`,
   );
-  await writeFile(join(out, `${tag}.tsx`), exampleFor(tag, 'react'));
-  await writeFile(join(out, `${tag}.angular.ts`), exampleFor(tag, 'angular'));
-  const sfc = exampleFor(tag, 'vue');
+  await writeFile(join(out, `${tag}.tsx`), renderExample('react'));
+  await writeFile(join(out, `${tag}.angular.ts`), renderExample('angular'));
+  const sfc = renderExample('vue');
   const { descriptor, errors } = parse(sfc, {
     filename: `${tag}.vue`,
     templateParseOptions: { isCustomElement: (name) => name.startsWith('t-') },
@@ -162,7 +177,7 @@ for (const framework of ['react', 'vue', 'angular']) {
         : `import '@angular/compiler'; import { bootstrapApplication } from '@angular/platform-browser'; await bootstrapApplication(Example);`;
   await build({
     stdin: {
-      contents: `${framework === 'angular' ? "import '@angular/compiler';\n" : ''}${imports}\nimport '@terminal-kit/core/themes.css';\nconst Example = ({${map}})[new URLSearchParams(location.search).get('component')];\n${boot}`,
+      contents: `${framework === 'angular' ? "import '@angular/compiler';\n" : ''}${imports}\nimport '@terminal-kit/core/themes.css';\nimport '@terminal-kit/core/typography.css';\nconst Example = ({${map}})[new URLSearchParams(location.search).get('component')];\n${boot}`,
       resolveDir: out,
       loader: 'ts',
     },
@@ -186,7 +201,9 @@ const server = createServer(async (request, response) => {
         ? resolve('dist/terminal.js')
         : path === '/assets/themes.css'
           ? resolve('dist/themes.css')
-          : join(out, basename(path));
+          : path === '/assets/typography.css'
+            ? resolve('dist/typography.css')
+            : join(out, basename(path));
     const content = await readFile(file);
     response.setHeader(
       'Content-Type',
@@ -211,6 +228,25 @@ try {
       await page.goto(
         framework === 'html' ? `${base}/${tag}.html` : `${base}/${framework}.html?component=${tag}`,
       );
+      if (tag === 'typography') {
+        const heading = page.getByRole('heading', { name: 'A clear signal.', level: 1 });
+        await heading.waitFor();
+        assert.equal(
+          await heading.evaluate((el) => getComputedStyle(el).fontSize),
+          '48px',
+          `${framework}: typography CSS must load.`,
+        );
+        const link = page.getByRole('link', { name: 'links for navigation' });
+        await link.focus();
+        assert.equal(
+          await link.evaluate((el) => getComputedStyle(el).textDecorationLine),
+          'underline',
+        );
+        await link.press('Enter');
+        assert(page.url().endsWith('#reading-notes'), `${framework}: native anchor must navigate.`);
+        assert.deepEqual(errors, [], `${framework}/typography: browser errors.`);
+        continue;
+      }
       await page
         .waitForFunction((tag) => !!document.querySelector(tag), tag)
         .catch((error) => {

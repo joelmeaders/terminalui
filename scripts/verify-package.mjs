@@ -118,6 +118,7 @@ await writeFile(
   `${imports}
 import '@terminal-kit/core';
 import '@terminal-kit/core/themes.css';
+import '@terminal-kit/core/typography.css';
 import { TInput as ReactInput } from '@terminal-kit/core/react';
 import * as ReactComponents from '@terminal-kit/core/react';
 import { useTerminalModel } from '@terminal-kit/core/vue';
@@ -349,10 +350,30 @@ try {
     ),
   );
   assert.deepEqual(errors, []);
+  await page.setContent(
+    '<main class="t-prose"><h1>Installed typography</h1><p><a href="#notes">Read the notes</a></p><h2 id="notes">Notes</h2></main>',
+  );
+  for (const name of ['themes', 'typography']) {
+    const installed = await readFile(
+      join(consumer, `node_modules/@terminal-kit/core/dist/${name}.css`),
+      'utf8',
+    );
+    assert.equal(
+      installed,
+      await readFile(`src/${name}.css`, 'utf8'),
+      `Installed ${name} CSS must match its source.`,
+    );
+    await page.addStyleTag({ content: installed });
+  }
+  assert.equal(await page.locator('h1').evaluate((el) => getComputedStyle(el).fontSize), '48px');
+  assert.equal(
+    await page.locator('a').evaluate((el) => getComputedStyle(el).textDecorationLine),
+    'underline',
+  );
 } finally {
   await browser.close();
 }
 console.log(
-  `Verified external npm install, all ${catalog.length} element exports and React wrappers, NodeNext types, icon registry, provider isolation, Angular AOT consumer with six added form bindings, standalone registration, and ${noticeDirectories.length} exact provider notices.`,
+  `Verified external npm install, all ${catalog.length} element exports and React wrappers, NodeNext types, icon registry, provider isolation, Angular AOT consumer with six added form bindings, standalone registration, native typography CSS, and ${noticeDirectories.length} exact provider notices.`,
 );
 console.log(`Consumer artifacts: ${consumer}`);

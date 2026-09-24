@@ -32,9 +32,11 @@ export interface ComponentApi {
   cssParts: ApiMember[];
   cssProperties: ApiMember[];
 }
-export const components = manifest.modules
+// Normalize the generated modules before flattening their different declaration shapes.
+const modules: { declarations?: Partial<ComponentApi>[] }[] = manifest.modules;
+export const components = modules
   .flatMap((module) => module.declarations ?? [])
-  .filter((item) => 'tagName' in item)
+  .filter((item) => typeof item.tagName === 'string')
   .map((item) => ({
     members: [],
     attributes: [],
@@ -73,7 +75,7 @@ export const exampleCss = `.example {
 /* Set shared tokens on the region, or use documented ::part() names. */
 .example { --t-space: 16px; }`;
 
-function markup(
+export function markup(
   node: ExampleNode,
   framework: Framework,
   root: boolean,

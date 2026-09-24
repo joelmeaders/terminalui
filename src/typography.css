@@ -1,0 +1,230 @@
+/* Opt-in native text styles. Import after themes.css. No global reset. */
+:where(.t-prose, .t-text, .t-h1, .t-h2, .t-h3, .t-h4, .t-h5, .t-h6) {
+  font-family: var(--t-font, monospace);
+  font-size: var(--t-text-size-medium, 1rem);
+  line-height: var(--t-text-leading, 1.7);
+  color: var(--t-text, #eee9d9);
+  overflow-wrap: anywhere;
+}
+:where(.t-prose) {
+  max-inline-size: var(--t-prose-width, 68ch);
+}
+:where(
+  .t-prose h1,
+  .t-prose h2,
+  .t-prose h3,
+  .t-prose h4,
+  .t-prose h5,
+  .t-prose h6,
+  .t-h1,
+  .t-h2,
+  .t-h3,
+  .t-h4,
+  .t-h5,
+  .t-h6
+) {
+  margin-block: 1.5em 0.5em;
+  color: var(--t-heading-color, var(--t-text, #eee9d9));
+  font-weight: var(--t-heading-weight, 600);
+  line-height: var(--t-heading-leading, 1.2);
+  letter-spacing: 0.02em;
+  text-wrap: pretty;
+}
+:where(.t-prose h1),
+.t-h1 {
+  font-size: var(--t-heading-1, 3rem);
+}
+:where(.t-prose h2),
+.t-h2 {
+  font-size: var(--t-heading-2, 2.25rem);
+}
+:where(.t-prose h3),
+.t-h3 {
+  font-size: var(--t-heading-3, 1.75rem);
+}
+:where(.t-prose h4),
+.t-h4 {
+  font-size: var(--t-heading-4, 1.5rem);
+}
+:where(.t-prose h5),
+.t-h5 {
+  font-size: var(--t-heading-5, 1.25rem);
+}
+:where(.t-prose h6),
+.t-h6 {
+  font-size: var(--t-heading-6, 1rem);
+}
+:where(
+  .t-prose p,
+  .t-prose ul,
+  .t-prose ol,
+  .t-prose dl,
+  .t-prose blockquote,
+  .t-prose pre,
+  .t-prose figure,
+  .t-prose address,
+  .t-text
+) {
+  margin-block: 0 1em;
+}
+:where(.t-prose > :first-child) {
+  margin-block-start: 0;
+}
+:where(.t-prose > :last-child) {
+  margin-block-end: 0;
+}
+:where(.t-prose ul, .t-prose ol) {
+  padding-inline-start: 1.75em;
+}
+:where(.t-prose li + li) {
+  margin-block-start: 0.35em;
+}
+:where(.t-prose li > ul, .t-prose li > ol) {
+  margin-block: 0.35em 0;
+}
+:where(.t-prose dt) {
+  font-weight: 700;
+}
+:where(.t-prose dd) {
+  margin-inline: 1.5em 0;
+  margin-block-end: 0.75em;
+}
+:where(.t-prose strong, .t-prose b) {
+  font-weight: 700;
+}
+:where(.t-prose em, .t-prose i) {
+  font-style: italic;
+}
+:where(.t-prose small, .t-prose figcaption) {
+  font-size: 0.875em;
+}
+:where(.t-prose figure) {
+  margin-inline: 0;
+}
+:where(.t-prose figcaption) {
+  margin-block-start: 0.5em;
+}
+:where(.t-prose address) {
+  font-style: normal;
+}
+:where(.t-prose abbr[title]) {
+  text-decoration: underline dotted;
+  text-underline-offset: 0.2em;
+}
+:where(.t-prose a[href], a.t-link[href]) {
+  color: var(--t-link-color, var(--t-accent, #f5ba5b));
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+:where(.t-prose a[href], a.t-link[href]):hover {
+  text-decoration-thickness: 0.15em;
+}
+:where(.t-prose a[href], a.t-link[href], .t-prose pre[tabindex]):focus-visible {
+  outline: 2px solid var(--t-focus, #ffe0a2);
+  outline-offset: 3px;
+}
+:where(.t-prose blockquote) {
+  margin-inline: 0;
+  padding-inline-start: 1em;
+  border-inline-start: var(--t-emphasis-width, 3px) solid var(--t-accent, #f5ba5b);
+}
+:where(.t-prose blockquote > :last-child) {
+  margin-block-end: 0;
+}
+:where(.t-prose blockquote footer, .t-prose figcaption, .t-muted) {
+  color: var(--t-muted, #aaae9e);
+}
+:where(.t-prose code, .t-prose kbd, .t-prose samp) {
+  font-family: var(--t-font, monospace);
+  font-size: 0.9em;
+  color: var(--t-text, #eee9d9);
+  background: var(--t-raised, #20261e);
+  padding: 0.1em 0.3em;
+  box-decoration-break: clone;
+}
+:where(.t-prose kbd) {
+  border: var(--t-line-width, 1px) solid var(--t-control-border, #849074);
+  border-block-end-width: var(--t-emphasis-width, 3px);
+}
+:where(.t-prose pre) {
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  overflow: auto;
+  padding: 1em;
+  color: var(--t-text, #eee9d9);
+  background: var(--t-raised, #20261e);
+  border: var(--t-line-width, 1px) solid var(--t-border, #59614e);
+  font-family: var(--t-font, monospace);
+  font-size: var(--t-text-size-small, 0.875rem);
+  line-height: var(--t-text-leading, 1.7);
+  white-space: pre;
+  overflow-wrap: normal;
+  tab-size: 2;
+}
+:where(.t-prose pre code, .t-prose pre samp) {
+  padding: 0;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+}
+:where(.t-prose mark) {
+  padding-inline: 0.15em;
+  color: var(--t-on-accent, #19180e);
+  background: var(--t-accent, #f5ba5b);
+  box-decoration-break: clone;
+}
+:where(.t-prose hr) {
+  margin-block: 2em;
+  border: 0;
+  border-block-start: var(--t-divider-width, 1px) solid var(--t-border, #59614e);
+}
+:where(.t-text-small) {
+  font-size: var(--t-text-size-small, 0.875rem);
+}
+:where(.t-text-medium) {
+  font-size: var(--t-text-size-medium, 1rem);
+}
+:where(.t-text-large, .t-lead) {
+  font-size: var(--t-text-size-large, 1.25rem);
+}
+:where(.t-eyebrow) {
+  color: var(--t-accent, #f5ba5b);
+  font-size: var(--t-text-size-small, 0.875rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+@media (forced-colors: active) {
+  :where(
+    .t-prose,
+    .t-prose *,
+    .t-text,
+    .t-h1,
+    .t-h2,
+    .t-h3,
+    .t-h4,
+    .t-h5,
+    .t-h6,
+    .t-muted,
+    .t-eyebrow,
+    a.t-link
+  ) {
+    text-shadow: none !important;
+  }
+  :where(.t-prose a[href], a.t-link[href]) {
+    color: LinkText;
+  }
+  :where(.t-prose a[href], a.t-link[href], .t-prose pre[tabindex]):focus-visible {
+    outline-color: Highlight;
+  }
+  :where(.t-prose blockquote, .t-prose kbd, .t-prose pre, .t-prose hr) {
+    border-color: CanvasText;
+  }
+  :where(.t-prose mark) {
+    color: HighlightText;
+    background: Highlight;
+  }
+}

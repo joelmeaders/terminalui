@@ -55,8 +55,10 @@ for (const source of sources) {
   const content = await readFile(file, 'utf8');
   await writeFile(file, esmExtensions(content));
 }
-await copyFile('src/themes.css', 'dist/themes.css');
-await writeFile('dist/themes.css.d.ts', 'export {};\n');
+for (const name of ['themes', 'typography']) {
+  await copyFile(`src/${name}.css`, `dist/${name}.css`);
+  await writeFile(`dist/${name}.css.d.ts`, 'export {};\n');
+}
 execFileSync(
   process.execPath,
   ['node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js', '-p', 'tsconfig.angular.json'],

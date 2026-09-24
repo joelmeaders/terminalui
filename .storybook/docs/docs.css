@@ -155,7 +155,7 @@
   flex-wrap: wrap;
   gap: 12px;
 }
-.tk-docs :is(a, button, select, summary, [tabindex]):focus-visible {
+.tk-docs :is(a, button, select, summary, [tabindex]):not(.sb-story *):focus-visible {
   outline: 2px solid var(--docs-accent);
   outline-offset: 3px;
 }

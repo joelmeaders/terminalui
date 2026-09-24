@@ -13,6 +13,58 @@ const entries = Object.keys(guides).map((tag) => {
   return { tag, id: title.toLowerCase().replaceAll('/', '-').replaceAll(' ', '-') + '--docs' };
 });
 
+test('typography docs share the framework selector and include complete native CSS examples', async ({
+  page,
+}) => {
+  await page.goto('/storybook/?path=/docs/introduction-typography--docs&globals=theme:paper');
+  const frame = page.frameLocator('#storybook-preview-iframe');
+  const select = frame.getByRole('combobox', { name: 'Documentation framework' });
+  for (const [value, snippet] of [
+    ['html', '/assets/typography.css'],
+    ['react', 'className="example t-prose"'],
+    ['angular', '@Component'],
+    ['vue', '<script setup lang="ts">'],
+  ]) {
+    await select.selectOption(value);
+    await expect(frame.locator('.tk-docs')).toHaveAttribute('data-docs-framework', value);
+    await expect(frame.getByTestId('typography-example')).toContainText(snippet);
+    await expect(frame.getByTestId('typography-example')).toContainText('typography.css');
+  }
+  await expect(frame.locator('#typography-guide')).toContainText('--t-heading-1');
+  await expect(frame.locator('#typography-guide')).toContainText('heading levels');
+  await expect(frame.locator('#typography-guide')).toContainText('t-link');
+  await frame.getByRole('link', { name: 'Try it', exact: true }).click();
+  await expect(frame.locator('#live-preview h1')).toHaveCSS('font-size', '48px');
+  const nativeLink = frame
+    .locator('#live-preview')
+    .getByRole('link', { name: 'links for navigation' });
+  await nativeLink.focus();
+  await page.keyboard.press('Shift');
+  await expect(nativeLink).toBeFocused();
+  await expect(nativeLink).toHaveCSS('outline-color', 'rgb(48, 79, 148)');
+  await page.getByRole('button', { name: 'Button', exact: true }).click();
+  await page.locator('a#components-button--docs').click();
+  await expect(frame.locator('.tk-docs-tag')).toHaveText('<t-button>');
+  await expect(select).toHaveValue('vue');
+});
+
+test('typography documentation stays usable at 320 CSS pixels', async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto('/storybook/iframe.html?id=introduction-typography--docs&viewMode=docs');
+  await expect(page.getByRole('combobox', { name: 'Documentation framework' })).toBeVisible();
+  await page.getByRole('link', { name: 'Styles and tokens', exact: true }).click();
+  await expect(page.locator('#typography-guide h2').first()).toBeInViewport();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
+    true,
+  );
+  const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
+  await writeFile(
+    testInfo.outputPath('typography-documentation-axe-review.json'),
+    JSON.stringify({ violations: report.violations, incomplete: report.incomplete }, null, 2),
+  );
+  expect(report.violations).toEqual([]);
+});
+
 for (const { tag, id } of entries) {
   test(`${tag} has a complete built documentation page`, async ({ page }) => {
     const errors: string[] = [];

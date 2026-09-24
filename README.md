@@ -39,6 +39,25 @@ Use `start` and `end` slots for icons beside button/link labels, disclosure trig
 
 With individual imports, register both Button and Icon. Field slots also accept named actions, such as a clear button. Keep interactive children out of button and disclosure trigger slots. See [slots and icons](docs/slots.md) for imports, input actions, notification actions, accessibility, and framework rules.
 
+## Typography
+
+Import the optional CSS layer for native headings, paragraphs, anchors, lists, quotes, code, and inline text. It adds about 1.4 kB gzip and no JavaScript:
+
+```js
+import '@terminal-kit/core/themes.css';
+import '@terminal-kit/core/typography.css';
+```
+
+```html
+<article class="t-prose">
+  <h1>A clear signal.</h1>
+  <p class="t-lead">Readable content in every palette.</p>
+  <p>Read the <a href="/guide">connection guide</a>.</p>
+</article>
+```
+
+Use `.t-h1` through `.t-h6` for heading appearance, `.t-text` for standalone text, and `.t-text-small`, `.t-text-medium`, or `.t-text-large` for size. The layer adds no JavaScript and does not reset unmarked content. Plain HTML can load `dist/themes.css` and `dist/typography.css` with stylesheet links. See **Introduction → Typography** in Storybook for the scale, inline elements, anchors, code, palettes, RTL, tokens, and all four framework examples. The shared [typography guide](docs/typography.md) explains scope and accessibility.
+
 ## Components
 
 | Element               | Purpose                          | Main API                                                                                    |

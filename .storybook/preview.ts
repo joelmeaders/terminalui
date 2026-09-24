@@ -5,6 +5,7 @@ import { html } from 'lit';
 import { themes } from 'storybook/theming';
 import '../src/index';
 import '../src/themes.css';
+import '../src/typography.css';
 import { ComponentDocs } from './docs/ComponentDocs';
 setCustomElementsManifest(manifest);
 const preview: Preview = {

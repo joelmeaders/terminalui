@@ -29,7 +29,7 @@ import './docs.css';
 
 const frameworkValue = (value: unknown): Framework =>
   typeof value === 'string' && Object.hasOwn(frameworks, value) ? (value as Framework) : 'html';
-function useFramework() {
+export function useFramework() {
   const context = useContext(DocsContext);
   const story = context.componentStories()[0];
   const [framework, setFramework] = useState(() =>
@@ -47,6 +47,31 @@ function useFramework() {
   const update = (value: Framework) =>
     context.channel.emit(UPDATE_GLOBALS, { globals: { framework: value } });
   return [framework, update] as const;
+}
+
+export function FrameworkSelector({
+  framework,
+  onChange,
+}: {
+  framework: Framework;
+  onChange: (value: Framework) => void;
+}) {
+  return (
+    <label>
+      Code examples
+      <select
+        aria-label="Documentation framework"
+        value={framework}
+        onChange={(event) => onChange(frameworkValue(event.target.value))}
+      >
+        {Object.entries(frameworks).map(([value, label]) => (
+          <option key={value} value={value}>
+            {label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
 }
 
 const commonDescriptions: Record<string, string> = {
@@ -268,25 +293,12 @@ export function ComponentDocs() {
   const guide = guides[tag];
   const [framework, updateFramework] = useFramework();
   const example = guide ? exampleFor(tag, framework) : undefined;
-  const languages = { html: 'html', react: 'tsx', vue: 'html', angular: 'typescript' };
+  const languages = { html: 'html', react: 'tsx', vue: 'html', angular: 'typescript' } as const;
   return (
     <article className="tk-docs" data-docs-framework={framework}>
       <div className="tk-docs-topline">
         <span>TERMINAL / KIT · COMPONENT MANUAL</span>
-        <label>
-          Code examples
-          <select
-            aria-label="Documentation framework"
-            value={framework}
-            onChange={(event) => updateFramework(frameworkValue(event.target.value))}
-          >
-            {Object.entries(frameworks).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
+        <FrameworkSelector framework={framework} onChange={updateFramework} />
       </div>
       <header className="tk-docs-hero">
         <Title />
