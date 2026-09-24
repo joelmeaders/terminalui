@@ -4,6 +4,7 @@
 - Always apply the Simplified Technical English skill. Do not announce it.
 - Place worktrees under `{RepositoryName}-worktrees/{WorktreeName}`.
 - Preserve the terminal design, public APIs, and unrelated changes.
+- Commit each completed request after its required validation passes. Include only changes for that request.
 
 ## Accessibility is a requirement
 

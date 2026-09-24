@@ -55,7 +55,7 @@ Storybook is at **http://127.0.0.1:6006**. The workbench's documentation links p
 | `t-skeleton`          | Loading placeholder              | `shape`, `animated`                                                                       |
 | `t-divider`           | Content separator                | `vertical`                                                                                |
 | `t-avatar`            | Image or initials                | `name`, `src`, `size`                                                                     |
-| `t-toast`             | Dismissible notification         | `message`, `open`, `variant`, `duration`, `urgent`, `show(message?, opener?)`, `close()`  |
+| `t-toast`             | Dismissible notification         | `duration`, `countdown`, `countdownUnit`, `show(message?, opener?)`, `close()`            |
 | `t-empty-state`       | Empty content panel              | `heading`, default and action slots                                                       |
 | `t-stack`             | Flex layout                      | `direction`, `align`, `justify`, `wrap`                                                   |
 | `t-grid`              | Grid layout                      | `columns`, default slot                                                                   |
@@ -138,6 +138,28 @@ select.value = 'web';
 dialog.show(openButton); // Explicit opener also handles pointer activation in WebKit.
 toast.show('Settings saved.', saveButton); // Optional opener for focus return after dismissal.
 ```
+
+Notification countdowns share the auto-dismiss timer:
+
+```html
+<t-toast duration="5000" countdown="bar" message="Settings saved."></t-toast>
+<t-toast
+  duration="5000"
+  countdown="spinner"
+  countdown-unit="seconds"
+  message="Settings saved."
+></t-toast>
+<t-toast
+  duration="5000"
+  countdown="spinner"
+  countdown-unit="milliseconds"
+  message="Settings saved."
+></t-toast>
+```
+
+Call `show()` or set `open` to display a notification. `duration` uses milliseconds. Its default of `0` keeps the notification open. `countdown` defaults to `none`, which hides the indicator without changing the timeout. `countdownUnit` controls the spinner text and defaults to `seconds`. Seconds round up, so zero coincides with dismissal. Millisecond text updates about every 32 ms, subject to browser scheduling. The timer uses elapsed time, not the number of display updates. Positive delays above 2,147,483,647 ms are capped at that browser timer limit. Negative or non-finite durations remain persistent.
+
+Hover, keyboard focus, and a hidden page pause both the timer and its indicator. Changing `message` or `duration`, or calling `show()` again, restarts the duration. Changing the countdown style or unit keeps the remaining time. Reduced motion and `data-motion="off"` stop spinner rotation and limit countdown updates to once per second. Countdown visuals stay outside the live region. Critical messages should stay persistent or remain available elsewhere. In the workbench, use **Quick settings** to choose the countdown style, unit, and duration before selecting **Show notification**.
 
 ## Framework examples
 
@@ -243,7 +265,7 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 7.9 KB gzip for one button, 9.3 KB for the original three form controls, and 36.6 KB for registration of all 50 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.1 KB gzip. The complete-catalog budget is 42 KB after this expansion; the original 8 KB button and 9.5 KB form budgets remain unchanged. Importing and using more exported APIs adds their code.
+The local size check measures about 7.9 KB gzip for one button, 9.3 KB for the original three form controls, and 38.5 KB for registration of all 50 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.1 KB gzip. The complete-catalog budget is 42 KB after this expansion; the original 8 KB button and 9.5 KB form budgets remain unchanged. Importing and using more exported APIs adds their code.
 
 ## Storybook and verification
 

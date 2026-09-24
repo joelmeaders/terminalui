@@ -1,4 +1,4 @@
-import { css, html, type PropertyValues } from 'lit';
+import { css, html, nothing, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { activeElement } from '../internal/floating';
 /** Polite dismissible notification. Duration defaults to zero (persistent); timers pause on hover, focus, or hidden pages.
@@ -6,6 +6,10 @@ import { activeElement } from '../internal/floating';
  * @fires t-close - CustomEvent<{reason:'dismiss'|'timeout'|'programmatic'}>.
  * @csspart notice - Notification surface.
  * @csspart close - Dismiss button.
+ * @csspart countdown - Countdown bar or spinner container.
+ * @csspart countdown-bar - Shrinking bar fill.
+ * @csspart countdown-ring - Rotating spinner ring.
+ * @csspart countdown-value - Remaining time inside the spinner.
  */
 export class TToast extends TerminalElement {
   static properties = {
@@ -14,12 +18,24 @@ export class TToast extends TerminalElement {
     variant: { reflect: true },
     duration: { type: Number },
     urgent: { type: Boolean },
+    countdown: { reflect: true },
+    countdownUnit: { attribute: 'countdown-unit' },
+    displayedRemaining: { state: true },
+    paused: { state: true },
   };
   message = '';
   open = false;
   variant = 'info';
   duration = 0;
   urgent = false;
+  /** Optional visual indicator for a positive duration. Does not enable a timeout by itself. */
+  countdown: 'none' | 'bar' | 'spinner' = 'none';
+  /** Unit displayed inside the spinner. Duration always uses milliseconds. */
+  countdownUnit: 'seconds' | 'milliseconds' = 'seconds';
+  private displayedRemaining = 0;
+  private paused = false;
+  private frame?: number;
+  private nextPaint = 0;
   private timer?: ReturnType<typeof setTimeout>;
   private remaining = 0;
   private started = 0;
@@ -35,9 +51,12 @@ export class TToast extends TerminalElement {
         display: block;
       }
       .notice {
+        --_t-toast-accent: var(--t-accent);
+        position: relative;
         animation: var(--_t-motion-name, t-enter)
           var(--_t-motion-duration, var(--t-motion-normal, 180ms)) var(--t-motion-ease, ease);
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
         gap: 16px;
@@ -45,18 +64,76 @@ export class TToast extends TerminalElement {
         background: var(--t-raised);
         color: var(--t-text);
         border: var(--t-line-width, 1px) solid var(--t-border);
-        border-left: var(--t-emphasis-width, 3px) solid var(--t-accent);
+        border-left: var(--t-emphasis-width, 3px) solid var(--_t-toast-accent);
         box-shadow: var(--_t-edge-glow);
         font-size: 13px;
       }
       :host([variant='success']) .notice {
-        border-left-color: var(--t-success);
+        --_t-toast-accent: var(--t-success);
       }
       :host([variant='warning']) .notice {
-        border-left-color: var(--t-warning);
+        --_t-toast-accent: var(--t-warning);
       }
       :host([variant='danger']) .notice {
-        border-left-color: var(--t-danger);
+        --_t-toast-accent: var(--t-danger);
+      }
+      .notice:not([data-open]) {
+        display: contents;
+      }
+      .message {
+        flex: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+      .countdown-bar {
+        position: absolute;
+        inset: auto 0 0;
+        height: var(--t-emphasis-width, 3px);
+        background: var(--t-bg);
+      }
+      .countdown-bar > span {
+        display: block;
+        height: 100%;
+        background: var(--_t-toast-accent);
+        transform: scaleX(var(--_t-countdown-progress));
+        transform-origin: left;
+      }
+      .countdown-spinner {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: var(--_t-countdown-size);
+        aspect-ratio: 1;
+        position: relative;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.2;
+        text-align: center;
+      }
+      .countdown-ring {
+        position: absolute;
+        inset: 0;
+        border: var(--t-selection-width, 2px) solid var(--t-border);
+        border-top-color: var(--_t-toast-accent);
+        border-radius: 50%;
+        animation: var(--_t-motion-name, countdown-spin) 900ms linear infinite;
+      }
+      .countdown-unit {
+        display: block;
+        font-size: 0.8em;
+      }
+      @keyframes countdown-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (forced-colors: active) {
+        .countdown-bar > span {
+          background: CanvasText;
+        }
+        .countdown-ring {
+          border-color: GrayText;
+          border-top-color: CanvasText;
+        }
       }
       button {
         flex: none;
@@ -77,6 +154,8 @@ export class TToast extends TerminalElement {
   disconnectedCallback() {
     clearTimeout(this.timer);
     this.timer = undefined;
+    this.stopDisplay();
+    this.hovered = this.focused = false;
     document.removeEventListener('visibilitychange', this.visibility);
     super.disconnectedCallback();
   }
@@ -101,52 +180,132 @@ export class TToast extends TerminalElement {
       else {
         clearTimeout(this.timer);
         this.timer = undefined;
+        this.stopDisplay();
         if (this.restoreFocus && this.opener?.isConnected) this.opener.focus();
         this.restoreFocus = false;
+        this.hovered = this.focused = false;
         if (changed.get('open') === true) this.emit('t-close', { reason: this.reason });
         this.reason = 'programmatic';
       }
     } else if (changed.has('duration') || changed.has('message')) this.restart();
+    else if (changed.has('countdown') || changed.has('countdownUnit')) this.startDisplay();
   }
+  private get timeoutDuration() {
+    // Browsers overflow larger setTimeout delays. Zero and invalid values stay persistent.
+    return Number.isFinite(this.duration) ? Math.min(2_147_483_647, Math.max(0, this.duration)) : 0;
+  }
+  private timeLeft() {
+    return this.timer === undefined
+      ? this.remaining
+      : Math.max(0, this.remaining - (performance.now() - this.started));
+  }
+  private stopDisplay() {
+    if (this.frame !== undefined) cancelAnimationFrame(this.frame);
+    this.frame = undefined;
+  }
+  private startDisplay() {
+    this.stopDisplay();
+    this.displayedRemaining = this.timeLeft();
+    this.nextPaint = 0;
+    if (this.timer !== undefined && (this.countdown === 'bar' || this.countdown === 'spinner'))
+      this.frame = requestAnimationFrame(this.paintCountdown);
+  }
+  private paintCountdown = (now: number) => {
+    // The timeout and indicator use the same elapsed time, rather than counting ticks.
+    if (now >= this.nextPaint) {
+      const left = this.timeLeft();
+      const reduced =
+        matchMedia('(prefers-reduced-motion: reduce)').matches ||
+        getComputedStyle(this).getPropertyValue('--_t-motion-name').trim() === 'none';
+      this.displayedRemaining = left;
+      this.nextPaint = now + (reduced ? 1000 : 32);
+    }
+    this.frame = requestAnimationFrame(this.paintCountdown);
+  };
   private restart() {
     clearTimeout(this.timer);
     this.timer = undefined;
-    this.remaining = Number.isFinite(this.duration) ? Math.max(0, this.duration) : 0;
+    this.stopDisplay();
+    this.remaining = this.timeoutDuration;
+    this.displayedRemaining = this.remaining;
     this.resume();
   }
   private pause() {
-    if (this.timer) {
+    if (this.timer !== undefined) {
+      this.remaining = this.timeLeft();
       clearTimeout(this.timer);
       this.timer = undefined;
-      this.remaining = Math.max(0, this.remaining - (performance.now() - this.started));
     }
+    this.paused = true;
+    this.displayedRemaining = this.remaining;
+    this.stopDisplay();
   }
   private resume() {
     if (
       !this.open ||
+      !this.isConnected ||
       this.hovered ||
       this.focused ||
       document.hidden ||
       this.remaining <= 0 ||
-      this.timer
-    )
+      this.timer !== undefined
+    ) {
+      this.paused = this.hovered || this.focused || document.hidden;
       return;
+    }
+    this.paused = false;
     this.started = performance.now();
     this.timer = setTimeout(() => {
       this.timer = undefined;
+      this.remaining = this.displayedRemaining = 0;
+      this.stopDisplay();
       this.close('timeout');
     }, this.remaining);
+    this.startDisplay();
   }
   private visibility = () => {
     if (document.hidden) this.pause();
     else this.resume();
   };
   render() {
-    return html`<div role=${this.urgent ? 'alert' : 'status'} aria-atomic="true">
+    const timed = this.timeoutDuration > 0;
+    const milliseconds = this.countdownUnit === 'milliseconds';
+    const value = Math.ceil(this.displayedRemaining / (milliseconds ? 1 : 1000));
+    const digits = String(Math.ceil(this.timeoutDuration / (milliseconds ? 1 : 1000))).length;
+    const indicator =
+      timed && this.countdown === 'bar'
+        ? html`<div
+            class="countdown-bar"
+            part="countdown"
+            aria-hidden="true"
+            ?hidden=${!this.open}
+            style=${`--_t-countdown-progress:${this.displayedRemaining / this.timeoutDuration}`}
+          >
+            <span part="countdown-bar"></span>
+          </div>`
+        : timed && this.countdown === 'spinner'
+          ? html`<div
+              class="countdown-spinner"
+              part="countdown"
+              aria-hidden="true"
+              ?hidden=${!this.open}
+              style=${`--_t-countdown-size:${Math.max(3.5, digits * 0.65 + 1.5)}em`}
+            >
+              <span
+                class="countdown-ring"
+                part="countdown-ring"
+                style=${`animation-play-state:${this.paused ? 'paused' : 'running'}`}
+              ></span>
+              <span part="countdown-value"
+                >${value}<span class="countdown-unit">${milliseconds ? 'ms' : 's'}</span></span
+              >
+            </div>`
+          : nothing;
+    return html`<div>
       <div
         class="notice"
         part="notice"
-        ?hidden=${!this.open}
+        ?data-open=${this.open}
         @mouseenter=${() => {
           this.hovered = true;
           this.pause();
@@ -164,10 +323,13 @@ export class TToast extends TerminalElement {
           this.resume();
         }}
       >
-        <span><slot>${this.message}</slot></span
-        ><button
+        <span class="message" role=${this.urgent ? 'alert' : 'status'} aria-atomic="true"
+          ><span ?hidden=${!this.open}><slot>${this.message}</slot></span></span
+        >
+        ${indicator}<button
           part="close"
           type="button"
+          ?hidden=${!this.open}
           aria-label="Dismiss notification"
           @mousedown=${(event: MouseEvent) => event.preventDefault()}
           @click=${() => this.close('dismiss')}

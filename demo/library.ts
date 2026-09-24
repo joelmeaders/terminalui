@@ -16,6 +16,9 @@ const rows = [
 ];
 let page = 1;
 let saved = '';
+let notificationCountdown: TToast['countdown'] = 'bar';
+let notificationUnit: TToast['countdownUnit'] = 'seconds';
+let notificationDuration = 5000;
 
 export function library(refresh: () => void, log: (message: string) => void) {
   return html`
@@ -199,7 +202,46 @@ export function library(refresh: () => void, log: (message: string) => void) {
               <t-popover label="Quick settings" heading="Quick settings"
                 ><t-stack
                   ><t-switch label="Show metadata" checked></t-switch
-                  ><t-checkbox label="Include archived records"></t-checkbox></t-stack
+                  ><t-checkbox label="Include archived records"></t-checkbox>
+                  <t-select
+                    label="Notification countdown"
+                    .value=${notificationCountdown}
+                    .options=${[
+                      { value: 'none', label: 'None' },
+                      { value: 'bar', label: 'Shrinking bar' },
+                      { value: 'spinner', label: 'Spinner with countdown' },
+                    ]}
+                    @change=${(event: Event) => {
+                      notificationCountdown = (event.currentTarget as HTMLSelectElement)
+                        .value as TToast['countdown'];
+                      refresh();
+                    }}
+                  ></t-select>
+                  <t-select
+                    label="Countdown unit"
+                    .value=${notificationUnit}
+                    .options=${[
+                      { value: 'seconds', label: 'Seconds' },
+                      { value: 'milliseconds', label: 'Milliseconds' },
+                    ]}
+                    @change=${(event: Event) => {
+                      notificationUnit = (event.currentTarget as HTMLSelectElement)
+                        .value as TToast['countdownUnit'];
+                      refresh();
+                    }}
+                  ></t-select>
+                  <t-number-input
+                    label="Dismiss after (seconds)"
+                    min="0"
+                    step="1"
+                    .value=${String(notificationDuration / 1000)}
+                    help="Use 0 to keep notifications open. Hover or focus pauses the timer."
+                    @change=${(event: Event) => {
+                      notificationDuration =
+                        Number((event.currentTarget as HTMLInputElement).value) * 1000;
+                      refresh();
+                    }}
+                  ></t-number-input> </t-stack
               ></t-popover>
             </div>
             <p>
@@ -243,7 +285,13 @@ export function library(refresh: () => void, log: (message: string) => void) {
         </t-card>
       </div>
       <div class="library-notification">
-        <t-toast id="library-toast" variant="success"></t-toast>
+        <t-toast
+          id="library-toast"
+          variant="success"
+          .duration=${notificationDuration}
+          .countdown=${notificationCountdown}
+          .countdownUnit=${notificationUnit}
+        ></t-toast>
       </div>
     </section>
     <t-drawer id="library-drawer" heading="Workspace settings"
