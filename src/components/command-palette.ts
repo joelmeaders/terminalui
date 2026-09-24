@@ -3,6 +3,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { activeElement } from '../internal/floating';
 import { containModalTab } from '../internal/modal-focus';
+import { ModalScrollController } from '../internal/modal-scroll';
 
 export interface CommandItem {
   value: string;
@@ -42,10 +43,12 @@ export class TCommandPalette extends TerminalElement {
   loading = false;
   private activeValue = '';
   private opener?: HTMLElement;
+  private scrollLock = new ModalScrollController(this);
   static styles = [
     baseStyles,
     css`
       dialog {
+        overscroll-behavior: contain;
         width: min(600px, calc(100vw - 32px));
         max-height: calc(100dvh - 32px);
         padding: 0;
@@ -99,6 +102,7 @@ export class TCommandPalette extends TerminalElement {
         border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
       }
       .results {
+        overscroll-behavior: contain;
         overflow: auto;
         min-height: 0;
         padding: 4px 8px 8px;
@@ -155,16 +159,23 @@ export class TCommandPalette extends TerminalElement {
     this.open = false;
   }
   protected updated(_changed: PropertyValues) {
+    if (!this.isConnected) return;
     const dialog = this.renderRoot.querySelector('dialog')!;
     if (this.open && !dialog.open) {
       this.opener ??= activeElement();
+      this.scrollLock.acquire();
       dialog.showModal();
       this.renderRoot.querySelector('input')?.focus();
-    } else if (!this.open && dialog.open) dialog.close();
+    } else if (!this.open) {
+      if (dialog.open) dialog.close();
+      this.scrollLock.release();
+    }
   }
   private onClose() {
+    if (this.renderRoot.querySelector('dialog')?.open) return;
+    this.scrollLock.release();
     this.open = false;
-    if (this.opener?.isConnected) this.opener.focus();
+    if (this.opener?.isConnected) this.opener.focus({ preventScroll: true });
     this.opener = undefined;
     this.emit('t-close');
   }

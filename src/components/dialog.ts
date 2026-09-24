@@ -1,16 +1,19 @@
 import { css, html, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { containModalTab } from '../internal/modal-focus';
+import { ModalScrollController } from '../internal/modal-scroll';
 /** Modal native dialog with Escape and focus return. Emits t-close. @slot - Body. @slot footer - Actions. */
 export class TDialog extends TerminalElement {
   static properties = { open: { type: Boolean, reflect: true }, heading: {} };
   open = false;
   heading = 'Dialog';
   private returnFocus?: HTMLElement;
+  private scrollLock = new ModalScrollController(this);
   static styles = [
     baseStyles,
     css`
       dialog {
+        overscroll-behavior: contain;
         border: var(--t-line-width, 1px) solid var(--t-accent);
         padding: 0;
         background: var(--t-surface);
@@ -53,6 +56,7 @@ export class TDialog extends TerminalElement {
         flex: none;
       }
       .body {
+        overscroll-behavior: contain;
         min-height: 0;
         overflow: auto;
         padding: 24px;
@@ -76,6 +80,7 @@ export class TDialog extends TerminalElement {
     this.open = false;
   }
   protected updated(_changed: PropertyValues) {
+    if (!this.isConnected) return;
     const dialog = this.renderRoot.querySelector('dialog')!;
     if (this.open && !dialog.open) {
       if (!this.returnFocus) {
@@ -83,12 +88,18 @@ export class TDialog extends TerminalElement {
         while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
         if (active instanceof HTMLElement) this.returnFocus = active;
       }
+      this.scrollLock.acquire();
       dialog.showModal();
-    } else if (!this.open && dialog.open) dialog.close();
+    } else if (!this.open) {
+      if (dialog.open) dialog.close();
+      this.scrollLock.release();
+    }
   }
   private onClose() {
+    if (this.renderRoot.querySelector('dialog')?.open) return;
+    this.scrollLock.release();
     this.open = false;
-    if (this.returnFocus?.isConnected) this.returnFocus.focus();
+    if (this.returnFocus?.isConnected) this.returnFocus.focus({ preventScroll: true });
     this.returnFocus = undefined;
     this.emit('t-close');
   }

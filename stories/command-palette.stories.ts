@@ -15,7 +15,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Searchable native modal with a combobox and listbox. Set `commands` to objects with unique `value`, `label`, optional `description`, `keywords`, and `disabled`. Call `show(opener?)` / `close()` or set `open`. `show()` clears the query. Arrow keys, Home/End, Enter, Escape, and modal Tab containment work without a global keyboard shortcut. `t-select` emits `{ value, command }`; the application runs the action. `t-close` fires after focus returns. The list is local and not virtualized.',
+          'Searchable native modal with a combobox and listbox. Set `commands` to objects with unique `value`, `label`, optional `description`, `keywords`, and `disabled`. Call `show(opener?)` / `close()` or set `open`. `show()` clears the query. Arrow keys, Home/End, Enter, Escape, and modal Tab containment work without a global keyboard shortcut. `t-select` emits `{ value, command }`; the application runs the action. `t-close` fires after focus returns. While open, background scrolling is locked and long modal content remains scrollable. Closing restores page scrolling. The list is local and not virtualized.',
       },
     },
   },

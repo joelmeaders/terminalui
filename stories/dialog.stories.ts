@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Native modal dialog. Call `show(opener?)` / `close()` or set `open`. Pass the opening button to `show` for consistent focus return after pointer activation. `heading` provides its accessible name. Supports Escape and native modal focus behavior. Slots: body and `footer`. Emits `t-close`. CSS part: `dialog`.',
+          'Native modal dialog. Call `show(opener?)` / `close()` or set `open`. Pass the opening button to `show` for consistent focus return after pointer activation. `heading` provides its accessible name. Supports Escape and native modal focus behavior. While open, background scrolling is locked and long modal content remains scrollable. Closing restores page scrolling. Slots: body and `footer`. Emits `t-close`. CSS part: `dialog`.',
       },
     },
   },

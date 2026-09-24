@@ -28,7 +28,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Native modal side panel. Call `show(opener?)` or set `open`; call `close()` to dismiss. Pass the native trigger to preserve focus return. `heading` names the panel. `placement` is `start` or `end` and follows document direction. The browser traps focus and Escape dismisses the panel. Body and `footer` slots accept normal content. Emits `t-close`. Backdrop clicks do not close the drawer.',
+          'Native modal side panel. Call `show(opener?)` or set `open`; call `close()` to dismiss. Pass the native trigger to preserve focus return. `heading` names the panel. `placement` is `start` or `end` and follows document direction. The browser traps focus and Escape dismisses the panel. While open, background scrolling is locked and long modal content remains scrollable. Closing restores page scrolling. Body and `footer` slots accept normal content. Emits `t-close`. Backdrop clicks do not close the drawer.',
       },
     },
   },

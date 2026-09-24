@@ -1,6 +1,7 @@
 import { css, html, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { containModalTab } from '../internal/modal-focus';
+import { ModalScrollController } from '../internal/modal-scroll';
 
 /**
  * Modal side panel built on a native dialog. Escape closes it and restores focus.
@@ -23,10 +24,12 @@ export class TDrawer extends TerminalElement {
   /** Logical screen edge. */
   placement: 'start' | 'end' = 'end';
   private returnFocus?: HTMLElement;
+  private scrollLock = new ModalScrollController(this);
   static styles = [
     baseStyles,
     css`
       dialog {
+        overscroll-behavior: contain;
         position: fixed;
         inset: 0;
         margin: 0;
@@ -77,6 +80,7 @@ export class TDrawer extends TerminalElement {
         font-size: 22px;
       }
       .body {
+        overscroll-behavior: contain;
         padding: var(--t-space-4, 16px);
         flex: 1;
         overflow: auto;
@@ -99,6 +103,7 @@ export class TDrawer extends TerminalElement {
     this.open = false;
   }
   protected updated(_changed: PropertyValues) {
+    if (!this.isConnected) return;
     const dialog = this.renderRoot.querySelector('dialog')!;
     if (this.open && !dialog.open) {
       if (!this.returnFocus) {
@@ -106,12 +111,18 @@ export class TDrawer extends TerminalElement {
         while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
         if (active instanceof HTMLElement) this.returnFocus = active;
       }
+      this.scrollLock.acquire();
       dialog.showModal();
-    } else if (!this.open && dialog.open) dialog.close();
+    } else if (!this.open) {
+      if (dialog.open) dialog.close();
+      this.scrollLock.release();
+    }
   }
   private onClose() {
+    if (this.renderRoot.querySelector('dialog')?.open) return;
+    this.scrollLock.release();
     this.open = false;
-    if (this.returnFocus?.isConnected) this.returnFocus.focus();
+    if (this.returnFocus?.isConnected) this.returnFocus.focus({ preventScroll: true });
     this.returnFocus = undefined;
     this.emit('t-close');
   }

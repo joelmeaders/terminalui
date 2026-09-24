@@ -17,6 +17,7 @@ Include accessibility in implementation, stories, tests, documentation, and revi
 - Preserve keyboard operation, visible focus, logical focus order, and disabled behavior. Never use positive `tabindex` in library markup.
 - Follow the relevant WAI-ARIA Authoring Practices pattern for composite widgets. Test navigation, selection, and disabled options.
 - Modals must contain keyboard focus and restore it on close. Account for slots, shadow roots, radio groups, and collapsed disclosures.
+- Modals must prevent background wheel, touch, and keyboard scrolling while keeping their content scrollable. Preserve page position and styles. Test stacked modals and removal cleanup.
 - Floating content must support dismissal and remain reachable at viewport edges. Hover help must remain visible when the pointer enters it.
 - Announce asynchronous status and validation changes appropriately. Avoid duplicate announcements and unnecessary assertive live regions.
 - Do not convey meaning through color, animation, hover, or icons alone. Give icon-only actions specific names.
