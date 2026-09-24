@@ -434,13 +434,27 @@ export const guides: Record<string, ComponentGuide> = {
     purpose: 'Display a measurement within a known range.',
     usage: [
       'Set min, max, value, and optional low/high/optimum thresholds.',
-      'Use valueText for units or a useful formatted value. Use t-progress for task completion. Native meter appearance varies by browser.',
+      'Use valueText for units or a useful formatted value. Use t-progress for task completion.',
+      'Choose solid (default), segmented-thin (2px strokes with 2px gaps), or segmented-thick (6px strokes with 3px gaps). Segment widths stay fixed during the reveal.',
+      'Sizes follow the library vocabulary: small (12px, the original/default height), medium (20px), and large (32px). Size changes the track height, not the label.',
+      'Add animated to reveal the fill once when the meter first enters the viewport, including a scroll container. Reconnection starts a new entrance. Changing the value or scrolling back does not replay it.',
+      'Set --t-meter-duration to change the entrance duration (default: three times --t-motion-slow, normally 720ms). Disable the animated property or use data-motion="off" for immediate display.',
     ],
     accessibility: [
       'Provide a label and understandable units. Do not convey the measurement using color alone.',
+      'The native meter exposes the final value and thresholds throughout the animation. Decorative segments are hidden from assistive technology.',
+      'Reduced motion and data-motion="off" show the full measurement immediately. Forced colors use the native meter. The fill starts at the inline edge in right-to-left layouts.',
     ],
     example: {
-      props: { label: 'Storage used', value: 42, max: 100, valueText: '42 GB of 100 GB' },
+      props: {
+        label: 'Storage used',
+        value: 42,
+        max: 100,
+        valueText: '42 GB of 100 GB',
+        variant: 'segmented-thin',
+        size: 'medium',
+        animated: true,
+      },
     },
   },
   't-number-input': field(

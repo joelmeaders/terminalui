@@ -1,4 +1,5 @@
 import { html } from 'lit';
+import { keyed } from 'lit/directives/keyed.js';
 import type { TCommandPalette } from '../src';
 import { providerExamples } from './icons';
 const creditsUrl = import.meta.env.DEV
@@ -7,6 +8,9 @@ const creditsUrl = import.meta.env.DEV
 
 let step = 'configure';
 let saved = '';
+let meterVariant = 'solid';
+let meterSize = 'small';
+let meterPreview = 0;
 const steps = [
   { id: 'configure', label: 'Configure', description: 'Set mission preferences' },
   { id: 'review', label: 'Review', description: 'Check the local example' },
@@ -138,16 +142,22 @@ export function extensions(refresh: () => void, log: (message: string) => void) 
         <t-card
           ><span slot="heading">16 / Measurements & facts</span>
           <t-stack>
-            <t-meter
-              label="Oxygen reserve"
-              value="82"
-              min="0"
-              max="100"
-              low="20"
-              high="60"
-              optimum="100"
-              value-text="82 percent — normal"
-            ></t-meter>
+            ${keyed(
+              meterPreview,
+              html`<t-meter
+                label="Oxygen reserve"
+                value="82"
+                min="0"
+                max="100"
+                low="20"
+                high="60"
+                optimum="100"
+                value-text="82 percent — normal"
+                variant=${meterVariant}
+                size=${meterSize}
+                animated
+              ></t-meter>`,
+            )}
             <t-description-list
               label="Mission facts"
               .items=${[
@@ -161,6 +171,45 @@ export function extensions(refresh: () => void, log: (message: string) => void) 
               <code>mission --status</code
               ><t-copy-button value="mission --status" label="Copy status command"></t-copy-button>
             </div>
+            <details>
+              <summary>Meter options</summary>
+              <t-stack style="margin-top:12px">
+                <t-select
+                  label="Meter style"
+                  .value=${meterVariant}
+                  .options=${[
+                    { value: 'solid', label: 'Solid' },
+                    { value: 'segmented-thin', label: 'Thin segments' },
+                    { value: 'segmented-thick', label: 'Thick segments' },
+                  ]}
+                  @change=${(event: Event) => {
+                    meterVariant = (event.target as HTMLSelectElement).value;
+                    refresh();
+                  }}
+                ></t-select>
+                <t-select
+                  label="Meter size"
+                  .value=${meterSize}
+                  .options=${[
+                    { value: 'small', label: 'Small' },
+                    { value: 'medium', label: 'Medium' },
+                    { value: 'large', label: 'Large' },
+                  ]}
+                  @change=${(event: Event) => {
+                    meterSize = (event.target as HTMLSelectElement).value;
+                    refresh();
+                  }}
+                ></t-select>
+                <t-button
+                  variant="secondary"
+                  @click=${() => {
+                    meterPreview++;
+                    refresh();
+                  }}
+                  >Replay meter entrance</t-button
+                >
+              </t-stack>
+            </details>
           </t-stack>
           <span slot="footer">t-meter / t-description-list / t-link / t-copy-button</span>
         </t-card>

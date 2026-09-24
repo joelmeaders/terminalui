@@ -130,6 +130,46 @@ test('production extensions preserve form, search, copy, icons, and motion behav
   expect(await notice.text()).toContain('Creative Commons');
 });
 
+test('built meter controls and viewport story expose the styles, sizes, and replay', async ({
+  page,
+}) => {
+  await page.goto('/#extensions');
+  await page.locator('summary').filter({ hasText: 'Meter options' }).click();
+  const host = page.locator('#extensions t-meter');
+  for (const variant of ['solid', 'segmented-thin', 'segmented-thick']) {
+    await page.getByRole('combobox', { name: 'Meter style', exact: true }).selectOption(variant);
+    await expect(host).toHaveAttribute('variant', variant);
+  }
+  for (const [size, height] of [
+    ['small', '12px'],
+    ['medium', '20px'],
+    ['large', '32px'],
+  ]) {
+    await page.getByRole('combobox', { name: 'Meter size', exact: true }).selectOption(size);
+    await expect(host.getByRole('meter')).toHaveCSS('height', height);
+  }
+  await page
+    .locator('#extensions')
+    .evaluate((el) => (el as HTMLElement).style.setProperty('--t-meter-duration', '10s'));
+  const previous = await host.elementHandle();
+  await page.getByRole('button', { name: 'Replay meter entrance', exact: true }).click();
+  expect(await previous!.evaluate((el) => el.isConnected)).toBe(false);
+  await expect(host.getByRole('meter')).toHaveAttribute('value', '82');
+  await host.scrollIntoViewIfNeeded();
+  await expect(host.locator('.visual')).toHaveAttribute('data-phase', 'entering');
+  await page.goto('/storybook/iframe.html?id=data-meter--viewport-entry&viewMode=story');
+  await expect(page.locator('t-meter .visual')).toHaveAttribute('data-phase', 'pending');
+  const region = page.getByRole('region', { name: 'Viewport entry preview' });
+  await region.focus();
+  await region.press('End');
+  await expect(page.locator('t-meter')).toBeInViewport();
+  await expect(page.locator('t-meter .visual')).toHaveAttribute('data-phase', 'complete');
+  await expect(page.getByRole('meter', { name: 'Oxygen reserve' })).toHaveAttribute(
+    'aria-valuetext',
+    '82 percent',
+  );
+});
+
 test('built Storybook serves documentation and the real component canvas', async ({ page }) => {
   await page.goto('/storybook/?path=/docs/components-button--docs');
   const frame = page.frameLocator('#storybook-preview-iframe');

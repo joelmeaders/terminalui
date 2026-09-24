@@ -27,58 +27,58 @@ The Icon and Icon Button pages include built-in names, registration, individual 
 
 ## Components
 
-| Element               | Purpose                          | Main API                                                                                  |
-| --------------------- | -------------------------------- | ----------------------------------------------------------------------------------------- |
-| `t-button`            | Action and form button           | `variant`, `size`, `disabled`, `loading`, `type`, `name`, `value`, `form`, native `click` |
-| `t-input`             | Text and numeric input           | `value`, `name`, `label`, `type`, `required`, `readonly`, `disabled`, `help`, `error`     |
-| `t-select`            | Native select                    | `options` property, `value`, `name`, `label`, `required`, `disabled`                      |
-| `t-checkbox`          | Checkbox or switch               | `checked`, `switch`, `value`, `name`, `label`, `required`, `disabled`                     |
-| `t-textarea`          | Multiline input                  | `value`, `rows`, `readonly`, `resize`, `minlength`, `maxlength`                           |
-| `t-radio-group`       | Single-choice field              | `options`, `value`, `orientation`, `label`                                                |
-| `t-range`             | Numeric slider                   | String `value`, `min`, `max`, `step`, `showValue`                                         |
-| `t-switch`            | Boolean toggle                   | `checked`, `value`, `name`, `label`, `required`, `disabled`                               |
-| `t-combobox`          | Searchable choice                | `options`, `value`, `placeholder`, `loading`, `emptyMessage`                              |
-| `t-file-input`        | Native file picker               | `files`, `accept`, `multiple`, `capture`, `name`, `label`                                 |
-| `t-card`              | Content panel                    | Default, `heading`, and `footer` slots                                                    |
-| `t-badge`             | Text status                      | `variant`, default slot                                                                   |
-| `t-alert`             | Inline notice                    | `variant`, `dismissible`, `urgent`, `t-dismiss`                                           |
-| `t-progress`          | Native progress                  | `label`, `value`, `max`; omit value for indeterminate                                     |
-| `t-accordion`         | Native disclosure                | `label`, `open`, `t-toggle` with `detail.open`                                            |
-| `t-tabs`              | Keyboard-operated tabs           | `tabs` property, `active`, `label`, named slots, `t-change` with `detail.value`           |
-| `t-dialog`            | Modal dialog                     | `heading`, `open`, `show(opener?)`, `close()`, `t-close`                                  |
-| `t-tooltip`           | Help button and tooltip          | `label`, `message`; focus, hover, click, and Escape                                       |
-| `t-menu`              | Action menu                      | `label`, `options`, `open`, `disabled`, `t-select`                                        |
-| `t-breadcrumb`        | Navigation path                  | `items`, `label`                                                                          |
-| `t-pagination`        | Page navigation                  | `page`, `total`, `pageSize`, `label`, `disabled`, `t-change`                              |
-| `t-table`             | Sortable native table            | `columns`, `rows`, `caption`, `sortKey`, `sortDirection`, `selectedKeys`, `loading`       |
-| `t-drawer`            | Modal side panel                 | `heading`, `open`, `placement`, `show(opener?)`, `close()`                                |
-| `t-tree`              | Hierarchical navigation          | `items`, `value`, `expandedIds`, `label`                                                  |
-| `t-icon`              | Built-in or registered SVG icon  | `name`, `label`, `size`                                                                   |
-| `t-icon-button`       | Icon action                      | `name`, `label`, `size`, `pressed`, `disabled`                                            |
-| `t-spinner`           | Loading indicator                | `label`, `size`, `type`, `steps`                                                          |
-| `t-skeleton`          | Loading placeholder              | `shape`, `animated`                                                                       |
-| `t-divider`           | Content separator                | `vertical`                                                                                |
-| `t-avatar`            | Image or initials                | `name`, `src`, `size`                                                                     |
-| `t-toast`             | Dismissible notification         | `duration`, `countdown`, `countdownUnit`, `show(message?, opener?)`, `close()`            |
-| `t-empty-state`       | Empty content panel              | `heading`, default and action slots                                                       |
-| `t-stack`             | Flex layout                      | `direction`, `align`, `justify`, `wrap`                                                   |
-| `t-grid`              | Grid layout                      | `columns`, default slot                                                                   |
-| `t-popover`           | Interactive floating panel       | `label`, `heading`, `open`, `disabled`, `placement`, `show()`, `close()`                  |
-| `t-password-input`    | Password with visibility control | String `value`, `revealed`, `t-visibility-change`                                         |
-| `t-number-input`      | Number with step buttons         | String `value`, `min`, `max`, `step`, `stepUp()`, `stepDown()`                            |
-| `t-segmented-control` | Segmented radio choices          | `label`, `options`, `value`, `disabled`                                                   |
-| `t-rating`            | Native radio rating              | String `value`, `max`, `clearable`, `clear()`                                             |
-| `t-tags-input`        | Multiple text values             | `values`, JSON string `value`, `name`, `required`                                         |
-| `t-color-picker`      | Native color input and hex field | `value`, named `swatches`, `required`, `disabled`                                         |
-| `t-command-palette`   | Modal command search             | `commands`, `query`, `heading`, `loading`, `show()`, `close()`, `t-select`                |
-| `t-steps`             | Ordered step navigation          | `items`, `value`, `orientation`, `t-select`                                               |
-| `t-timeline`          | Ordered event history            | `items`, `label`, `emptyText`                                                             |
-| `t-meter`             | Native scalar measurement        | `value`, `min`, `max`, `low`, `high`, `optimum`, `valueText`                              |
-| `t-description-list`  | Semantic term/value pairs        | `items`, `label`                                                                          |
-| `t-link`              | Native navigation link           | `href`, `target`, `rel`, `download`, default slot                                         |
-| `t-toolbar`           | Arrow-key action group           | `label`, `orientation`, slotted buttons and links                                         |
-| `t-split-pane`        | Resizable two-pane layout        | `size`, `min`, `max`, `step`, `orientation`, `stackAt`, named slots                       |
-| `t-copy-button`       | Clipboard action and status      | `value`, `label`, `disabled`, `t-copy`, `t-copy-error`                                    |
+| Element               | Purpose                          | Main API                                                                                    |
+| --------------------- | -------------------------------- | ------------------------------------------------------------------------------------------- |
+| `t-button`            | Action and form button           | `variant`, `size`, `disabled`, `loading`, `type`, `name`, `value`, `form`, native `click`   |
+| `t-input`             | Text and numeric input           | `value`, `name`, `label`, `type`, `required`, `readonly`, `disabled`, `help`, `error`       |
+| `t-select`            | Native select                    | `options` property, `value`, `name`, `label`, `required`, `disabled`                        |
+| `t-checkbox`          | Checkbox or switch               | `checked`, `switch`, `value`, `name`, `label`, `required`, `disabled`                       |
+| `t-textarea`          | Multiline input                  | `value`, `rows`, `readonly`, `resize`, `minlength`, `maxlength`                             |
+| `t-radio-group`       | Single-choice field              | `options`, `value`, `orientation`, `label`                                                  |
+| `t-range`             | Numeric slider                   | String `value`, `min`, `max`, `step`, `showValue`                                           |
+| `t-switch`            | Boolean toggle                   | `checked`, `value`, `name`, `label`, `required`, `disabled`                                 |
+| `t-combobox`          | Searchable choice                | `options`, `value`, `placeholder`, `loading`, `emptyMessage`                                |
+| `t-file-input`        | Native file picker               | `files`, `accept`, `multiple`, `capture`, `name`, `label`                                   |
+| `t-card`              | Content panel                    | Default, `heading`, and `footer` slots                                                      |
+| `t-badge`             | Text status                      | `variant`, default slot                                                                     |
+| `t-alert`             | Inline notice                    | `variant`, `dismissible`, `urgent`, `t-dismiss`                                             |
+| `t-progress`          | Native progress                  | `label`, `value`, `max`; omit value for indeterminate                                       |
+| `t-accordion`         | Native disclosure                | `label`, `open`, `t-toggle` with `detail.open`                                              |
+| `t-tabs`              | Keyboard-operated tabs           | `tabs` property, `active`, `label`, named slots, `t-change` with `detail.value`             |
+| `t-dialog`            | Modal dialog                     | `heading`, `open`, `show(opener?)`, `close()`, `t-close`                                    |
+| `t-tooltip`           | Help button and tooltip          | `label`, `message`; focus, hover, click, and Escape                                         |
+| `t-menu`              | Action menu                      | `label`, `options`, `open`, `disabled`, `t-select`                                          |
+| `t-breadcrumb`        | Navigation path                  | `items`, `label`                                                                            |
+| `t-pagination`        | Page navigation                  | `page`, `total`, `pageSize`, `label`, `disabled`, `t-change`                                |
+| `t-table`             | Sortable native table            | `columns`, `rows`, `caption`, `sortKey`, `sortDirection`, `selectedKeys`, `loading`         |
+| `t-drawer`            | Modal side panel                 | `heading`, `open`, `placement`, `show(opener?)`, `close()`                                  |
+| `t-tree`              | Hierarchical navigation          | `items`, `value`, `expandedIds`, `label`                                                    |
+| `t-icon`              | Built-in or registered SVG icon  | `name`, `label`, `size`                                                                     |
+| `t-icon-button`       | Icon action                      | `name`, `label`, `size`, `pressed`, `disabled`                                              |
+| `t-spinner`           | Loading indicator                | `label`, `size`, `type`, `steps`                                                            |
+| `t-skeleton`          | Loading placeholder              | `shape`, `animated`                                                                         |
+| `t-divider`           | Content separator                | `vertical`                                                                                  |
+| `t-avatar`            | Image or initials                | `name`, `src`, `size`                                                                       |
+| `t-toast`             | Dismissible notification         | `duration`, `countdown`, `countdownUnit`, `show(message?, opener?)`, `close()`              |
+| `t-empty-state`       | Empty content panel              | `heading`, default and action slots                                                         |
+| `t-stack`             | Flex layout                      | `direction`, `align`, `justify`, `wrap`                                                     |
+| `t-grid`              | Grid layout                      | `columns`, default slot                                                                     |
+| `t-popover`           | Interactive floating panel       | `label`, `heading`, `open`, `disabled`, `placement`, `show()`, `close()`                    |
+| `t-password-input`    | Password with visibility control | String `value`, `revealed`, `t-visibility-change`                                           |
+| `t-number-input`      | Number with step buttons         | String `value`, `min`, `max`, `step`, `stepUp()`, `stepDown()`                              |
+| `t-segmented-control` | Segmented radio choices          | `label`, `options`, `value`, `disabled`                                                     |
+| `t-rating`            | Native radio rating              | String `value`, `max`, `clearable`, `clear()`                                               |
+| `t-tags-input`        | Multiple text values             | `values`, JSON string `value`, `name`, `required`                                           |
+| `t-color-picker`      | Native color input and hex field | `value`, named `swatches`, `required`, `disabled`                                           |
+| `t-command-palette`   | Modal command search             | `commands`, `query`, `heading`, `loading`, `show()`, `close()`, `t-select`                  |
+| `t-steps`             | Ordered step navigation          | `items`, `value`, `orientation`, `t-select`                                                 |
+| `t-timeline`          | Ordered event history            | `items`, `label`, `emptyText`                                                               |
+| `t-meter`             | Native scalar measurement        | `value`, `min`, `max`, `low`, `high`, `optimum`, `valueText`, `variant`, `size`, `animated` |
+| `t-description-list`  | Semantic term/value pairs        | `items`, `label`                                                                            |
+| `t-link`              | Native navigation link           | `href`, `target`, `rel`, `download`, default slot                                           |
+| `t-toolbar`           | Arrow-key action group           | `label`, `orientation`, slotted buttons and links                                           |
+| `t-split-pane`        | Resizable two-pane layout        | `size`, `min`, `max`, `step`, `orientation`, `stackAt`, named slots                         |
+| `t-copy-button`       | Clipboard action and status      | `value`, `label`, `disabled`, `t-copy`, `t-copy-error`                                      |
 
 The input supports text, numeric, and native date/time types with browser constraint validation. Date/time interfaces follow the browser. The kit does not include a custom calendar or rich-text editor. File selection uses `t-file-input`; it does not upload files. Tables provide local sorting and selection without virtualization or editable cells.
 
@@ -144,6 +144,8 @@ toast.show('Settings saved.', saveButton); // Optional opener for focus return a
 ```
 
 Spinners support ten styles through `type`: `ring` (default), `dots`, `bars`, `pulse`, `orbit`, `cursor`, `cursor-box`, `arrow`, `pixels`, and `blocks`. The arrow uses six or eight fixed positions with `steps="6|8"`. All styles inherit theme colors and respect motion preferences. See the [spinner guide](docs/spinners.md) for sizes, styling, status labels, and examples.
+
+Meters offer `variant="solid|segmented-thin|segmented-thick"` and `size="small|medium|large"`. Small preserves the original 12px track. Medium is 20px and large is 32px. Add `animated` for one fill reveal on viewport entry per connection. The accessible value updates immediately. Reduced motion and `data-motion="off"` show the full value without animation. Set `--t-meter-duration` to change the default 720ms entrance. Storybook's Meter page includes the styles, sizes, motion-off state, and a scrollable viewport example.
 
 Notification countdowns share the auto-dismiss timer:
 
@@ -271,7 +273,7 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 7.9 KB gzip for one button, 9.3 KB for the original three form controls, and 39.5 KB for registration of all 50 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.1 KB gzip. The complete-catalog budget is 42 KB after this expansion; the original 8 KB button and 9.5 KB form budgets remain unchanged. Importing and using more exported APIs adds their code.
+The local size check measures about 7.9 KB gzip for one button, 9.3 KB for the original three form controls, and 40.5 KB for registration of all 50 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.1 KB gzip. The complete-catalog budget is 42 KB after this expansion; the original 8 KB button and 9.5 KB form budgets remain unchanged. Importing and using more exported APIs adds their code.
 
 ## Storybook and verification
 
