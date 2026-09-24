@@ -2,7 +2,10 @@ import { css, html } from 'lit';
 import type { PropertyValues } from 'lit';
 import { FormControl, fieldStyles } from '../internal/form-control';
 
-/** Native slider with keyboard support and a visible numeric value. */
+/**
+ * Native slider with keyboard support and a visible numeric value.
+ * @csspart input - input element.
+ */
 export class TRange extends FormControl {
   static properties = {
     min: { type: Number },

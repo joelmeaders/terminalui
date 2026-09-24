@@ -5,10 +5,15 @@ export interface DescriptionItem {
   term: string;
   value: string | number;
 }
-/** Responsive term/value pairs with native description-list semantics.
+/**
+ * Responsive term/value pairs with native description-list semantics.
+ *
  * @slot - Additional native dt/dd pairs, optionally wrapped in div elements.
+ *
  * @csspart list - Native description list.
+ *
  * @csspart term - Term.
+ *
  * @csspart value - Description.
  */
 export class TDescriptionList extends TerminalElement {

@@ -1,7 +1,11 @@
 import { css, html, nothing } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import './icon';
-/** Named native icon button. @slot - Optional replacement icon. @csspart button - Native button. */
+/**
+ * Named native icon button.
+ * @slot - Optional replacement icon.
+ * @csspart button - Native button.
+ */
 export class TIconButton extends TerminalElement {
   static properties = {
     name: {},

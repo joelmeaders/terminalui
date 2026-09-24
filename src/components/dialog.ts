@@ -2,7 +2,13 @@ import { css, html, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { containModalTab } from '../internal/modal-focus';
 import { ModalScrollController } from '../internal/modal-scroll';
-/** Modal native dialog with Escape and focus return. Emits t-close. @slot - Body. @slot footer - Actions. */
+/**
+ * Modal native dialog with Escape and focus return. Emits t-close.
+ * @slot - Body.
+ * @slot footer - Actions.
+ * @csspart dialog - dialog element.
+ * @fires t-close - The dialog closed. No detail payload.
+ */
 export class TDialog extends TerminalElement {
   static properties = { open: { type: Boolean, reflect: true }, heading: {} };
   open = false;

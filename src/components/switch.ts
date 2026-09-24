@@ -1,6 +1,8 @@
 import { TCheckbox } from './checkbox';
 
-/** On/off switch. Uses a native checkbox with the switch role and checkbox form behavior. */
+/**
+ * On/off switch. Uses a native checkbox with the switch role and checkbox form behavior.
+ */
 export class TSwitch extends TCheckbox {
   switch = true;
 }

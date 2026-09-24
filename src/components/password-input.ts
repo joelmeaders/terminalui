@@ -1,8 +1,11 @@
 import { css, html, type PropertyValues } from 'lit';
 import { TInput } from './input';
 
-/** Password field with an accessible visibility action. Inherits native input constraints and form behavior.
+/**
+ * Password field with an accessible visibility action. Inherits native input constraints and form behavior.
+ *
  * @fires t-visibility-change - CustomEvent<{revealed:boolean}> when the user changes visibility.
+ *
  * @csspart reveal - Password visibility button.
  */
 export class TPasswordInput extends TInput {

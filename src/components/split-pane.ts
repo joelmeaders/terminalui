@@ -7,13 +7,21 @@ export interface SplitPaneChange {
   orientation: 'horizontal' | 'vertical';
   source: 'keyboard' | 'pointer';
 }
-/** Two scrollable regions with an accessible, adjustable separator.
+/**
+ * Two scrollable regions with an accessible, adjustable separator.
+ *
  * @slot primary - Primary pane contents.
+ *
  * @slot secondary - Secondary pane contents.
+ *
  * @fires t-input - Resize preview: `{ size, orientation, source }`.
+ *
  * @fires t-change - Committed resize, with the same detail as t-input.
+ *
  * @csspart primary - Primary scroll region.
+ *
  * @csspart secondary - Secondary scroll region.
+ *
  * @csspart separator - Keyboard and pointer resize handle.
  */
 export class TSplitPane extends TerminalElement {

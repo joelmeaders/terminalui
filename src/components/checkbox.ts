@@ -1,6 +1,9 @@
 import { css, html } from 'lit';
 import { FormControl, fieldStyles } from '../internal/form-control';
-/** Form-associated checkbox. The switch option changes presentation and accessible role. */
+/**
+ * Form-associated checkbox. The switch option changes presentation and accessible role.
+ * @csspart input - input element.
+ */
 export class TCheckbox extends FormControl {
   static properties = {
     checked: { type: Boolean, reflect: true },

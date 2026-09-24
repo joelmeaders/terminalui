@@ -8,9 +8,13 @@ export interface StepItem {
   status?: 'pending' | 'complete' | 'error';
   disabled?: boolean;
 }
-/** Ordered step navigation. Applications own the associated content and validation.
+/**
+ * Ordered step navigation. Applications own the associated content and validation.
+ *
  * @fires t-select - User selects a step: `{ value, index, step }`.
+ *
  * @csspart nav - Navigation landmark.
+ *
  * @csspart step - Native step button.
  */
 export class TSteps extends TerminalElement {

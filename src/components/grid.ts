@@ -1,7 +1,13 @@
 import { css, html } from 'lit';
 import { styleMap } from 'lit/directives/style-map.js';
 import { baseStyles, TerminalElement } from '../internal/base';
-/** Auto-fitting grid. Set columns for a fixed maximum; it collapses at narrow container widths. @slot - Cells. @csspart layout - Grid. */
+/**
+ * Auto-fitting grid. Set columns for a fixed maximum; it collapses at narrow container widths.
+ * @slot - Cells.
+ * @csspart layout - Grid.
+ * @cssprop --t-grid-min - min.
+ * @cssprop --t-grid-gap - gap.
+ */
 export class TGrid extends TerminalElement {
   static properties = { columns: { type: Number } };
   /** Zero selects automatic columns using --t-grid-min (default 240px). */

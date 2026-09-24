@@ -5,9 +5,25 @@ import { html } from 'lit';
 import { themes } from 'storybook/theming';
 import '../src/index';
 import '../src/themes.css';
+import { ComponentDocs } from './docs/ComponentDocs';
 setCustomElementsManifest(manifest);
 const preview: Preview = {
   globalTypes: {
+    framework: {
+      description:
+        'Framework used by documentation examples (the preview uses the shared Web Component)',
+      toolbar: {
+        title: 'Framework',
+        icon: 'code',
+        items: [
+          { value: 'html', title: 'HTML / JS / CSS' },
+          { value: 'angular', title: 'Angular' },
+          { value: 'vue', title: 'Vue' },
+          { value: 'react', title: 'React' },
+        ],
+        dynamicTitle: true,
+      },
+    },
     motion: {
       description: 'Component motion (device reduced-motion preference always wins)',
       toolbar: { title: 'Motion', icon: 'play', items: ['auto', 'off'], dynamicTitle: true },
@@ -54,6 +70,7 @@ const preview: Preview = {
     },
   },
   initialGlobals: {
+    framework: 'html',
     motion: 'auto',
     theme: 'amber',
     density: 'comfortable',
@@ -77,7 +94,7 @@ const preview: Preview = {
       </div>`,
   ],
   parameters: {
-    docs: { theme: themes.dark },
+    docs: { theme: themes.dark, page: ComponentDocs, canvas: { sourceState: 'none' } },
     layout: 'padded',
     a11y: { test: 'error' },
     controls: { expanded: true },

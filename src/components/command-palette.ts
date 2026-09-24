@@ -12,11 +12,17 @@ export interface CommandItem {
   keywords?: string[];
   disabled?: boolean;
 }
-/** Searchable modal command list. No global shortcut is registered.
+/**
+ * Searchable modal command list. No global shortcut is registered.
+ *
  * @fires t-select - Command chosen: `{ value, command }`.
+ *
  * @fires t-close - Modal closed and focus returned.
+ *
  * @csspart dialog - Native modal.
+ *
  * @csspart search - Search input.
+ *
  * @csspart option - Command option.
  */
 export class TCommandPalette extends TerminalElement {

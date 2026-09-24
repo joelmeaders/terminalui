@@ -14,6 +14,7 @@ jobs:
       - run: npm run format:check
       - run: npm run build
       - run: npm run typecheck
+      - run: npm run test:docs
       - run: npm run test:behavior
       - run: npm run test:stories
       - run: npm run test:package
@@ -37,7 +38,7 @@ jobs:
       - run: npm run build
       - run: npm run test:production
       - uses: actions/upload-artifact@v4
-        if: failure()
+        if: always()
         with:
           name: windows-visual-results
           path: test-results

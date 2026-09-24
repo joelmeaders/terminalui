@@ -9,8 +9,11 @@ export interface TimelineItem {
   dateTime?: string;
   status?: string;
 }
-/** Semantic ordered history. Dates and statuses remain visible as text.
+/**
+ * Semantic ordered history. Dates and statuses remain visible as text.
+ *
  * @csspart list - Ordered timeline.
+ *
  * @csspart item - History entry.
  */
 export class TTimeline extends TerminalElement {

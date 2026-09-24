@@ -7,10 +7,14 @@ export interface ColorSwatch {
 }
 const isHexColor = (value: string) => /^#[0-9a-f]{6}$/i.test(value);
 
-/** Native color chooser with an editable six-digit hexadecimal value and optional named swatches.
+/**
+ * Native color chooser with an editable six-digit hexadecimal value and optional named swatches.
  * Empty values are permitted unless required. Invalid text remains visible and fails form validation.
+ *
  * @csspart input - Hexadecimal text entry.
+ *
  * @csspart picker - Native color chooser.
+ *
  * @csspart swatch - Named preset button.
  */
 export class TColorPicker extends FormControl {

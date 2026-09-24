@@ -3,7 +3,7 @@ export default defineConfig({
   testDir: './tests',
   outputDir: './test-results/components',
   testMatch: '**/*.spec.ts',
-  testIgnore: '**/production.spec.ts',
+  testIgnore: '**/*production.spec.ts',
   fullyParallel: true,
   workers: 4,
   reporter: 'list',

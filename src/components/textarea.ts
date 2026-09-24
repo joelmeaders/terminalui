@@ -2,7 +2,10 @@ import { css, html, nothing } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControl, fieldStyles } from '../internal/form-control';
 
-/** Multiline native text field with form participation and constraint validation. */
+/**
+ * Multiline native text field with form participation and constraint validation.
+ * @csspart textarea - textarea element.
+ */
 export class TTextarea extends FormControl {
   static properties = {
     placeholder: {},

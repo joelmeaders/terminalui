@@ -10,6 +10,7 @@
     "noEmit": true,
     "types": ["node", "vite/client"],
     "experimentalDecorators": true,
+    "jsx": "react-jsx",
     "resolveJsonModule": true
   },
   "include": ["src", "demo", "examples", "stories", ".storybook", "tests", "*.ts"]

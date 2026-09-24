@@ -57,6 +57,15 @@ Include accessibility in implementation, stories, tests, documentation, and revi
 Continue authorized fixes and automated checks when a manual testing environment is unavailable. Record that gap explicitly.
 For framework examples, verify that labels, focus, values, and events survive the integration.
 
+## Documentation is part of each component
+
+- Use Storybook as the component documentation entry point. Do not add a second documentation system without a demonstrated need.
+- Each component needs a guide in `.storybook/docs/catalog.ts`: purpose, usage, a complete example, events or form behavior, and accessibility guidance. Keep one example recipe and generate the HTML/JS/CSS, Angular, Vue, and React versions from it.
+- Document public slots, events, CSS parts, and component CSS properties in source JSDoc. Keep private implementation details out of the published manifest.
+- Keep project setup and icon-provider instructions in the shared Markdown guides. Storybook must display those guides where users need them, including icon registration and imports on both icon component pages.
+- Preserve the global framework selector across component navigation. Clearly distinguish framework integration code from the shared Web Component preview.
+- Run `npm run test:docs` after the package build. It compiles and renders all framework examples. Built Storybook documentation, switcher, accessibility, and reflow checks run in `npm run test:production` and the full check.
+
 ## References
 
 - [WCAG 2.2](https://www.w3.org/TR/WCAG22/)

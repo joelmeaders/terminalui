@@ -21,6 +21,10 @@ npm run storybook
 
 Storybook is at **http://127.0.0.1:6006**. The workbench's documentation links point there during development.
 
+Every component's Docs page includes project setup, a complete starting example, live controls, API tables, styling hooks, accessibility guidance, and state examples. Choose **HTML / JS / CSS**, **Angular**, **Vue**, or **React** with the global framework selector. The selection follows you between pages and is included in shareable Storybook URLs. Live previews use the shared Web Component; the selector changes setup and integration code.
+
+The Icon and Icon Button pages include built-in names, registration, individual provider imports, and custom SVG examples. Storybook reuses the guides in `docs/` and generates API tables from source metadata. See [documentation maintenance](docs/documentation.md) for the shared recipes and verification workflow.
+
 ## Components
 
 | Element               | Purpose                          | Main API                                                                                  |

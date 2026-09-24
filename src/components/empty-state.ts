@@ -1,7 +1,13 @@
 import { css, html } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import './icon';
-/** Empty content guidance. @slot - Supporting text. @slot actions - Recovery actions. @slot icon - Decorative illustration. @csspart body - Container. */
+/**
+ * Empty content guidance.
+ * @slot - Supporting text.
+ * @slot actions - Recovery actions.
+ * @slot icon - Decorative illustration.
+ * @csspart body - Container.
+ */
 export class TEmptyState extends TerminalElement {
   static properties = { heading: {} };
   heading = 'Nothing here yet';

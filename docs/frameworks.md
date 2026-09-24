@@ -58,6 +58,7 @@ export function Settings() {
 Use `checked` for checkbox and switch state. Use `onTSelect`, `onTChange`, `onTClose`, and similar names for `t-*` events.
 Custom event details use `unknown` until you narrow them to the component's documented payload.
 These bindings do not provide React server rendering or hydration. Render this library in a browser client boundary.
+The examples assume a client bundler that accepts CSS imports, such as Vite. With Vite and TypeScript, include `vite/client` in your application's types so local CSS imports are recognized.
 
 ## Vue 3
 

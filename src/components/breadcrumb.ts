@@ -8,7 +8,9 @@ export interface BreadcrumbItem {
 }
 /**
  * Native navigation links. The last item is current unless another item is marked current.
+ *
  * @csspart nav - Navigation landmark.
+ *
  * @csspart link - Navigation links.
  */
 export class TBreadcrumb extends TerminalElement {

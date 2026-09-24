@@ -1,8 +1,11 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { TRadioGroup } from './radio-group';
 
-/** Rating from native radio options. Empty string means unrated. Selected values are integer strings.
+/**
+ * Rating from native radio options. Empty string means unrated. Selected values are integer strings.
+ *
  * @csspart clear - Optional clear action.
+ * @csspart input - input element.
  */
 export class TRating extends TRadioGroup {
   static properties = {

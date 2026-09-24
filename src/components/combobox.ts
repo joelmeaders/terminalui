@@ -4,7 +4,12 @@ import { FormControl, fieldStyles } from '../internal/form-control';
 import { observeFloating } from '../internal/floating';
 import type { SelectOption } from './select';
 
-/** Searchable single select. Only enabled options can supply the submitted value. */
+/**
+ * Searchable single select. Only enabled options can supply the submitted value.
+ * @csspart input - input element.
+ * @csspart listbox - listbox element.
+ * @csspart option - option element.
+ */
 export class TCombobox extends FormControl {
   static properties = {
     options: { attribute: false },

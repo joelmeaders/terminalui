@@ -1,0 +1,265 @@
+import assert from 'node:assert/strict';
+import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
+import { resolve, join, basename } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { createServer } from 'node:http';
+import { build } from 'esbuild';
+import { parse, compileScript } from 'vue/compiler-sfc';
+import { chromium } from '@playwright/test';
+
+const out = resolve('test-results/documentation-examples');
+await mkdir(out, { recursive: true });
+const bundled = await build({
+  entryPoints: ['.storybook/docs/examples.ts'],
+  bundle: true,
+  write: false,
+  platform: 'node',
+  format: 'esm',
+});
+const examples = await import(
+  `data:text/javascript;base64,${Buffer.from(bundled.outputFiles[0].text).toString('base64')}`
+);
+const catalogBundle = await build({
+  entryPoints: ['.storybook/docs/catalog.ts'],
+  bundle: true,
+  write: false,
+  platform: 'node',
+  format: 'esm',
+});
+const { guides } = await import(
+  `data:text/javascript;base64,${Buffer.from(catalogBundle.outputFiles[0].text).toString('base64')}`
+);
+const { components, exampleFor } = examples;
+assert.deepEqual(
+  Object.keys(guides).sort(),
+  components.map((c) => c.tagName).sort(),
+  'Every component needs a documentation recipe.',
+);
+const storySources = await Promise.all(
+  (await readdir('stories'))
+    .filter((f) => f.endsWith('.stories.ts'))
+    .map((f) => readFile(join('stories', f), 'utf8')),
+);
+const entries = [];
+for (const component of components) {
+  const tag = component.tagName;
+  const guide = guides[tag];
+  assert(
+    guide.purpose && guide.usage.length && guide.accessibility.length,
+    `${tag}: purpose, usage and accessibility are required.`,
+  );
+  assert(
+    storySources.some((s) => s.includes(`component: '${tag}'`) && s.includes("'autodocs'")),
+    `${tag}: missing autodocs story.`,
+  );
+  for (const prop of Object.keys(guide.example.props ?? {})) {
+    const member = component.members.find(
+      (m) => m.name === prop && m.privacy !== 'private' && m.privacy !== 'protected',
+    );
+    assert(member, `${tag}: example uses unknown property ${prop}.`);
+  }
+  if (guide.event && !['click', 'input', 'change'].includes(guide.event.name))
+    assert(
+      component.events.some((e) => e.name === guide.event.name),
+      `${tag}: unknown example event.`,
+    );
+  const source = await readFile(`src/components/${tag.slice(2)}.ts`, 'utf8');
+  for (const match of source.matchAll(/\bpart="([^"$]*)"/g))
+    for (const part of match[1].split(/\s+/))
+      assert(
+        component.cssParts.some((p) => p.name === part),
+        `${tag}: undocumented CSS part ${part}.`,
+      );
+  for (const match of source.matchAll(/<slot\b([^>]*)>/g)) {
+    if (/\bname=\$/.test(match[1])) continue;
+    const name = /\bname="([^"]*)"/.exec(match[1])?.[1] ?? '';
+    assert(
+      component.slots.some((s) => s.name === name),
+      `${tag}: undocumented slot ${name || '(default)'}.`,
+    );
+  }
+  const titleSource = storySources.find((s) => s.includes(`component: '${tag}'`));
+  const title = /title: '([^']+)'/.exec(titleSource)[1];
+  entries.push({
+    tag,
+    docsId: title.toLowerCase().replaceAll('/', '-').replaceAll(' ', '-') + '--docs',
+  });
+  await writeFile(
+    join(out, `${tag}.html`),
+    `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>${tag} example</title></head><body>${exampleFor(tag, 'html')}</body></html>`,
+  );
+  await writeFile(join(out, `${tag}.tsx`), exampleFor(tag, 'react'));
+  await writeFile(join(out, `${tag}.angular.ts`), exampleFor(tag, 'angular'));
+  const sfc = exampleFor(tag, 'vue');
+  const { descriptor, errors } = parse(sfc, {
+    filename: `${tag}.vue`,
+    templateParseOptions: { isCustomElement: (name) => name.startsWith('t-') },
+  });
+  assert.deepEqual(errors, [], `${tag}: Vue SFC parse errors.`);
+  const compiled = compileScript(descriptor, {
+    id: tag,
+    inlineTemplate: true,
+    templateOptions: { compilerOptions: { isCustomElement: (name) => name.startsWith('t-') } },
+  });
+  await writeFile(join(out, `${tag}.vue.ts`), compiled.content);
+}
+await writeFile(join(out, 'catalog.json'), JSON.stringify(entries, null, 2));
+await writeFile(join(out, 'example.css'), examples.exampleCss);
+const options = {
+  target: 'ES2022',
+  module: 'ESNext',
+  moduleResolution: 'Bundler',
+  jsx: 'react-jsx',
+  strict: true,
+  noUnusedLocals: true,
+  skipLibCheck: true,
+  experimentalDecorators: true,
+  useDefineForClassFields: false,
+  lib: ['ES2022', 'DOM', 'DOM.Iterable'],
+  types: ['react', 'vite/client'],
+  noEmit: true,
+};
+await writeFile(
+  join(out, 'react-tsconfig.json'),
+  JSON.stringify({ compilerOptions: options, include: ['./*.tsx'] }),
+);
+execFileSync(
+  process.execPath,
+  ['node_modules/typescript/bin/tsc', '-p', join(out, 'react-tsconfig.json')],
+  { stdio: 'inherit' },
+);
+await writeFile(
+  join(out, 'angular-tsconfig.json'),
+  JSON.stringify({
+    compilerOptions: { ...options, noEmit: false, outDir: './angular-build' },
+    angularCompilerOptions: { strictTemplates: true },
+    include: ['./*.angular.ts'],
+  }),
+);
+execFileSync(
+  process.execPath,
+  [
+    'node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js',
+    '-p',
+    join(out, 'angular-tsconfig.json'),
+  ],
+  { stdio: 'inherit' },
+);
+for (const framework of ['react', 'vue', 'angular']) {
+  const ext = framework === 'react' ? 'tsx' : framework === 'vue' ? 'vue.ts' : 'angular.ts';
+  const imports = entries
+    .map(
+      ({ tag }, i) =>
+        `import ${framework === 'vue' ? `Example${i}` : `{ Example as Example${i} }`} from './${framework === 'angular' ? 'angular-build/' : ''}${tag}.${framework === 'angular' ? 'angular.js' : ext}';`,
+    )
+    .join('\n');
+  const map = entries.map(({ tag }, i) => `'${tag}': Example${i}`).join(',');
+  const boot =
+    framework === 'react'
+      ? `import React from 'react'; import { createRoot } from 'react-dom/client'; createRoot(document.querySelector('#app')).render(React.createElement(Example));`
+      : framework === 'vue'
+        ? `import { createApp } from 'vue'; createApp(Example).mount('#app');`
+        : `import '@angular/compiler'; import { bootstrapApplication } from '@angular/platform-browser'; await bootstrapApplication(Example);`;
+  await build({
+    stdin: {
+      contents: `${framework === 'angular' ? "import '@angular/compiler';\n" : ''}${imports}\nimport '@terminal-kit/core/themes.css';\nconst Example = ({${map}})[new URLSearchParams(location.search).get('component')];\n${boot}`,
+      resolveDir: out,
+      loader: 'ts',
+    },
+    outfile: join(out, `${framework}.js`),
+    bundle: true,
+    format: 'esm',
+    target: 'es2022',
+    jsx: 'automatic',
+    define: { 'process.env.NODE_ENV': '"production"' },
+  });
+  await writeFile(
+    join(out, `${framework}.html`),
+    `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>${framework} example</title><link rel="stylesheet" href="/${framework}.css"><link rel="stylesheet" href="/example.css"></head><body><div id="app"><app-example></app-example></div><script type="module" src="/${framework}.js"></script></body></html>`,
+  );
+}
+const server = createServer(async (request, response) => {
+  try {
+    const path = new URL(request.url, 'http://localhost').pathname;
+    const file =
+      path === '/assets/terminal.js'
+        ? resolve('dist/terminal.js')
+        : path === '/assets/themes.css'
+          ? resolve('dist/themes.css')
+          : join(out, basename(path));
+    const content = await readFile(file);
+    response.setHeader(
+      'Content-Type',
+      file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : 'text/html',
+    );
+    response.end(content);
+  } catch {
+    response.writeHead(404).end();
+  }
+});
+await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+const browser = await chromium.launch();
+try {
+  const page = await browser.newPage();
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const base = `http://127.0.0.1:${server.address().port}`;
+  for (const framework of ['html', 'react', 'vue', 'angular']) {
+    console.log(`Checking ${framework} documentation examples...`);
+    for (const { tag } of entries) {
+      errors.length = 0;
+      await page.goto(
+        framework === 'html' ? `${base}/${tag}.html` : `${base}/${framework}.html?component=${tag}`,
+      );
+      await page
+        .waitForFunction((tag) => !!document.querySelector(tag), tag)
+        .catch((error) => {
+          throw new Error(`${framework}/${tag}: did not mount. ${errors.join('; ')}`, {
+            cause: error,
+          });
+        });
+      await page.locator(tag).first().waitFor({ state: 'attached' });
+      await page.waitForFunction(
+        (tag) => !!document.querySelector(tag)?.shadowRoot?.firstElementChild,
+        tag,
+      );
+      const expected = guides[tag].example.props ?? {};
+      const keys = Object.keys(expected).filter((key) => !['open'].includes(key));
+      const actual = await page
+        .locator(tag)
+        .first()
+        .evaluate(
+          (element, keys) => Object.fromEntries(keys.map((key) => [key, element[key]])),
+          keys,
+        );
+      for (const key of keys)
+        assert.deepEqual(
+          actual[key],
+          expected[key],
+          `${framework}/${tag}: ${key} did not reach the element.`,
+        );
+      if (guides[tag].action) {
+        await page.getByRole('button', { name: guides[tag].action.label, exact: true }).click();
+        assert.equal(
+          await page
+            .locator(tag)
+            .first()
+            .evaluate((el) => el.open),
+          true,
+          `${framework}/${tag}: opener must work.`,
+        );
+      }
+      if (tag === 't-input') {
+        await page.getByRole('textbox', { name: 'Callsign', exact: false }).fill('DOCUMENTED');
+        assert.equal(await page.locator(tag).evaluate((el) => el.value), 'DOCUMENTED');
+      }
+      assert.deepEqual(errors, [], `${framework}/${tag}: browser errors.`);
+    }
+  }
+  console.log(
+    `Verified ${entries.length} guides, metadata coverage, React types, Angular AOT, Vue SFC compilation, and all ${entries.length * 4} examples rendered with their documented properties in Chromium.`,
+  );
+} finally {
+  await browser.close();
+  await new Promise((resolve) => server.close(resolve));
+}

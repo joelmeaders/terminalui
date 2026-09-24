@@ -2,7 +2,10 @@ import { html, nothing, type PropertyValues } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControl, fieldStyles } from '../internal/form-control';
 
-/** Form-associated text input. Label and help are associated inside the shadow root. */
+/**
+ * Form-associated text input. Label and help are associated inside the shadow root.
+ * @csspart input - input element.
+ */
 export class TInput extends FormControl {
   static properties = {
     type: {},

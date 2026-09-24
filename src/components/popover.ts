@@ -2,12 +2,19 @@ import { css, html, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { activeElement, observeFloating, type Placement } from '../internal/floating';
 
-/** Non-modal top-layer disclosure with native light dismissal and collision handling.
+/**
+ * Non-modal top-layer disclosure with native light dismissal and collision handling.
+ *
  * @slot - Interactive panel contents.
+ *
  * @slot trigger-label - Trigger label content.
+ *
  * @fires t-toggle - CustomEvent<{open:boolean}> after the panel changes visibility.
+ *
  * @csspart trigger - Native trigger button.
+ *
  * @csspart panel - Non-modal panel.
+ * @cssprop --t-popover-width - width.
  */
 export class TPopover extends TerminalElement {
   static properties = {

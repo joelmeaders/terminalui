@@ -1,6 +1,12 @@
 import { css, html } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
-/** Native disclosure. Emits t-toggle with {open}. @slot - Expanded content. */
+/**
+ * Native disclosure. Emits t-toggle with {open}.
+ * @fires t-toggle - Disclosure changed. detail.open is the new boolean state.
+ * @slot - Expanded content.
+ * @csspart summary - summary element.
+ * @csspart content - content element.
+ */
 export class TAccordion extends TerminalElement {
   static properties = { label: {}, open: { type: Boolean, reflect: true } };
   label = '';

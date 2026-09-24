@@ -1,10 +1,15 @@
 import { css, html } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import './icon';
-/** Copy explicit text to the clipboard after user activation.
+/**
+ * Copy explicit text to the clipboard after user activation.
+ *
  * @fires t-copy - Text was copied: { value }.
+ *
  * @fires t-copy-error - Clipboard access failed. No success is announced.
+ *
  * @csspart button - Native action button.
+ *
  * @csspart status - Visible clipboard completion or failure message.
  */
 export class TCopyButton extends TerminalElement {

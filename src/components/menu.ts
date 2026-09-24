@@ -11,9 +11,13 @@ export interface MenuOption {
 
 /**
  * Single-level action menu with arrow navigation, typeahead, and focus return.
+ *
  * @fires t-select - Selected action: `{ value, option }`.
+ *
  * @csspart trigger - Native trigger button.
+ *
  * @csspart menu - Menu surface.
+ *
  * @csspart item - Action button.
  */
 export class TMenu extends TerminalElement {

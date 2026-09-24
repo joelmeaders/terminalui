@@ -5,10 +5,15 @@ import { ModalScrollController } from '../internal/modal-scroll';
 
 /**
  * Modal side panel built on a native dialog. Escape closes it and restores focus.
+ *
  * @slot - Drawer body.
+ *
  * @slot footer - Footer actions.
+ *
  * @fires t-close - The drawer closed.
+ *
  * @csspart dialog - Native modal panel.
+ *
  * @csspart body - Scrollable body.
  */
 export class TDrawer extends TerminalElement {

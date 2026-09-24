@@ -3,7 +3,10 @@ import { baseStyles, TerminalElement } from '../internal/base';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { getRegisteredIcon, subscribeIcons } from '../internal/icon-registry';
 
-/** Built-in or registered provider icon. Supply a label for meaningful icons; omit it for decoration. @csspart svg - Vector artwork. */
+/**
+ * Built-in or registered provider icon. Supply a label for meaningful icons; omit it for decoration.
+ * @csspart svg - Vector artwork.
+ */
 export class TIcon extends TerminalElement {
   static properties = { name: {}, label: {}, size: { type: Number } };
   name: string = 'info';

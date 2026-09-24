@@ -1,6 +1,11 @@
 import { css, html } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
-/** Responsive flex layout. Gap follows --t-space or --t-stack-gap. @slot - Items. @csspart layout - Flex container. */
+/**
+ * Responsive flex layout. Gap follows --t-space or --t-stack-gap.
+ * @slot - Items.
+ * @csspart layout - Flex container.
+ * @cssprop --t-stack-gap - gap.
+ */
 export class TStack extends TerminalElement {
   static properties = {
     direction: { reflect: true },

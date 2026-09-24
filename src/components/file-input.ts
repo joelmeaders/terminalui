@@ -2,7 +2,10 @@ import { css, html, nothing } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControl, fieldStyles } from '../internal/form-control';
 
-/** Native file picker. Files participate in FormData. This component does not upload files. */
+/**
+ * Native file picker. Files participate in FormData. This component does not upload files.
+ * @csspart input - input element.
+ */
 export class TFileInput extends FormControl {
   static properties = {
     accept: {},

@@ -1,9 +1,13 @@
 import { css, html, type PropertyValues } from 'lit';
 import { TInput } from './input';
 
-/** Native number field with named step actions. The submitted value remains a string.
+/**
+ * Native number field with named step actions. The submitted value remains a string.
+ *
  * @csspart stepper - Step action group.
+ *
  * @csspart decrease - Decrease button.
+ *
  * @csspart increase - Increase button.
  */
 export class TNumberInput extends TInput {

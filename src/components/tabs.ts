@@ -5,7 +5,12 @@ export interface TabItem {
   label: string;
   disabled?: boolean;
 }
-/** Horizontal tabs with automatic keyboard activation. Slots use each tab's id. Emits t-change with {value}. */
+/**
+ * Horizontal tabs with automatic keyboard activation. Slots use each tab's id. Emits t-change with {value}.
+ * @csspart tab - tab element.
+ * @csspart panel - panel element.
+ * @fires t-change - Selection changed. detail.value is the selected tab ID.
+ */
 export class TTabs extends TerminalElement {
   static properties = { tabs: { attribute: false }, active: { reflect: true }, label: {} };
   tabs: TabItem[] = [];

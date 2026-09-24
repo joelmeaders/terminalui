@@ -17,9 +17,13 @@ interface VisibleItem {
 }
 /**
  * Single-select tree with roving focus, arrows, Home/End, typeahead, and sibling expansion.
+ *
  * @fires t-select - Selection changed: `{ value, item }`.
+ *
  * @fires t-toggle - Branch changed: `{ id, expanded, expandedIds }`.
+ *
  * @csspart tree - Tree container.
+ *
  * @csspart item - Tree row.
  */
 export class TTree extends TerminalElement {

@@ -6,7 +6,10 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
-/** Native select with a reactive options property and standard form participation. */
+/**
+ * Native select with a reactive options property and standard form participation.
+ * @csspart select - select element.
+ */
 export class TSelect extends FormControl {
   static properties = { options: { attribute: false } };
   /** Available choices. Replace this array to update options. */

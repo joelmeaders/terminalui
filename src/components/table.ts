@@ -10,10 +10,15 @@ export interface TableColumn {
 export type TableRow = Record<string, unknown>;
 /**
  * Native table with local sorting and optional row selection. No virtualization or cell editing.
+ *
  * @fires t-sort - Sort changed: `{ key, direction }`.
+ *
  * @fires t-selection-change - Selection changed: `{ selectedKeys }`.
+ *
  * @csspart container - Horizontal scroll container.
+ *
  * @csspart table - Native table.
+ *
  * @csspart row - Body row.
  */
 export class TTable extends TerminalElement {

@@ -3,8 +3,11 @@ import { baseStyles, TerminalElement } from '../internal/base';
 
 /**
  * Bounded pagination. Displays the first, last, and nearby pages.
+ *
  * @fires t-change - User navigation: `{ page, pageSize }`.
+ *
  * @csspart nav - Navigation landmark.
+ *
  * @csspart button - Page and previous/next buttons.
  */
 export class TPagination extends TerminalElement {

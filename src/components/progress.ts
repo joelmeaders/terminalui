@@ -1,6 +1,9 @@
 import { css, html, nothing } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
-/** Native progress indicator. Omit value for an indeterminate task. */
+/**
+ * Native progress indicator. Omit value for an indeterminate task.
+ * @csspart progress - progress element.
+ */
 export class TProgress extends TerminalElement {
   static properties = { value: { type: Number }, max: { type: Number }, label: {} };
   value: number | undefined;

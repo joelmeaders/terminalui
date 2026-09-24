@@ -1,11 +1,15 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { FormControl, fieldStyles } from '../internal/form-control';
 
-/** Editable unique text tags. Each tag submits a separate FormData entry under name.
+/**
+ * Editable unique text tags. Each tag submits a separate FormData entry under name.
  * The value property is a JSON array string. The values property is the corresponding string array.
  * Enter or comma adds a tag. Backspace in an empty entry removes the last tag.
+ *
  * @csspart input - Tag entry field.
+ *
  * @csspart tag - One selected tag.
+ *
  * @csspart remove - Named tag removal action.
  */
 export class TTagsInput extends FormControl {

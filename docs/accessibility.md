@@ -4,7 +4,7 @@ Terminal Kit targets WCAG 2.2 Level AA for its 50 browser components and shipped
 
 ## Evidence and limits
 
-Local validation of the 50-component library on Windows on 2026-09-23 passed `npm run check`: 438 browser tests passed with 3 emulation skips, all 212 Storybook tests passed, and all 16 production checks passed. Type checks, formatting, size budgets, and the external package consumer also passed. The focused accessibility selection contains 282 of those browser cases: 279 passed and 3 were skipped. All 42 modal scrolling cases and 45 notification countdown cases passed across the three browser engines. These counts describe tested scenarios; they are not a count of WCAG criteria or proof of conformance.
+Local validation of the 50-component library on Windows on 2026-09-23 passed `npm run check`: 438 browser tests passed with 3 emulation skips, all 212 Storybook tests passed, and all 71 production checks passed. All 200 generated framework documentation examples also compiled and rendered in Chromium. Type checks, formatting, size budgets, and the external package consumer passed. The focused accessibility selection contains 282 of those browser cases: 279 passed and 3 were skipped. All 42 modal scrolling cases and 45 notification countdown cases passed across the three browser engines. These counts describe tested scenarios; they are not a count of WCAG criteria or proof of conformance.
 
 Contrast-pair measurements and axe review items are retained in the Playwright output. CI is configured to upload the browser test results even when the job succeeds; this local result does not establish a remote CI result.
 
@@ -41,6 +41,10 @@ Modal scrolling regressions cover dialogs, drawers, and the command palette in C
 Notification countdown checks cover shrinking bars and spinners with seconds or milliseconds. Tests use a controlled clock to check the deadline, zero at dismissal, hover/focus pause, simulated page visibility, live property changes, persistent durations, and reconnection. The countdown remains outside the persistent message live region, so its updates do not mutate the announcement. This follows the persistent-container approach in [W3C technique ARIA22](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA22). Tests check reduced-motion and explicit motion-off behavior, six-palette axe results, and layout at 320 CSS pixels with enlarged text. These checks do not prove spoken output or real browser background-tab scheduling. Default notifications remain persistent. Applications must keep important messages available when they enable auto-dismiss.
 
 The ten spinner styles retain one stable status label and hide animated shapes from assistive technology. Browser tests verify visible geometry at all three sizes, six- and eight-position arrow steps, clockwise pixel frames, runtime property changes, and 320 CSS pixel layout. Tests also verify motion off, device reduced motion, nested motion regions, preference changes, and static cursor visibility after disabling motion mid-blink. Cursors blink once per 1.2-second cycle. Forced-color checks cover Chromium and Firefox; WebKit cannot emulate this mode. Six-palette scans check axe violations and confirm that indicators use the tested theme accent. Modern and terminal galleries received a visual browser review on Windows. These checks do not establish screen-reader announcements or a real OS contrast-theme result.
+
+The expanded Storybook manual was reviewed at desktop and 320 CSS pixels on Windows. All 50 component documentation pages passed built-page checks. The global framework selector passed keyboard, toolbar, navigation, and reload checks; section links stay inside the preview frame. All 200 generated HTML, React, Vue, and Angular examples rendered with their documented properties in Chromium. React examples also passed strict TypeScript checks, Angular templates passed AOT compilation, and Vue examples passed single-file component compilation. These checks cover executable recipes, not every application integration or assistive technology.
+
+The Icon, Input, and Dialog documentation pages passed representative 320 CSS pixel reflow and axe violation checks with Angular setup expanded. The manual fixes low-contrast default Storybook links and boolean labels, wraps long inline code, and keeps wide tables in keyboard-reachable scroll regions. These scans still return review items, listed below.
 
 1. Build the current library and Storybook with `npm run build:site`.
 2. Start the compiled site with `npm run preview`.
@@ -115,6 +119,8 @@ Use a physical touch device to operate compact controls, menus, tabs, pagination
 ## Manual evidence register
 
 ### Automated review items from 2026-09-23
+
+The three Storybook documentation scans return `color-contrast` incomplete findings for partially clipped table cells and overlapping Storybook Controls category labels. The Input page also returns `aria-prohibited-attr` for Storybook's boolean-control labels, where axe cannot establish support for `aria-label` on the label element. These are unresolved review items, not verified passes. Reports are saved as `documentation-axe-review.json` in each production documentation test's output directory. CI retains the Windows output even when the tests pass. Manual screen-reader and real zoom checks of the documentation remain pending.
 
 The nine catalog layout scans returned no axe violations. They also returned `incomplete` results for two rules. Their JSON attachments are named `axe-layout-review-needed.json` in the Playwright output directories. These results remain review items:
 

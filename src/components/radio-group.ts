@@ -2,7 +2,10 @@ import { css, html, nothing } from 'lit';
 import { FormControl, fieldStyles } from '../internal/form-control';
 import type { SelectOption } from './select';
 
-/** Form-associated native radio group. Arrow keys move between enabled options. */
+/**
+ * Form-associated native radio group. Arrow keys move between enabled options.
+ * @csspart input - input element.
+ */
 export class TRadioGroup extends FormControl {
   static properties = { options: { attribute: false }, orientation: { reflect: true } };
   /** Choices. Replace the array to update options. Each value must be unique. */

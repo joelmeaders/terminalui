@@ -1,7 +1,10 @@
 import { css, html, nothing } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
-/** Native anchor with safe URL schemes and external-window protection.
+/**
+ * Native anchor with safe URL schemes and external-window protection.
+ *
  * @slot - Link text or content. Provide label when the slot contains only an icon.
+ *
  * @csspart link - Native anchor.
  */
 export class TLink extends TerminalElement {

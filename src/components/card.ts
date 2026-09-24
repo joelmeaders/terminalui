@@ -1,6 +1,14 @@
 import { css, html } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
-/** Bordered content panel. @slot heading - Panel title. @slot - Body. @slot footer - Actions or metadata. */
+/**
+ * Bordered content panel.
+ * @slot heading - Panel title.
+ * @slot - Body.
+ * @slot footer - Actions or metadata.
+ * @csspart heading - heading element.
+ * @csspart body - body element.
+ * @csspart footer - footer element.
+ */
 export class TCard extends TerminalElement {
   static styles = [
     baseStyles,

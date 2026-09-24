@@ -1,7 +1,11 @@
 import { css, html } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 
-/** An action, submit, or reset button. Submit uses a temporary native submitter. @slot Default - Button label. */
+/**
+ * An action, submit, or reset button. Submit uses a temporary native submitter.
+ * @slot - Button label.
+ * @csspart button - button element.
+ */
 export class TButton extends TerminalElement {
   static formAssociated = true;
   static properties = {

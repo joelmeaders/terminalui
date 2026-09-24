@@ -1,7 +1,10 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
-/** A native scalar measurement. Use progress for task completion.
+/**
+ * A native scalar measurement. Use progress for task completion.
+ *
  * @csspart meter - Native meter element.
+ *
  * @csspart label - Visible measurement label.
  */
 export class TMeter extends TerminalElement {

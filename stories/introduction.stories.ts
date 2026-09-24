@@ -7,7 +7,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Terminal Kit is a Lit component library with 50 components and six themes. Choose palette, density, line weight, glow, scanlines, and motion from the toolbar. The Appearance stories show presets and local overrides. Each component has API metadata, interactive controls, and state examples. See the repository README for direct browser usage, typed React wrappers, the Vue model helper, and the Angular value accessor.',
+          'Terminal Kit is a Lit component library with 50 components and six themes. Choose palette, density, line weight, glow, scanlines, and motion from the toolbar. The Appearance stories show presets and local overrides. Each component Docs page includes setup, complete integration code, API tables, styling, accessibility guidance, live controls, and state examples. Use the global framework selector for HTML / JS / CSS, Angular, Vue, or React. The Icon pages include registration and provider imports.',
       },
     },
   },

@@ -1,14 +1,23 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { activeElement } from '../internal/floating';
-/** Polite dismissible notification. Duration defaults to zero (persistent); timers pause on hover, focus, or hidden pages.
+/**
+ * Polite dismissible notification. Duration defaults to zero (persistent); timers pause on hover, focus, or hidden pages.
+ *
  * @slot - Optional content instead of message.
+ *
  * @fires t-close - CustomEvent<{reason:'dismiss'|'timeout'|'programmatic'}>.
+ *
  * @csspart notice - Notification surface.
+ *
  * @csspart close - Dismiss button.
+ *
  * @csspart countdown - Countdown bar or spinner container.
+ *
  * @csspart countdown-bar - Shrinking bar fill.
+ *
  * @csspart countdown-ring - Rotating spinner ring.
+ *
  * @csspart countdown-value - Remaining time inside the spinner.
  */
 export class TToast extends TerminalElement {

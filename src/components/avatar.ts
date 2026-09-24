@@ -1,6 +1,10 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
-/** Image or initials with an accessible name. @csspart avatar - Outer frame. @csspart image - Image. */
+/**
+ * Image or initials with an accessible name.
+ * @csspart avatar - Outer frame.
+ * @csspart image - Image.
+ */
 export class TAvatar extends TerminalElement {
   static properties = { name: {}, src: {}, size: { reflect: true }, failed: { state: true } };
   name = '';

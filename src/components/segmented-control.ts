@@ -1,7 +1,9 @@
 import { css } from 'lit';
 import { TRadioGroup } from './radio-group';
 
-/** Native radio choices with segmented presentation. Uses options: {value,label,disabled?}[] and a string value. */
+/**
+ * Native radio choices with segmented presentation. Uses options: {value,label,disabled?}[] and a string value.
+ */
 export class TSegmentedControl extends TRadioGroup {
   orientation: 'vertical' | 'horizontal' = 'horizontal';
   static styles = [

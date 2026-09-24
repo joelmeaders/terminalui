@@ -1,6 +1,10 @@
 import { css, html } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
-/** Themed separator. @csspart line - Separator. */
+/**
+ * Themed separator.
+ * @csspart line - Separator.
+ * @cssprop --t-divider-width - width.
+ */
 export class TDivider extends TerminalElement {
   static properties = { vertical: { type: Boolean, reflect: true } };
   vertical = false;

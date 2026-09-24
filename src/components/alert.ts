@@ -1,6 +1,11 @@
 import { css, html, nothing } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
-/** Inline notice. Emits t-dismiss. Set urgent only for messages that need immediate announcement. */
+/**
+ * Inline notice. Emits t-dismiss. Set urgent only for messages that need immediate announcement.
+ * @slot - Main content.
+ * @csspart notice - notice element.
+ * @fires t-dismiss - The notice was dismissed. No detail payload.
+ */
 export class TAlert extends TerminalElement {
   static properties = {
     variant: { reflect: true },

@@ -15,8 +15,11 @@ export type SpinnerType =
 
 /**
  * Indeterminate activity indicator with a stable, polite status label.
+ *
  * @csspart indicator - Visual loading indicator.
+ *
  * @csspart item - Individual dot, bar, pixel, cursor, or arrow.
+ *
  * @cssprop --t-spinner-color - Indicator color. Defaults to the theme accent.
  */
 export class TSpinner extends TerminalElement {

@@ -1,6 +1,10 @@
 import { css, html } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
-/** Compact status text. Always include a text label so meaning does not depend on color. */
+/**
+ * Compact status text. Always include a text label so meaning does not depend on color.
+ * @slot - Main content.
+ * @csspart badge - badge element.
+ */
 export class TBadge extends TerminalElement {
   static properties = { variant: { reflect: true } };
   variant = 'neutral';

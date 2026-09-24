@@ -1,6 +1,11 @@
 import { css, html } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
-/** Decorative loading placeholder. Set aria-busy on the content region it represents. @csspart placeholder - Shape. */
+/**
+ * Decorative loading placeholder. Set aria-busy on the content region it represents.
+ * @csspart placeholder - Shape.
+ * @cssprop --t-skeleton-width - width.
+ * @cssprop --t-skeleton-height - height.
+ */
 export class TSkeleton extends TerminalElement {
   static properties = { shape: { reflect: true }, animated: { type: Boolean, reflect: true } };
   shape = 'text';

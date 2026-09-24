@@ -1,0 +1,180 @@
+.sbdocs-content {
+  max-width: 1180px;
+}
+.tk-docs {
+  --docs-accent: #f1c779;
+  --docs-muted: #c1c6b9;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.tk-docs :not(pre) > code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.tk-docs-controls {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 4px;
+}
+.tk-docs-controls label[aria-disabled='false'] > span[aria-hidden='true'] {
+  color: var(--docs-muted);
+}
+.tk-docs a.sbdocs-a {
+  color: var(--docs-accent);
+}
+.tk-docs .tk-docs-topline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #505749;
+  color: var(--docs-muted);
+  font:
+    12px/1.5 Consolas,
+    monospace;
+  letter-spacing: 0.04em;
+}
+.tk-docs label {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.tk-docs select {
+  font: inherit;
+  color: #f0f2e9;
+  background: #20261d;
+  border: 1px solid #89957d;
+  border-radius: 4px;
+  min-height: 36px;
+  padding: 4px 12px;
+}
+.tk-docs .tk-docs-hero {
+  padding: 32px 0 20px;
+}
+.tk-docs .tk-docs-tag {
+  display: inline-block;
+  padding: 6px 10px;
+  border: 1px solid #626d58;
+  color: var(--docs-accent);
+  border-radius: 4px;
+}
+.tk-docs .tk-docs-lead {
+  font-size: 20px;
+  line-height: 1.6;
+  max-width: 70ch;
+  color: #e7ecdf;
+}
+.tk-docs .tk-docs-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 0 20px;
+  border-bottom: 1px solid #505749;
+}
+.tk-docs .tk-docs-nav a {
+  color: var(--docs-accent);
+  border: 1px solid #626d58;
+  border-radius: 4px;
+  padding: 8px 14px;
+  min-height: 36px;
+  text-decoration: none;
+}
+.tk-docs .tk-docs-nav a:hover {
+  background: #2b3026;
+  text-decoration: underline;
+}
+.tk-docs section {
+  min-width: 0;
+  scroll-margin-top: 24px;
+  margin-top: 32px;
+}
+.tk-docs details {
+  margin: 20px 0;
+  padding: 16px;
+  border: 1px solid #626d58;
+  border-radius: 6px;
+}
+.tk-docs summary {
+  cursor: pointer;
+  color: var(--docs-accent);
+  min-height: 28px;
+  line-height: 1.6;
+}
+.tk-docs .tk-docs-note {
+  border-left: 3px solid var(--docs-accent);
+  padding: 12px 16px;
+  background: #24291f;
+}
+.tk-docs .tk-docs-table {
+  overflow-x: auto;
+  margin: 20px 0;
+  max-width: 100%;
+  border: 1px solid #626d58;
+  border-radius: 4px;
+}
+.tk-docs .tk-docs-table table {
+  margin: 0;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.tk-docs .tk-docs-table caption {
+  padding: 12px;
+  text-align: left;
+  color: var(--docs-accent);
+  font-weight: 600;
+}
+.tk-docs .tk-docs-table th,
+.tk-docs .tk-docs-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 12px;
+  overflow-wrap: anywhere;
+  min-width: 125px;
+  border: 0;
+  border-top: 1px solid #505749;
+}
+.tk-docs .tk-docs-table th {
+  background: #24291f;
+  color: #f0f2e9;
+}
+.tk-docs .tk-docs-table tr {
+  background: transparent;
+}
+.tk-docs .tk-docs-table td {
+  color: #e7ecdf;
+}
+.tk-docs .tk-docs-empty {
+  color: var(--docs-muted);
+}
+.tk-docs .tk-docs-icon-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.tk-docs :is(a, button, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--docs-accent);
+  outline-offset: 3px;
+}
+@media (max-width: 600px) {
+  .sbdocs.sbdocs-wrapper {
+    padding: 24px 16px;
+  }
+  .tk-docs .tk-docs-lead {
+    font-size: 18px;
+  }
+}
+@media (forced-colors: active) {
+  .tk-docs {
+    --docs-accent: LinkText;
+    --docs-muted: CanvasText;
+  }
+  .tk-docs select,
+  .tk-docs details,
+  .tk-docs .tk-docs-table {
+    border-color: CanvasText;
+  }
+}

@@ -21,6 +21,7 @@ for (const module of manifest.modules) {
     declaration.attributes = (declaration.attributes ?? []).filter(
       (attribute) => !hidden.has(attribute.fieldName),
     );
+    declaration.members = (declaration.members ?? []).filter((member) => !hidden.has(member.name));
     declaration.events = (declaration.events ?? []).filter(
       (event) =>
         !(

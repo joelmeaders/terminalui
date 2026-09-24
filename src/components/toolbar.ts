@@ -2,9 +2,12 @@ import { css, html } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { activeElement } from '../internal/floating';
 
-/** Roving toolbar for native buttons/links and buttons in open shadow roots.
+/**
+ * Roving toolbar for native buttons/links and buttons in open shadow roots.
  * Text fields and other composite widgets must remain outside this toolbar.
+ *
  * @slot - Action buttons or links. Native separators may separate action groups.
+ *
  * @csspart toolbar - Toolbar container.
  */
 export class TToolbar extends TerminalElement {
