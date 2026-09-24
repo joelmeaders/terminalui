@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import { expect, userEvent } from 'storybook/test';
 import '../src/components/select';
+import '../src/components/icon';
 const options = [
   { value: '', label: 'Choose a destination' },
   { value: 'web', label: 'Website' },
@@ -41,6 +42,12 @@ export const Default: Story = {
   },
 };
 export const Selected: Story = { args: { value: 'web' } };
+export const WithIcon: Story = {
+  render: () =>
+    html`<t-select label="Destination" .options=${options} value="web"
+      ><t-icon slot="start" name="folder"></t-icon
+    ></t-select>`,
+};
 export const Required: Story = { args: { required: true } };
 export const Disabled: Story = { args: { disabled: true } };
 export const Invalid: Story = { args: { error: 'Choose a destination.' } };

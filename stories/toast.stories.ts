@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import '../src/components/toast';
+import '../src/components/button';
+import '../src/components/icon';
 import { expect, userEvent } from 'storybook/test';
 import type { TToast } from '../src/components/toast';
 const meta = {
@@ -88,4 +90,48 @@ export const Triggered: Story = {
         >Save configuration</t-button
       ><t-toast variant="success"></t-toast
     ></t-stack>`,
+};
+
+export const WithActions: Story = {
+  render: () =>
+    html`<section>
+      <t-button
+        @click=${(event: Event) => {
+          const section = (event.currentTarget as HTMLElement).closest('section')!;
+          section.querySelector('[data-archive-state]')!.textContent = 'Draft archived.';
+          section
+            .querySelector('t-toast')!
+            .show('Draft archived.', event.currentTarget as HTMLElement);
+        }}
+        >Archive local draft</t-button
+      >
+      <p data-archive-state style="margin:12px 0">Draft is active.</p>
+      <t-toast>
+        <t-icon slot="icon" name="check"></t-icon>
+        <t-button
+          slot="actions"
+          variant="secondary"
+          @click=${(event: Event) => {
+            const section = (event.currentTarget as HTMLElement).closest('section')!;
+            section.querySelector('[data-archive-state]')!.textContent =
+              'Archive undone. Draft is active.';
+            section.querySelector('t-toast')!.close();
+          }}
+          >Undo archive</t-button
+        >
+      </t-toast>
+    </section>`,
+  play: async ({ canvasElement }) => {
+    const buttons = canvasElement.querySelectorAll('t-button');
+    await userEvent.click(buttons[0].shadowRoot!.querySelector('button')!);
+    await expect(canvasElement.querySelector('t-toast')!.open).toBe(true);
+    await expect(
+      canvasElement.querySelector('t-toast')!.shadowRoot!.querySelector('[role=status]'),
+    ).toHaveTextContent('Draft archived.');
+    await userEvent.click(buttons[1].shadowRoot!.querySelector('button')!);
+    await expect(canvasElement.querySelector('[data-archive-state]')).toHaveTextContent(
+      'Archive undone. Draft is active.',
+    );
+    await expect(canvasElement.querySelector('t-toast')!.open).toBe(false);
+  },
 };

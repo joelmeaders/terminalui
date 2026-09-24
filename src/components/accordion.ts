@@ -1,9 +1,12 @@
 import { css, html } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
+import { inlineSlotStyles } from '../internal/slots';
 /**
  * Native disclosure. Emits t-toggle with {open}.
  * @fires t-toggle - Disclosure changed. detail.open is the new boolean state.
  * @slot - Expanded content.
+ * @slot start - Non-interactive icon before the summary label.
+ * @slot end - Non-interactive icon or status after the summary label.
  * @csspart summary - summary element.
  * @csspart content - content element.
  */
@@ -13,6 +16,7 @@ export class TAccordion extends TerminalElement {
   open = false;
   static styles = [
     baseStyles,
+    inlineSlotStyles,
     css`
       :host {
         display: block;
@@ -46,7 +50,9 @@ export class TAccordion extends TerminalElement {
         }
       }}
     >
-      <summary part="summary">${this.label}</summary>
+      <summary part="summary">
+        <slot name="start"></slot>${this.label}<slot name="end"></slot>
+      </summary>
       <div class="content" part="content"><slot></slot></div>
     </details>`;
   }

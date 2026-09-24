@@ -1,3 +1,4 @@
+import '../src/components/icon';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import { expect, userEvent } from 'storybook/test';
@@ -45,4 +46,16 @@ export const Disabled: Story = {
 };
 export const Empty: Story = {
   render: () => html`<t-menu label="No available actions" disabled></t-menu>`,
+};
+
+export const WithSlots: Story = {
+  render: () =>
+    html`<t-menu
+      label="Record actions"
+      .options=${[
+        { value: 'download', label: 'Download' },
+        { value: 'archive', label: 'Archive' },
+      ]}
+      ><t-icon slot="start" name="more"></t-icon
+    ></t-menu>`,
 };

@@ -1,9 +1,13 @@
 import { html, nothing, type PropertyValues } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControl, fieldStyles } from '../internal/form-control';
+import { fieldSlotStyles, optionalSlotStyles, syncSlot } from '../internal/slots';
 
 /**
  * Form-associated text input. Label and help are associated inside the shadow root.
+ * @slot start - Leading icon, short prefix, or named action. Inert while disabled.
+ * @slot end - Trailing icon, short suffix, or named action. Inert while disabled.
+ * @csspart control - Frame around the native input and optional affixes.
  * @csspart input - input element.
  */
 export class TInput extends FormControl {
@@ -34,7 +38,7 @@ export class TInput extends FormControl {
   maxlength?: number;
   /** Accept more than one email address when type is email. */
   multiple = false;
-  static styles = fieldStyles;
+  static styles = [fieldStyles, optionalSlotStyles, fieldSlotStyles];
   protected updated(changed: PropertyValues) {
     // Keep the public value and FormData consistent with native type sanitization.
     if (this.control && this.control.value !== this.value) this.value = this.control.value;
@@ -124,11 +128,15 @@ export class TInput extends FormControl {
     ].includes(this.type)
       ? this.type
       : 'text';
-    return html`<label
+    return html`<label for="control"
         ><span class="label"
           >${this.label}${this.required ? html` <abbr title="required" aria-hidden="true">*</abbr>` : nothing}</span
         >
+      </label>
+      <div class="field-row" part="control">
+        <slot name="start" data-optional @slotchange=${syncSlot} ?inert=${this.isDisabled}></slot>
         <input
+          id="control"
           part="input"
           .value=${this.value}
           type=${type}
@@ -150,7 +158,8 @@ export class TInput extends FormControl {
           @change=${this.handleChange}
           @keydown=${this.onKeydown}
         />
-      </label>
+        <slot name="end" data-optional @slotchange=${syncSlot} ?inert=${this.isDisabled}></slot>
+      </div>
       ${this.renderDescription()}`;
   }
 }

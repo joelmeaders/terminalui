@@ -1,9 +1,12 @@
 import { css, html, nothing } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
+import { inlineSlotStyles } from '../internal/slots';
 /**
  * Native anchor with safe URL schemes and external-window protection.
  *
  * @slot - Link text or content. Provide label when the slot contains only an icon.
+ * @slot start - Non-interactive icon or content before the link text.
+ * @slot end - Non-interactive icon or content after the link text.
  *
  * @csspart link - Native anchor.
  */
@@ -33,6 +36,7 @@ export class TLink extends TerminalElement {
   download?: string;
   static styles = [
     baseStyles,
+    inlineSlotStyles,
     css`
       :host {
         display: inline;
@@ -90,7 +94,8 @@ export class TLink extends TerminalElement {
       target=${target || nothing}
       rel=${rel || nothing}
       download=${this.download ?? nothing}
-      ><slot></slot
+      ><slot name="start"></slot><slot></slot
+      ><slot name="end"></slot
       >${newTab ? html`<span class="external" aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span>` : nothing}</a
     >`;
   }

@@ -1,3 +1,4 @@
+import '../src/components/icon';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 const meta = {
@@ -24,3 +25,10 @@ export const Default: Story = {};
 export const Success: Story = { args: { variant: 'success', label: 'Operational' } };
 export const Warning: Story = { args: { variant: 'warning', label: 'Limited' } };
 export const Danger: Story = { args: { variant: 'danger', label: 'Offline' } };
+
+export const WithSlots: Story = {
+  render: () =>
+    html`<t-badge variant="success"
+      ><t-icon slot="start" name="check" size="14"></t-icon>Operational</t-badge
+    >`,
+};

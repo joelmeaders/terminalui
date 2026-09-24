@@ -1,3 +1,4 @@
+import '../src/components/icon';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import { expect, userEvent } from 'storybook/test';
@@ -67,4 +68,16 @@ export const AsyncOptions: Story = {
     await userEvent.keyboard('{ArrowDown}{Enter}');
     await expect(host.value).toBe('alpha');
   },
+};
+
+export const WithSlots: Story = {
+  render: () =>
+    html`<t-combobox
+      label="Department"
+      .options=${[
+        { value: 'archive', label: 'Archive' },
+        { value: 'engineering', label: 'Engineering' },
+      ]}
+      ><t-icon slot="start" name="search"></t-icon
+    ></t-combobox>`,
 };

@@ -25,6 +25,20 @@ Every component's Docs page includes project setup, a complete starting example,
 
 The Icon and Icon Button pages include built-in names, registration, individual provider imports, and custom SVG examples. Storybook reuses the guides in `docs/` and generates API tables from source metadata. See [documentation maintenance](docs/documentation.md) for the shared recipes and verification workflow.
 
+### Slots and icons
+
+Use `start` and `end` slots for icons beside button/link labels, disclosure triggers, badges, and single-line fields. Alert accepts an `icon` slot. Toast accepts `icon` and `actions` slots. Each component's Storybook page lists its slots and shows composition examples for the selected framework.
+
+```html
+<t-button>
+  <t-icon slot="start" name="download"></t-icon>
+  Download report
+  <t-icon slot="end" name="chevron-right"></t-icon>
+</t-button>
+```
+
+With individual imports, register both Button and Icon. Field slots also accept named actions, such as a clear button. Keep interactive children out of button and disclosure trigger slots. See [slots and icons](docs/slots.md) for imports, input actions, notification actions, accessibility, and framework rules.
+
 ## Components
 
 | Element               | Purpose                          | Main API                                                                                    |
@@ -273,7 +287,7 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 7.9 KB gzip for one button, 9.3 KB for the original three form controls, and 40.5 KB for registration of all 50 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.1 KB gzip. The complete-catalog budget is 42 KB after this expansion; the original 8 KB button and 9.5 KB form budgets remain unchanged. Importing and using more exported APIs adds their code.
+The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 41.5 KB for registration of all 50 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.1 KB gzip. The button and complete-catalog budgets remain 8 KB and 42 KB. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
 
 ## Storybook and verification
 

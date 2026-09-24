@@ -1,3 +1,4 @@
+import '../src/components/icon';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import '../src/components/popover';
@@ -42,3 +43,11 @@ export const Default: Story = {
 };
 export const Disabled: Story = { args: { disabled: true } };
 export const EdgePlacement: Story = { args: { placement: 'left' } };
+
+export const WithSlots: Story = {
+  render: () =>
+    html`<t-popover label="Settings" heading="Workspace settings"
+      ><t-icon slot="start" name="settings"></t-icon>Your settings are stored in this
+      workspace.</t-popover
+    >`,
+};

@@ -1,3 +1,4 @@
+import '../src/components/icon';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import '../src/components/icon-button';
@@ -34,3 +35,8 @@ export const Default: Story = {
 };
 export const Disabled: Story = { args: { disabled: true } };
 export const Toggle: Story = { args: { name: 'eye', label: 'Preview', pressed: true } };
+
+export const WithSlots: Story = {
+  render: () =>
+    html`<t-icon-button label="Open archive"><t-icon name="folder"></t-icon></t-icon-button>`,
+};

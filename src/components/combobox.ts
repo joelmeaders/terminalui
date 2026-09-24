@@ -3,9 +3,13 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControl, fieldStyles } from '../internal/form-control';
 import { observeFloating } from '../internal/floating';
 import type { SelectOption } from './select';
+import { fieldSlotStyles, optionalSlotStyles, syncSlot } from '../internal/slots';
 
 /**
  * Searchable single select. Only enabled options can supply the submitted value.
+ * @slot start - Leading icon, short prefix, or named action. Inert while disabled.
+ * @slot end - Trailing icon, short suffix, or named action. Inert while disabled.
+ * @csspart control - Frame around the native combobox and optional affixes.
  * @csspart input - input element.
  * @csspart listbox - listbox element.
  * @csspart option - option element.
@@ -33,6 +37,8 @@ export class TCombobox extends FormControl {
   private cleanupFloating?: () => void;
   static styles = [
     fieldStyles,
+    optionalSlotStyles,
+    fieldSlotStyles,
     css`
       .control {
         position: relative;
@@ -119,17 +125,17 @@ export class TCombobox extends FormControl {
     super.updated(changed);
     if (!this.isConnected) return;
     const panel = this.renderRoot.querySelector<HTMLElement>('[popover]')!;
-    const control = this.control!;
     if (this.open) {
       if (!this.cleanupFloating) {
+        const anchor = this.renderRoot.querySelector<HTMLElement>('.field-row')!;
         const matchWidth = () => {
-          panel.style.width = `${control.getBoundingClientRect().width}px`;
+          panel.style.width = `${anchor.getBoundingClientRect().width}px`;
         };
         matchWidth();
         if (!panel.matches(':popover-open')) panel.showPopover();
         const resize = new ResizeObserver(matchWidth);
-        resize.observe(control);
-        const stopPosition = observeFloating(control, panel, 'bottom');
+        resize.observe(anchor);
+        const stopPosition = observeFloating(anchor, panel, 'bottom');
         this.cleanupFloating = () => {
           resize.disconnect();
           stopPosition();
@@ -241,11 +247,15 @@ export class TCombobox extends FormControl {
   render() {
     const options = this.filtered;
     return html`<div class="control">
-        <label
+        <label for="control"
           ><span class="label"
             >${this.label}${this.required ? html` <abbr title="required" aria-hidden="true">*</abbr>` : nothing}</span
           >
+        </label>
+        <div class="field-row" part="control">
+          <slot name="start" data-optional @slotchange=${syncSlot} ?inert=${this.isDisabled}></slot>
           <input
+            id="control"
             part="input"
             role="combobox"
             type="text"
@@ -273,7 +283,9 @@ export class TCombobox extends FormControl {
             }}
             @blur=${this.onBlur}
             @keydown=${this.onKeydown}
-        /></label>
+          />
+          <slot name="end" data-optional @slotchange=${syncSlot} ?inert=${this.isDisabled}></slot>
+        </div>
         <div
           class="list"
           part="listbox"

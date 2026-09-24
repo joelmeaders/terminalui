@@ -1,6 +1,7 @@
 import { css, html, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { observeFloating } from '../internal/floating';
+import { inlineSlotStyles } from '../internal/slots';
 
 export interface MenuOption {
   value: string;
@@ -11,6 +12,8 @@ export interface MenuOption {
 
 /**
  * Single-level action menu with arrow navigation, typeahead, and focus return.
+ * @slot start - Non-interactive icon before the trigger label.
+ * @slot end - Non-interactive icon or content after the trigger label, before the arrow.
  *
  * @fires t-select - Selected action: `{ value, option }`.
  *
@@ -40,6 +43,7 @@ export class TMenu extends TerminalElement {
   private cleanup?: () => void;
   static styles = [
     baseStyles,
+    inlineSlotStyles,
     css`
       :host {
         display: inline-block;
@@ -209,7 +213,8 @@ export class TMenu extends TerminalElement {
           }
         }}
       >
-        ${this.label} <span aria-hidden="true">▾</span>
+        <slot name="start"></slot>${this.label}<slot name="end"></slot>
+        <span aria-hidden="true">▾</span>
       </button>
       <div
         id="menu"

@@ -3,6 +3,7 @@ import { baseStyles, TerminalElement } from '../internal/base';
 /**
  * Inline notice. Emits t-dismiss. Set urgent only for messages that need immediate announcement.
  * @slot - Main content.
+ * @slot icon - Decorative icon replacing the built-in status symbol.
  * @csspart notice - notice element.
  * @fires t-dismiss - The notice was dismissed. No detail payload.
  */
@@ -67,7 +68,9 @@ export class TAlert extends TerminalElement {
       ? nothing
       : html`<div class="notice" part="notice" role=${this.urgent ? 'alert' : 'status'}>
           <span class="symbol" aria-hidden="true"
-            >${this.variant === 'success' ? '✓' : this.variant === 'info' ? 'ⓘ' : '!'}</span
+            ><slot name="icon"
+              >${this.variant === 'success' ? '✓' : this.variant === 'info' ? 'ⓘ' : '!'}</slot
+            ></span
           >
           <div class="content"><slot></slot></div>
           ${

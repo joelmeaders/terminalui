@@ -1,3 +1,4 @@
+import '../src/components/icon';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import { expect, userEvent } from 'storybook/test';
@@ -29,3 +30,11 @@ export const Collapsed: Story = {
   },
 };
 export const Expanded: Story = { args: { open: true } };
+
+export const WithSlots: Story = {
+  render: () =>
+    html`<t-accordion label="Archive details"
+      ><t-icon slot="start" name="folder"></t-icon><span slot="end">3 files</span>Three files are
+      ready for review.</t-accordion
+    >`,
+};

@@ -855,3 +855,68 @@ export const guides: Record<string, ComponentGuide> = {
     event: selectEvent,
   },
 };
+
+// Shared slot guidance and one recipe still generate all four framework examples.
+const startIcons: Record<string, string> = {
+  't-button': 'check',
+  't-link': 'file',
+  't-badge': 'check',
+  't-accordion': 'info',
+  't-menu': 'more',
+  't-popover': 'settings',
+  't-input': 'user',
+  't-password-input': 'info',
+  't-select': 'folder',
+  't-combobox': 'search',
+};
+for (const [tag, name] of Object.entries(startIcons)) {
+  const guide = guides[tag];
+  guide.example.children = [
+    {
+      tag: 't-icon',
+      attrs: { slot: 'start' },
+      props: { name, ...(tag === 't-badge' ? { size: 14 } : {}) },
+    },
+    ...(guide.example.children ?? []),
+  ];
+}
+guides['t-number-input'].example.children = [
+  { tag: 'span', attrs: { slot: 'end' }, children: ['crew'] },
+];
+for (const tag of [...Object.keys(startIcons), 't-number-input']) {
+  const guide = guides[tag];
+  const field = [
+    't-input',
+    't-password-input',
+    't-number-input',
+    't-select',
+    't-combobox',
+  ].includes(tag);
+  guide.usage = [
+    ...guide.usage,
+    field
+      ? 'Use start/end slots for icons, short affixes, or named actions. The control part styles the shared frame; disabled fields make their affix slots inert.'
+      : 'Use start/end slots for non-interactive icons or short content beside the label. The slots follow text direction.',
+  ];
+  guide.accessibility = [
+    ...guide.accessibility,
+    field
+      ? 'Keep the field label. Put essential units in label or help as well as the visual affix. Give each slotted action a name and keep value/event handling in your application.'
+      : 'Keep meaningful text. Decorative t-icon children need no label. Do not nest interactive controls inside these slots.',
+  ];
+}
+guides['t-badge'].usage.push('Content in the start slot replaces the default status dot.');
+for (const tag of ['t-alert', 't-toast']) {
+  const guide = guides[tag];
+  guide.example.children = [
+    { tag: 't-icon', attrs: { slot: 'icon' }, props: { name: 'check' } },
+    ...(guide.example.children ?? []),
+  ];
+  guide.usage = [
+    ...guide.usage,
+    'Use the icon slot for a decorative status icon. Keep the message text to communicate meaning.',
+  ];
+}
+guides['t-toast'].usage.push(
+  'Use the actions slot for named actions outside the live message. Focus pauses auto-dismiss. Actions and icons are hidden when closed.',
+);

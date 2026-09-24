@@ -23,12 +23,12 @@ for (const [name, contents] of Object.entries(scenarios)) {
   const bytes = result.outputFiles[0].contents;
   const gzipBytes = gzipSync(bytes).length;
   // The complete catalog includes collection, overlay, and form behaviors. Keep small imports strict.
-  // 50 components plus optional icon registration measured about 39.3 kB gzip.
+  // Optional field slots and disabled-action handling add about 0.5 kB to the form bundle.
   const budget =
     name === 'One button'
       ? 8000
       : name === 'Form controls'
-        ? 9500
+        ? 10000
         : name === 'One Ionicons icon'
           ? 12000
           : 42000;

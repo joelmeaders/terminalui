@@ -1,3 +1,4 @@
+import '../src/components/icon';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import { expect, userEvent } from 'storybook/test';
@@ -49,3 +50,10 @@ export const Revealed: Story = { args: { revealed: true, value: 'Example passwor
 export const Disabled: Story = { args: { disabled: true, value: 'Example password' } };
 export const Readonly: Story = { args: { readonly: true, value: 'Example password' } };
 export const Invalid: Story = { args: { error: 'Use at least twelve characters.' } };
+
+export const WithSlots: Story = {
+  render: () =>
+    html`<t-password-input label="Access key" value="example-only"
+      ><t-icon slot="start" name="info"></t-icon
+    ></t-password-input>`,
+};

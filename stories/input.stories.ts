@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import { expect, userEvent } from 'storybook/test';
 import '../src/components/input';
+import '../src/components/icon-button';
 const meta = {
   title: 'Components/Input',
   component: 't-input',
@@ -48,6 +49,39 @@ export const Default: Story = {
   },
 };
 export const Required: Story = { args: { required: true } };
+export const WithAction: Story = {
+  render: () =>
+    html`<t-input label="Search archive" type="search" value="Survey">
+      <t-icon slot="start" name="search"></t-icon>
+      <t-icon-button
+        slot="end"
+        name="close"
+        label="Clear search"
+        @click=${(event: Event) => {
+          const field = (event.currentTarget as HTMLElement)
+            .parentElement as import('../src/components/input').TInput;
+          field.value = '';
+          field.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+          field.focus();
+        }}
+      ></t-icon-button>
+    </t-input>`,
+  play: async ({ canvasElement }) => {
+    const field = canvasElement.querySelector('t-input')!;
+    await userEvent.click(
+      canvasElement.querySelector('t-icon-button')!.shadowRoot!.querySelector('button')!,
+    );
+    await expect(field.value).toBe('');
+    await expect(field.shadowRoot!.activeElement).toBe(field.shadowRoot!.querySelector('input'));
+  },
+};
+export const DisabledWithAction: Story = {
+  render: () =>
+    html`<t-input label="Search archive" disabled value="Survey"
+      ><t-icon slot="start" name="search"></t-icon
+      ><t-icon-button slot="end" name="close" label="Clear search"></t-icon-button
+    ></t-input>`,
+};
 export const Invalid: Story = { args: { error: 'Enter a valid workspace name.' } };
 export const Disabled: Story = { args: { disabled: true, value: 'READ-ONLY STATION' } };
 export const Email: Story = {

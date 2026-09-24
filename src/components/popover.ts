@@ -1,6 +1,7 @@
 import { css, html, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { activeElement, observeFloating, type Placement } from '../internal/floating';
+import { inlineSlotStyles } from '../internal/slots';
 
 /**
  * Non-modal top-layer disclosure with native light dismissal and collision handling.
@@ -8,6 +9,8 @@ import { activeElement, observeFloating, type Placement } from '../internal/floa
  * @slot - Interactive panel contents.
  *
  * @slot trigger-label - Trigger label content.
+ * @slot start - Non-interactive icon before the trigger label.
+ * @slot end - Non-interactive icon after the trigger label.
  *
  * @fires t-toggle - CustomEvent<{open:boolean}> after the panel changes visibility.
  *
@@ -37,6 +40,7 @@ export class TPopover extends TerminalElement {
   };
   static styles = [
     baseStyles,
+    inlineSlotStyles,
     css`
       :host {
         display: inline-block;
@@ -162,7 +166,8 @@ export class TPopover extends TerminalElement {
           if (!this.open) this.opener = event.currentTarget as HTMLElement;
         }}
       >
-        <slot name="trigger-label">${this.label}</slot>
+        <slot name="start"></slot><slot name="trigger-label">${this.label}</slot
+        ><slot name="end"></slot>
       </button>
       <div
         part="panel"

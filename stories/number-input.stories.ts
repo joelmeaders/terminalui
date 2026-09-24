@@ -1,3 +1,4 @@
+import '../src/components/icon';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import { expect, userEvent } from 'storybook/test';
@@ -49,3 +50,10 @@ export const Decimal: Story = { args: { value: '0.5', min: '0', max: '1', step: 
 export const Disabled: Story = { args: { disabled: true } };
 export const Readonly: Story = { args: { readonly: true } };
 export const Invalid: Story = { args: { value: '3', error: 'Choose an even number.' } };
+
+export const WithSlots: Story = {
+  render: () =>
+    html`<t-number-input label="Budget (USD)" value="50" min="0" step="5"
+      ><span slot="end">USD</span></t-number-input
+    >`,
+};

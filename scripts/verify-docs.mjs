@@ -238,6 +238,26 @@ try {
           expected[key],
           `${framework}/${tag}: ${key} did not reach the element.`,
         );
+      const expectedSlots = (guides[tag].example.children ?? [])
+        .filter((child) => typeof child !== 'string' && child.attrs?.slot)
+        .map((child) => child.attrs.slot);
+      await page
+        .locator(tag)
+        .first()
+        .evaluate(async (element) => element.updateComplete);
+      const actualSlots = await page
+        .locator(tag)
+        .first()
+        .evaluate((element) =>
+          Array.from(element.children)
+            .filter((child) => child.hasAttribute('slot'))
+            .map((child) => child.assignedSlot?.name),
+        );
+      assert.deepEqual(
+        actualSlots,
+        expectedSlots,
+        `${framework}/${tag}: slot content was not assigned.`,
+      );
       if (guides[tag].action) {
         await page.getByRole('button', { name: guides[tag].action.label, exact: true }).click();
         assert.equal(
@@ -253,11 +273,18 @@ try {
         await page.getByRole('textbox', { name: 'Callsign', exact: false }).fill('DOCUMENTED');
         assert.equal(await page.locator(tag).evaluate((el) => el.value), 'DOCUMENTED');
       }
+      if (tag === 't-toast') {
+        assert.equal(
+          (await page.locator('t-toast [role=status]').innerText()).trim(),
+          expected.message,
+          `${framework}/${tag}: message must remain visible beside named slots.`,
+        );
+      }
       assert.deepEqual(errors, [], `${framework}/${tag}: browser errors.`);
     }
   }
   console.log(
-    `Verified ${entries.length} guides, metadata coverage, React types, Angular AOT, Vue SFC compilation, and all ${entries.length * 4} examples rendered with their documented properties in Chromium.`,
+    `Verified ${entries.length} guides, metadata coverage, React types, Angular AOT, Vue SFC compilation, and all ${entries.length * 4} examples rendered with their documented properties and slots in Chromium.`,
   );
 } finally {
   await browser.close();

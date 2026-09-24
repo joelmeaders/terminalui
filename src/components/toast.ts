@@ -1,10 +1,13 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { activeElement } from '../internal/floating';
+import { optionalSlotStyles, syncSlot } from '../internal/slots';
 /**
  * Polite dismissible notification. Duration defaults to zero (persistent); timers pause on hover, focus, or hidden pages.
  *
  * @slot - Optional content instead of message.
+ * @slot icon - Optional decorative status icon.
+ * @slot actions - Named notification actions. Focus pauses auto-dismiss. Hidden when closed.
  *
  * @fires t-close - CustomEvent<{reason:'dismiss'|'timeout'|'programmatic'}>.
  *
@@ -31,6 +34,7 @@ export class TToast extends TerminalElement {
     countdownUnit: { attribute: 'countdown-unit' },
     displayedRemaining: { state: true },
     paused: { state: true },
+    hasMessageContent: { state: true },
   };
   message = '';
   open = false;
@@ -43,6 +47,8 @@ export class TToast extends TerminalElement {
   countdownUnit: 'seconds' | 'milliseconds' = 'seconds';
   private displayedRemaining = 0;
   private paused = false;
+  private hasMessageContent = false;
+  private contentObserver = new MutationObserver(() => this.syncMessageContent());
   private frame?: number;
   private nextPaint = 0;
   private timer?: ReturnType<typeof setTimeout>;
@@ -55,6 +61,7 @@ export class TToast extends TerminalElement {
   private reason: 'dismiss' | 'timeout' | 'programmatic' = 'programmatic';
   static styles = [
     baseStyles,
+    optionalSlotStyles,
     css`
       :host {
         display: block;
@@ -93,6 +100,10 @@ export class TToast extends TerminalElement {
         flex: 1;
         min-width: 0;
         overflow-wrap: anywhere;
+      }
+      .notice:has(slot[name='actions'][data-filled]) .message {
+        flex-basis: 12ch;
+        min-width: min(12ch, 100%);
       }
       .countdown-bar {
         position: absolute;
@@ -157,16 +168,33 @@ export class TToast extends TerminalElement {
   ];
   connectedCallback() {
     super.connectedCallback();
+    this.syncMessageContent();
+    this.contentObserver.observe(this, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['slot'],
+    });
     document.addEventListener('visibilitychange', this.visibility);
     if (this.open) this.restart();
   }
   disconnectedCallback() {
+    this.contentObserver.disconnect();
     clearTimeout(this.timer);
     this.timer = undefined;
     this.stopDisplay();
     this.hovered = this.focused = false;
     document.removeEventListener('visibilitychange', this.visibility);
     super.disconnectedCallback();
+  }
+  private syncMessageContent() {
+    // Formatting whitespace between named slots must not hide the message fallback.
+    this.hasMessageContent = Array.from(this.childNodes).some((node) =>
+      node instanceof Element
+        ? !node.getAttribute('slot')
+        : node.nodeType === Node.TEXT_NODE && !!node.textContent?.trim(),
+    );
   }
   /** Pass an opener for reliable focus return after pointer activation in Safari. */
   show(message?: string, opener?: HTMLElement) {
@@ -332,9 +360,20 @@ export class TToast extends TerminalElement {
           this.resume();
         }}
       >
+        <slot
+          name="icon"
+          data-optional
+          aria-hidden="true"
+          inert
+          ?hidden=${!this.open}
+          @slotchange=${syncSlot}
+        ></slot>
         <span class="message" role=${this.urgent ? 'alert' : 'status'} aria-atomic="true"
-          ><span ?hidden=${!this.open}><slot>${this.message}</slot></span></span
+          ><span ?hidden=${!this.open}
+            ><slot></slot>${this.hasMessageContent ? nothing : this.message}</span
+          ></span
         >
+        <slot name="actions" data-optional ?hidden=${!this.open} @slotchange=${syncSlot}></slot>
         ${indicator}<button
           part="close"
           type="button"

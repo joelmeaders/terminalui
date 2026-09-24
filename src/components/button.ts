@@ -4,6 +4,8 @@ import { baseStyles, TerminalElement } from '../internal/base';
 /**
  * An action, submit, or reset button. Submit uses a temporary native submitter.
  * @slot - Button label.
+ * @slot start - Non-interactive icon or content before the label.
+ * @slot end - Non-interactive icon or content after the label.
  * @csspart button - button element.
  */
 export class TButton extends TerminalElement {
@@ -74,8 +76,10 @@ export class TButton extends TerminalElement {
     css`
       :host {
         display: inline-block;
+        max-width: 100%;
       }
       button {
+        max-width: 100%;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -132,6 +136,10 @@ export class TButton extends TerminalElement {
         border-radius: 50%;
         animation: var(--_t-motion-name, spin) 0.8s linear infinite;
       }
+      .label {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
       @keyframes spin {
         to {
           transform: rotate(360deg);
@@ -149,7 +157,10 @@ export class TButton extends TerminalElement {
       ?disabled=${this.isDisabled}
       aria-busy=${this.loading ? 'true' : 'false'}
     >
-      ${this.loading ? html`<span class="spinner" aria-hidden="true"></span>` : ''}<slot></slot>
+      ${this.loading ? html`<span class="spinner" aria-hidden="true"></span>` : ''}<slot
+        name="start"
+      ></slot
+      ><span class="label"><slot></slot></span><slot name="end"></slot>
     </button>`;
   }
 }

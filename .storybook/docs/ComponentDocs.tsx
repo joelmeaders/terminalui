@@ -23,6 +23,7 @@ import { guides } from './catalog';
 import frameworkGuide from '../../docs/frameworks.md?raw';
 import iconGuide from '../../docs/icons.md?raw';
 import spinnerGuide from '../../docs/spinners.md?raw';
+import slotGuide from '../../docs/slots.md?raw';
 import { icons } from '../../src/components/icon';
 import './docs.css';
 
@@ -221,6 +222,12 @@ function ApiReference({ api }: { api: ComponentApi }) {
       />
       {api.tagName === 't-tabs' && (
         <p>Tab panels use dynamic slot names: each panel slot must match a tabs item ID.</p>
+      )}
+      {api.slots.length > 0 && (
+        <details className="tk-docs-setup">
+          <summary>Composing with slots and icons</summary>
+          <Markdown>{slotGuide.replace(/^# .+\n/, '')}</Markdown>
+        </details>
       )}
     </section>
   );

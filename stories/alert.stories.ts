@@ -1,3 +1,4 @@
+import '../src/components/icon';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import { expect, userEvent } from 'storybook/test';
@@ -37,4 +38,11 @@ export const Dismissible: Story = {
     await userEvent.click(host.shadowRoot!.querySelector('button')!);
     await expect(host.shadowRoot!.querySelector('[role=status]')).toBeNull();
   },
+};
+
+export const WithSlots: Story = {
+  render: () =>
+    html`<t-alert variant="success" dismissible
+      ><t-icon slot="icon" name="check"></t-icon>Your configuration was saved.</t-alert
+    >`,
 };

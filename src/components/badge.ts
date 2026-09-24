@@ -3,6 +3,8 @@ import { baseStyles, TerminalElement } from '../internal/base';
 /**
  * Compact status text. Always include a text label so meaning does not depend on color.
  * @slot - Main content.
+ * @slot start - Non-interactive icon or content replacing the status dot.
+ * @slot end - Non-interactive icon or content after the status text.
  * @csspart badge - badge element.
  */
 export class TBadge extends TerminalElement {
@@ -27,8 +29,8 @@ export class TBadge extends TerminalElement {
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
-      span::before {
-        content: '';
+      .dot {
+        flex: none;
         width: 4px;
         height: 4px;
         background: currentColor;
@@ -48,7 +50,10 @@ export class TBadge extends TerminalElement {
     `,
   ];
   render() {
-    return html`<span part="badge"><slot></slot></span>`;
+    return html`<span part="badge"
+      ><slot name="start"><i class="dot" aria-hidden="true"></i></slot><slot></slot
+      ><slot name="end"></slot
+    ></span>`;
   }
 }
 customElements.define('t-badge', TBadge);

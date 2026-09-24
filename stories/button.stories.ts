@@ -3,6 +3,7 @@ import { html } from 'lit';
 import { expect, userEvent, fn } from 'storybook/test';
 import '../src/components/button';
 import '../src/components/input';
+import '../src/components/icon';
 const meta = {
   title: 'Components/Button',
   component: 't-button',
@@ -48,6 +49,19 @@ export const Primary: Story = {
   },
 };
 export const Secondary: Story = { args: { variant: 'secondary' } };
+export const WithIcons: Story = {
+  render: () =>
+    html`<t-button
+      ><t-icon slot="start" name="download"></t-icon>Download report<t-icon
+        slot="end"
+        name="chevron-right"
+      ></t-icon
+    ></t-button>`,
+};
+export const LoadingWithIcons: Story = {
+  render: () =>
+    html`<t-button loading><t-icon slot="start" name="upload"></t-icon>Uploading report</t-button>`,
+};
 export const Ghost: Story = { args: { variant: 'ghost' } };
 export const Danger: Story = { args: { variant: 'danger', label: 'Discard' } };
 export const Disabled: Story = {

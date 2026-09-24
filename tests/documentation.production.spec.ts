@@ -49,6 +49,7 @@ test('global framework selection changes code and survives navigation and reload
     await select.selectOption(value);
     await expect(frame.locator('.tk-docs')).toHaveAttribute('data-docs-framework', value);
     await expect(frame.getByTestId('framework-example')).toContainText(snippet);
+    await expect(frame.getByTestId('framework-example')).toContainText('slot="start"');
     if (value !== 'html') await expect(page).toHaveURL(new RegExp(`globals=.*framework:${value}`));
     else await expect(page).not.toHaveURL(/framework:/);
   }
@@ -80,6 +81,39 @@ test('global framework selection changes code and survives navigation and reload
     await frame.getByRole('link', { name, exact: true }).click();
     await expect(page).toHaveURL(/\/storybook\/\?path=\/docs\/components-icon--docs/);
     await expect(frame.locator(`#${id} h2`).first()).toBeInViewport();
+  }
+});
+
+test('slot API tables and the shared composition guide work in built documentation', async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  for (const [id, slots] of [
+    ['components-input--docs', ['start', 'end']],
+    ['components-button--docs', ['start', 'end']],
+    ['components-toast--docs', ['icon', 'actions']],
+  ] as const) {
+    await page.goto(`/storybook/iframe.html?id=${id}&viewMode=docs`);
+    const table = page.getByRole('region', { name: 'Slots', exact: true });
+    for (const slot of slots)
+      await expect(table.getByRole('cell', { name: slot, exact: true })).toBeVisible();
+    await page.getByText('Composing with slots and icons', { exact: true }).click();
+    const guide = page
+      .locator('details')
+      .filter({ has: page.getByText('Composing with slots and icons', { exact: true }) });
+    await expect(guide).toHaveAttribute('open', '');
+    await expect(guide).toContainText('@terminal-kit/core/components/icon');
+    await expect(guide).toContainText('slot="start"');
+    await expect(guide).toContainText('read-only');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
+      true,
+    );
+    const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
+    await writeFile(
+      testInfo.outputPath(`${id}-slots-axe-review.json`),
+      JSON.stringify({ violations: report.violations, incomplete: report.incomplete }, null, 2),
+    );
+    expect(report.violations).toEqual([]);
   }
 });
 
@@ -123,7 +157,7 @@ for (const id of ['components-icon--docs', 'components-input--docs', 'components
     await select.press('Enter');
     await expect(select).toHaveValue('angular');
     await page.getByText('Project setup for Angular', { exact: true }).click();
-    await expect(page.locator('.tk-docs-setup')).toHaveAttribute('open', '');
+    await expect(page.locator('#getting-started .tk-docs-setup')).toHaveAttribute('open', '');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
       true,
     );

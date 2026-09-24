@@ -1,3 +1,4 @@
+import '../src/components/icon';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import '../src/components/link';
@@ -25,4 +26,14 @@ export const External: Story = {
 };
 export const Disabled: Story = {
   render: () => html`<p><t-link href="#unavailable" disabled>Unavailable document</t-link></p>`,
+};
+
+export const WithSlots: Story = {
+  render: () =>
+    html`<t-link href="#archive"
+      ><t-icon slot="start" name="folder"></t-icon>Archive<t-icon
+        slot="end"
+        name="chevron-right"
+      ></t-icon
+    ></t-link>`,
 };
