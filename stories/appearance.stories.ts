@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
+import { expect, within } from 'storybook/test';
 
 const sample = () =>
   html` <t-card>
@@ -22,7 +23,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Colors, line weight, glow, and density are independent inherited settings. These examples use local overrides, adjustable with Controls. A .t-screen surface paints scanlines behind its contents; opaque child surfaces cover the texture. Nested screens do not add another texture when an ancestor screen already has one. Default effects are off. Effects are static and disappear in forced-colors mode or with an increased-contrast preference. Custom colors and opacity need a new contrast check.',
+          'Set theme, density, lines, glow, scanlines, and motion on html, body, or a region. Each setting inherits independently, and the nearest override wins. These stories demonstrate local overrides. The Inheritance guide explains page defaults, nested regions, CSS tokens, frameworks, and accessibility preferences.',
       },
     },
   },
@@ -59,7 +60,7 @@ export const ScopedScreens: Story = {
       <section class="t-screen" data-scanlines="pronounced" style="padding:20px">
         ${sample()}
         <section class="t-screen" data-scanlines="subtle">
-          <p>This nested screen uses the outer texture.</p>
+          <p>This nested screen overrides the inherited texture with subtle scanlines.</p>
         </section>
       </section>
       <section data-lines="standard" data-glow="off">
@@ -69,6 +70,64 @@ export const ScopedScreens: Story = {
         ></t-input>
       </section>
     </div>`,
+};
+export const CascadingSettings: Story = {
+  render: () =>
+    html` <article
+      class="t-screen t-prose"
+      data-theme="phosphor"
+      data-density="compact"
+      data-lines="bold"
+      data-glow="subtle"
+      data-scanlines="pronounced"
+      data-motion="off"
+      style="padding:clamp(8px,2vw,24px);max-width:800px"
+    >
+      <h2 class="t-h3">One region. Inherited settings.</h2>
+      <p>Phosphor · compact · bold · subtle glow · pronounced scanlines · motion off</p>
+      <t-button variant="secondary">Inherited action</t-button>
+      <section
+        class="t-screen"
+        data-theme="paper"
+        data-density="comfortable"
+        data-lines="standard"
+        data-glow="off"
+        data-scanlines="off"
+        style="margin-block:24px;padding:clamp(8px,2vw,20px)"
+      >
+        <h3 class="t-h4">A clear editing region</h3>
+        <p>Paper · comfortable · standard · no glow or scanlines. Motion still inherits off.</p>
+        <t-input label="Operator" value="EXPLORER-01"></t-input>
+        <section
+          class="t-screen"
+          data-theme="amber"
+          data-density="compact"
+          data-scanlines="subtle"
+          style="margin-block-start:20px;padding:clamp(8px,2vw,20px)"
+        >
+          <h4 class="t-h5">A deeper override</h4>
+          <p>
+            Amber and compact again. Standard lines, glow off, and motion off still inherit. Only
+            this surface restores subtle scanlines.
+          </p>
+          <t-button variant="secondary">Nested action</t-button>
+        </section>
+      </section>
+      <t-button variant="secondary">Sibling action</t-button>
+      <p class="t-text-small">
+        The sibling retains the outer settings. Use the same attributes on html or body for page
+        defaults.
+      </p>
+    </article>`,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const inherited = canvas.getByText('Inherited action').shadowRoot!.querySelector('button')!;
+    const nested = canvas.getByText('Nested action').shadowRoot!.querySelector('button')!;
+    await expect(getComputedStyle(inherited).borderTopWidth).toBe('2px');
+    await expect(getComputedStyle(nested).borderTopWidth).toBe('1px');
+    await expect(getComputedStyle(nested).minHeight).toBe('34px');
+    await expect(getComputedStyle(nested).transitionDuration).toBe('0s, 0s');
+  },
 };
 export const CRTPreset: Story = {
   render: () =>

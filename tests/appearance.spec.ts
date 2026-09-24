@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 
 async function fixture(page: Page) {
+  await page.route('**/@vite/client', (route) => route.abort());
   await page.goto('/tests/fixture.html');
   await page.locator('body[data-ready=true]').waitFor();
   await page.locator('#fixture').evaluate((el) => {
@@ -61,16 +62,19 @@ test('appearance settings inherit through shadow roots and support local resets 
   await expect(action).toHaveCSS('outline-style', 'solid');
   await expect(action).toHaveCSS('outline-width', '2px');
   // A thicker track must not push the switch thumb outside its border.
-  expect(
-    await page.locator('t-checkbox input').evaluate((el) => {
-      const track = getComputedStyle(el),
-        thumb = getComputedStyle(el, '::before');
-      return parseFloat(thumb.left) + parseFloat(thumb.width) <= el.clientWidth;
-    }),
-  ).toBe(true);
+  // Allow the existing thumb transition to finish after the border changes.
+  await expect
+    .poll(() =>
+      page.locator('t-checkbox input').evaluate((el) => {
+        const track = getComputedStyle(el),
+          thumb = getComputedStyle(el, '::before');
+        return parseFloat(thumb.left) + parseFloat(thumb.width) <= el.clientWidth;
+      }),
+    )
+    .toBe(true);
 });
 
-test('scanlines stay inside explicit screens, do not stack, and allow pointer and keyboard input', async ({
+test('scanlines use independent opaque screens and allow pointer and keyboard input', async ({
   page,
 }) => {
   await fixture(page);
@@ -85,7 +89,7 @@ test('scanlines stay inside explicit screens, do not stack, and allow pointer an
         pointerEvents: css.pointerEvents,
       };
     });
-  expect((await overlay('#screen')).content).toBe('none');
+  expect((await overlay('#screen')).display).toBe('none');
   expect((await overlay('#nested')).display).not.toBe('none');
   await page.locator('#screen').evaluate((el) => {
     el.dataset.scanlines = 'subtle';
@@ -95,8 +99,9 @@ test('scanlines stay inside explicit screens, do not stack, and allow pointer an
     inset: '0px',
     pointerEvents: 'none',
   });
-  expect((await overlay('#nested')).display).toBe('none');
-  expect((await overlay('#clear')).content).toBe('none');
+  expect((await overlay('#nested')).display).not.toBe('none');
+  await expect(page.locator('#nested')).toHaveCSS('background-color', 'rgb(18, 20, 17)');
+  expect((await overlay('#clear')).display).toBe('none');
   await page.getByRole('button', { name: 'Screen action', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Action received', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Action received', exact: true }).focus();

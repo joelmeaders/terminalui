@@ -24,6 +24,7 @@ import frameworkGuide from '../../docs/frameworks.md?raw';
 import iconGuide from '../../docs/icons.md?raw';
 import spinnerGuide from '../../docs/spinners.md?raw';
 import slotGuide from '../../docs/slots.md?raw';
+import appearanceGuide from '../../docs/appearance.md?raw';
 import { icons } from '../../src/components/icon';
 import './docs.css';
 
@@ -290,6 +291,7 @@ export function ComponentDocs() {
   const primary = context.componentStories()[0];
   const tag = typeof primary?.component === 'string' ? primary.component : '';
   const api = apiFor(tag);
+  const isAppearance = primary?.title === 'Introduction/Appearance';
   const guide = guides[tag];
   const [framework, updateFramework] = useFramework();
   const example = guide ? exampleFor(tag, framework) : undefined;
@@ -312,6 +314,11 @@ export function ComponentDocs() {
         <a href="#live-preview" target="_self">
           Try it
         </a>
+        {isAppearance && (
+          <a href="#appearance-guide" target="_self">
+            Inheritance
+          </a>
+        )}
         {api && (
           <>
             <a href="#api-reference" target="_self">
@@ -374,6 +381,12 @@ export function ComponentDocs() {
           </>
         )}
       </section>
+      {isAppearance && (
+        <section id="appearance-guide">
+          <h2>Cascading appearance</h2>
+          <Markdown>{appearanceGuide.replace(/^# .+\n/, '')}</Markdown>
+        </section>
+      )}
       {guide?.guide === 'icons' && (
         <section id="icon-registration">
           <h2>Register and import icons</h2>
@@ -432,8 +445,9 @@ export function ComponentDocs() {
           <section id="styling">
             <h2>Styling</h2>
             <p>
-              Import themes.css once. Set data-theme on html or a parent region. Use the toolbar to
-              compare all six palettes, density, line weight, glow, scanlines, and motion.
+              Import themes.css once. Set appearance attributes on html, body, or a parent region.
+              The nearest override of each setting wins. Use the toolbar to compare all six
+              palettes, density, line weight, glow, scanlines, and motion.
             </p>
             <Source
               code={
@@ -441,6 +455,10 @@ export function ComponentDocs() {
               }
               language="html"
             />
+            <details>
+              <summary>Cascading appearance settings</summary>
+              <Markdown>{appearanceGuide.replace(/^# .+\n/, '')}</Markdown>
+            </details>
             <ApiTable
               title="CSS parts"
               columns={['Part', 'Target']}

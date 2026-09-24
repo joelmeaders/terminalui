@@ -240,15 +240,17 @@ The complete token set is in [src/themes.css](src/themes.css). Use documented CS
 
 ### Display styles
 
-Appearance settings are independent. Omitting them preserves the base appearance.
+Appearance settings inherit independently from `html`, `body`, any container, or a component. The nearest explicit value wins for that subtree. Omit an attribute to inherit it, or remove it to restore inheritance. Without ancestor settings, the base appearance remains.
 
-| Setting          | Values                                  | Scope                                |
-| ---------------- | --------------------------------------- | ------------------------------------ |
-| `data-theme`     | The six palettes above                  | Page, subtree, or component          |
-| `data-lines`     | `standard` (default), `bold`            | Inherited borders and dividers       |
-| `data-glow`      | `off` (default), `subtle`, `strong`     | Inherited text and surface glow      |
-| `data-density`   | `comfortable` (default), `compact`      | Inherited spacing and control height |
-| `data-scanlines` | `off` (default), `subtle`, `pronounced` | One explicit `.t-screen` region      |
+| Setting          | Values                                  | Scope                                                   |
+| ---------------- | --------------------------------------- | ------------------------------------------------------- |
+| `data-theme`     | The six palettes above                  | Page, subtree, or component                             |
+| `data-lines`     | `standard` (default), `bold`            | Inherited borders and dividers                          |
+| `data-glow`      | `off` (default), `subtle`, `strong`     | Inherited text and surface glow                         |
+| `data-density`   | `comfortable` (default), `compact`      | Inherited spacing and control height                    |
+| `data-scanlines` | `off` (default), `subtle`, `pronounced` | Inherited by `.t-screen` surfaces and the page backdrop |
+| `data-motion`    | `auto` (default), `off`                 | Inherited animation and transitions                     |
+| `data-effects`   | `crt`, `off`                            | Inherited glow and scanline preset                      |
 
 ```html
 <main data-theme="phosphor" data-lines="bold" data-glow="subtle">
@@ -262,26 +264,27 @@ Appearance settings are independent. Omitting them preserves the base appearance
 </main>
 ```
 
-Change an attribute to update the display. This needs no JavaScript configuration service, framework adapter, or component re-render. Line and glow settings also work on individual custom elements and `.t-native` controls. A nested palette supplies its own glow color. Focus outlines remain distinct from decorative borders.
+Change an attribute to update the display. This needs no JavaScript configuration service, framework adapter, or component re-render. Settings cross slots and component shadow roots. A nested palette supplies its own glow color and native light/dark color scheme without resetting density, fonts, or motion. Focus outlines remain distinct from decorative borders.
 
-Scanlines use one static texture behind the content of a `.t-screen` surface. Their color follows the palette accent unless you set `--t-scanline-color`. The surface creates a positioning and stacking context without clipping tooltips or focus outlines. Opaque child surfaces cover the texture, which protects control interiors from color blending. Nested screens do not add another texture when an ancestor screen already has one. An inner `data-scanlines="off"` cannot erase a visible ancestor backdrop; give clear content an opaque background or place it outside that screen.
+Scanline settings inherit from any ancestor. A `.t-screen` paints the inherited texture behind its content. Its opaque `--t-bg` background prevents nested textures from accumulating and lets a deeper screen turn scanlines off or change their strength. Set `--t-screen-background` or ordinary background CSS for another surface. A transparent wrapper cannot erase an ancestor backdrop; use an opaque `.t-screen` for a visibly clear region. Control interiors retain their own backgrounds. Texture color follows the local palette accent unless you set `--t-scanline-color`.
 
-The existing `data-effects="crt"` attribute remains a convenience preset for subtle glow and scanlines. On the document root it uses a fixed backdrop inside the body. On `.t-screen` it applies to that region. Both now paint behind content; earlier foreground overlays reduced text contrast. Explicit `data-glow` and `data-scanlines` values override the preset. Prefer the independent settings for new integrations.
+Set `data-scanlines` or `data-effects="crt"` on `html` or `body` for a fixed page backdrop. The CRT preset supplies subtle glow and scanlines. `data-effects="off"` resets those effects for its subtree. Explicit `data-glow` and `data-scanlines` values on the same element override either preset. See **Introduction → Appearance → Inheritance** in Storybook and the shared [appearance guide](docs/appearance.md) for complete page, nested-region, framework, and preference examples.
 
 For custom styling, adjust the public variables in your own selector or inline style:
 
-| Variable               | Standard/off value      | Bold/subtle value             |
-| ---------------------- | ----------------------- | ----------------------------- |
-| `--t-line-width`       | `1px`                   | `2px`                         |
-| `--t-divider-width`    | `1px`                   | `2px`                         |
-| `--t-emphasis-width`   | `3px`                   | `4px`                         |
-| `--t-selection-width`  | `2px`                   | `3px`                         |
-| `--t-glow-blur`        | `0px`                   | `5px` (strong: `9px`)         |
-| `--t-glow-strength`    | `0%`                    | `22%` (strong: `40%`)         |
-| `--t-scanline-opacity` | No texture              | `0.06` (pronounced: `0.12`)   |
-| `--t-scanline-width`   | `1px`                   | `1px` (pronounced: `2px`)     |
-| `--t-scanline-color`   | Palette accent fallback | Custom CSS color, if supplied |
-| `--t-scanline-spacing` | `4px`                   | `4px`                         |
+| Variable                | Standard/off value      | Bold/subtle value                   |
+| ----------------------- | ----------------------- | ----------------------------------- |
+| `--t-line-width`        | `1px`                   | `2px`                               |
+| `--t-divider-width`     | `1px`                   | `2px`                               |
+| `--t-emphasis-width`    | `3px`                   | `4px`                               |
+| `--t-selection-width`   | `2px`                   | `3px`                               |
+| `--t-glow-blur`         | `0px`                   | `5px` (strong: `9px`)               |
+| `--t-glow-strength`     | `0%`                    | `22%` (strong: `40%`)               |
+| `--t-scanline-opacity`  | No texture              | `0.06` (pronounced: `0.12`)         |
+| `--t-scanline-width`    | `1px`                   | `1px` (pronounced: `2px`)           |
+| `--t-scanline-color`    | Palette accent fallback | Custom CSS color, if supplied       |
+| `--t-scanline-spacing`  | `4px`                   | `4px`                               |
+| `--t-screen-background` | Current `--t-bg`        | An opaque CSS color for `.t-screen` |
 
 Variables beginning with `--_t-` are internal. Glow and scanlines turn off in forced-colors mode and with an increased-contrast preference. The effects do not animate. The default stripe opacity and width balance visibility with text contrast. Recheck composited text and control contrast when overriding colors or opacity.
 
@@ -306,7 +309,7 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 41.5 KB for registration of all 50 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.1 KB gzip. The button and complete-catalog budgets remain 8 KB and 42 KB. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
+The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 41.5 KB for registration of all 50 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.2 KB gzip. The button and complete-catalog budgets remain 8 KB and 42 KB. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
 
 ## Storybook and verification
 

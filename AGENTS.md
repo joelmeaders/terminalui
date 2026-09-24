@@ -25,6 +25,8 @@ Include accessibility in implementation, stories, tests, documentation, and revi
 
 ### Visual design and user preferences
 
+- Keep appearance axes independent and inherited from `html`, `body`, regions, and component hosts. The nearest explicit value wins. Removing it restores inheritance. A palette must not reset fonts, density, or motion tokens.
+- Test nested palettes with native typography, slots, shadow roots, and open overlays. Scanline settings inherit, while `.t-screen` supplies an opaque surface so nested textures and local opt-outs remain visually independent.
 - Test all shipped palettes. Normal text needs at least 4.5:1 contrast. Qualifying large text needs at least 3:1.
 - Essential control boundaries, state indicators, and custom focus indicators need at least 3:1 against adjacent colors.
 - Use `--t-control-border` for meaningful control boundaries. Reserve `--t-border` for decorative dividers and panel framing.

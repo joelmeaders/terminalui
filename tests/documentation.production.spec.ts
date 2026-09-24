@@ -13,6 +13,39 @@ const entries = Object.keys(guides).map((tag) => {
   return { tag, id: title.toLowerCase().replaceAll('/', '-').replaceAll(' ', '-') + '--docs' };
 });
 
+test('appearance inheritance guide is available in introductions and component styling at narrow widths', async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  for (const id of ['introduction-appearance--docs', 'components-button--docs']) {
+    await page.goto(`/storybook/iframe.html?id=${id}&viewMode=docs`);
+    let guide;
+    if (id.startsWith('introduction')) {
+      await page.getByRole('link', { name: 'Inheritance', exact: true }).click();
+      guide = page.locator('#appearance-guide');
+    } else {
+      await page.getByText('Cascading appearance settings', { exact: true }).click();
+      guide = page.locator('#styling details');
+      await expect(guide).toHaveAttribute('open', '');
+    }
+    await expect(guide).toContainText('html');
+    await expect(guide).toContainText('body');
+    await expect(guide).toContainText('data-scanlines');
+    await expect(guide).toContainText('--t-screen-background');
+    await expect(guide).toContainText('shadow roots');
+    await expect(guide).toContainText('[attr.data-theme]');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
+      true,
+    );
+    const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
+    await writeFile(
+      testInfo.outputPath(`${id}-appearance-axe-review.json`),
+      JSON.stringify({ violations: report.violations, incomplete: report.incomplete }, null, 2),
+    );
+    expect(report.violations).toEqual([]);
+  }
+});
+
 test('typography docs share the framework selector and include complete native CSS examples', async ({
   page,
 }) => {

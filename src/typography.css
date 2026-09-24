@@ -9,6 +9,9 @@
 :where(.t-prose) {
   max-inline-size: var(--t-prose-width, 68ch);
 }
+:where(.t-prose [data-theme], .t-text [data-theme]) {
+  color: var(--t-text, #eee9d9);
+}
 :where(
   .t-prose h1,
   .t-prose h2,

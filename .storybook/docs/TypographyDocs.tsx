@@ -4,6 +4,7 @@ import { FrameworkSelector, useFramework } from './ComponentDocs';
 import { exampleCss, frameworks } from './examples';
 import { typographyExampleFor } from './typography';
 import guide from '../../docs/typography.md?raw';
+import appearanceGuide from '../../docs/appearance.md?raw';
 
 export function TypographyDocs() {
   const [framework, updateFramework] = useFramework();
@@ -72,6 +73,10 @@ export function TypographyDocs() {
       </section>
       <section id="typography-guide">
         <Markdown>{guide.replace(/^# .+\n/, '')}</Markdown>
+        <details>
+          <summary>Cascading appearance settings</summary>
+          <Markdown>{appearanceGuide.replace(/^# .+\n/, '')}</Markdown>
+        </details>
       </section>
       <section id="states">
         <h2>Examples</h2>
