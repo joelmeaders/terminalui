@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
-import { expect, userEvent } from 'storybook/test';
+import { expect, userEvent, waitFor } from 'storybook/test';
 const meta = {
   title: 'Components/Tooltip',
   component: 't-tooltip',
@@ -25,7 +25,7 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const host = canvasElement.querySelector('t-tooltip')!;
     await userEvent.click(host.shadowRoot!.querySelector('button')!);
-    await expect(host.shadowRoot!.querySelector('[role=tooltip]')).toBeVisible();
+    await waitFor(() => expect(host.shadowRoot!.querySelector('[role=tooltip]')).toBeVisible());
     await userEvent.keyboard('{Escape}');
     await expect(host.shadowRoot!.querySelector('[role=tooltip]')).not.toBeVisible();
   },

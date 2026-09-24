@@ -59,7 +59,8 @@ test('tooltip remains visible across the hover gap and works after reconnection'
   await expect(tooltip).toBeVisible();
   const box = (await tooltip.boundingBox())!;
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 10 });
-  await page.waitForTimeout(200);
+  // Stay over the help longer than the close delay to prove it remains hoverable.
+  await page.waitForTimeout(450);
   await expect(tooltip).toBeVisible();
   await page.mouse.move(600, 500);
   await expect(tooltip).toBeHidden();

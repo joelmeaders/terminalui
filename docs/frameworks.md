@@ -109,15 +109,18 @@ export class Settings {
 }
 ```
 
-The accessor supports `formControl`, `formControlName`, and `ngModel` for all nine form controls.
-It maps text, select, radio, range, and combobox controls to string values.
+The accessor supports `formControl`, `formControlName`, and `ngModel` for all fifteen form controls.
+Input, textarea, select, radio, range, combobox, password input, number input, segmented control, rating, tags input, and color picker use string values.
 Checkboxes and switches use booleans. File inputs use `FileList | null`.
+Number inputs and ratings use numeric strings, not JavaScript numbers. Tags use a JSON array string, such as `'["alpha","beta"]'`.
+Use `new FormControl('["alpha"]', { nonNullable: true })` with `t-tags-input`; do not pass an array to this accessor.
 It forwards input, touched, disabled, and application reset states.
 Browser validity remains available through `checkValidity()` and `reportValidity()`.
 Add Angular validators when your application requires Angular `FormControl.errors` to match browser constraints.
 
 The Vite example loads `@angular/compiler` for its application template at runtime.
 The library adapter itself is compiled with `ngc`, and the external package check also compiles an AOT application.
+That consumer exercises model-to-element writes, element input events, touched state, and disabled state for the six added form controls.
 Angular 22.1.7 requires TypeScript `>=6.0 <6.1`, as declared by its compiler peer dependency.
 Use a supported Node version from [Angular's compatibility reference](https://angular.dev/reference/versions).
 

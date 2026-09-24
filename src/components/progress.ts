@@ -36,12 +36,29 @@ export class TProgress extends TerminalElement {
       }
       progress::-webkit-progress-value {
         background: var(--t-accent);
+        transition: width var(--_t-motion-duration, var(--t-motion-normal, 180ms))
+          var(--t-motion-ease, ease);
       }
       progress::-moz-progress-bar {
         background: var(--t-accent);
+        transition: width var(--_t-motion-duration, var(--t-motion-normal, 180ms))
+          var(--t-motion-ease, ease);
       }
       progress:indeterminate {
         background: repeating-linear-gradient(90deg, var(--t-accent) 0 8px, var(--t-bg) 8px 16px);
+        background-size: 32px 100%;
+        animation: var(--_t-motion-name, working) 900ms linear infinite;
+      }
+      progress:indeterminate::-webkit-progress-bar {
+        background: transparent;
+      }
+      progress:indeterminate::-moz-progress-bar {
+        background: transparent;
+      }
+      @keyframes working {
+        to {
+          background-position: 32px 0;
+        }
       }
     `,
   ];

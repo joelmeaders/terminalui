@@ -23,7 +23,7 @@ export class TTooltip extends TerminalElement {
     clearTimeout(this.closeTimer);
     this.closeTimer = setTimeout(() => {
       if (!this.hovered && this.shadowRoot?.activeElement?.tagName !== 'BUTTON') this.open = false;
-    }, 150);
+    }, 300);
   }
   private escape = (event: KeyboardEvent) => {
     if (event.key === 'Escape') this.hideTooltip();
@@ -91,14 +91,6 @@ export class TTooltip extends TerminalElement {
   }
   render() {
     return html`<div
-      @mouseenter=${() => {
-        this.hovered = true;
-        this.showTooltip();
-      }}
-      @mouseleave=${() => {
-        this.hovered = false;
-        this.scheduleClose();
-      }}
       @keydown=${(e: KeyboardEvent) => {
         if (e.key === 'Escape') {
           this.hideTooltip();
@@ -114,10 +106,32 @@ export class TTooltip extends TerminalElement {
         @focus=${this.showTooltip}
         @blur=${this.scheduleClose}
         @click=${this.showTooltip}
+        @mouseenter=${() => {
+          this.hovered = true;
+          this.showTooltip();
+        }}
+        @mouseleave=${() => {
+          this.hovered = false;
+          this.scheduleClose();
+        }}
       >
         ?
       </button>
-      <div part="tooltip" id="tip" popover="manual" role="tooltip" ?hidden=${!this.open}>
+      <div
+        part="tooltip"
+        id="tip"
+        popover="manual"
+        role="tooltip"
+        ?hidden=${!this.open}
+        @mouseenter=${() => {
+          this.hovered = true;
+          this.showTooltip();
+        }}
+        @mouseleave=${() => {
+          this.hovered = false;
+          this.scheduleClose();
+        }}
+      >
         ${this.message}
       </div>
     </div>`;

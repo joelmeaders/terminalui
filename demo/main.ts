@@ -3,6 +3,7 @@ import '../src/index';
 import '../src/themes.css';
 import './style.css';
 import { library } from './library';
+import { extensions } from './extensions';
 import type { TDialog } from '../src/index';
 
 const themes = [
@@ -18,12 +19,14 @@ let compact = false;
 let lines = 'standard';
 let glow = 'off';
 let scanlines = 'off';
+let motion = 'auto';
 let formMessage = '';
 let saved = false;
 try {
   const prefs = JSON.parse(localStorage.getItem('terminal-kit') || '{}');
   theme = themes.some((t) => t.id === prefs.theme) ? prefs.theme : 'amber';
   compact = !!prefs.compact;
+  motion = prefs.motion === 'off' ? 'off' : 'auto';
   lines = prefs.lines === 'bold' ? 'bold' : 'standard';
   glow = ['off', 'subtle', 'strong'].includes(prefs.glow)
     ? prefs.glow
@@ -57,10 +60,11 @@ function preferences() {
   root.dataset.density = compact ? 'compact' : 'comfortable';
   root.dataset.lines = lines;
   root.dataset.glow = glow;
+  root.dataset.motion = motion;
   try {
     localStorage.setItem(
       'terminal-kit',
-      JSON.stringify({ theme, compact, lines, glow, scanlines }),
+      JSON.stringify({ theme, compact, lines, glow, scanlines, motion }),
     );
   } catch {
     /* Work without persistence. */
@@ -110,6 +114,9 @@ function draw() {
           <a class="directory" href="#navigation"><span>04</span> Navigation <small>02</small></a>
           <a class="directory" href="#overlays"><span>05</span> Overlays <small>02</small></a>
           <a class="directory" href="#library"><span>06</span> Application kit <small>23</small></a>
+          <a class="directory" href="#extensions"
+            ><span>07</span> More controls <small>15</small></a
+          >
           <div class="sidebar-note">
             <span class="crosshair" aria-hidden="true">＋</span>
             <p>FAMILIAR CONTROLS.<br />DIFFERENT ATMOSPHERE.</p>
@@ -129,7 +136,7 @@ function draw() {
                 websites and applications.
               </p>
               <div class="hero-meta">
-                <span>35 COMPONENTS</span><b>+</b><span>06 THEMES</span><b>+</b
+                <span>50 COMPONENTS</span><b>+</b><span>06 THEMES</span><b>+</b
                 ><span>ONE SHARED SYSTEM</span>
               </div>
             </div>
@@ -203,7 +210,7 @@ function draw() {
             </div>
           </section>
           <details class="display-settings">
-            <summary>Display effects <span>GLOW / SCANLINES</span></summary>
+            <summary>Display effects <span>GLOW / SCANLINES / MOTION</span></summary>
             <div class="display-options">
               <label
                 >Phosphor glow
@@ -237,6 +244,22 @@ function draw() {
                   </option>
                 </select>
               </label>
+              <label
+                >Component motion
+                <select
+                  class="t-native"
+                  .value=${motion}
+                  @change=${(event: Event) => {
+                    motion = (event.target as HTMLSelectElement).value;
+                    preferences();
+                  }}
+                >
+                  <option value="auto" ?selected=${motion === 'auto'}>
+                    Follow device preference
+                  </option>
+                  <option value="off" ?selected=${motion === 'off'}>Off</option>
+                </select>
+              </label>
               <p>
                 Scanlines apply to this preview, the calibration display, and the event log. Each
                 screen can have its own setting.
@@ -248,6 +271,7 @@ function draw() {
                   lines = 'standard';
                   glow = 'off';
                   scanlines = 'off';
+                  motion = 'auto';
                   preferences();
                 }}
               >
@@ -443,7 +467,7 @@ function draw() {
             ><span>${formMessage || 'Awaiting input. Try a component above.'}</span
             ><span class="cursor" aria-hidden="true">▌</span>
           </div>
-          ${library(draw, action)}
+          ${library(draw, action)} ${extensions(draw, action)}
           <footer class="page-footer">
             <span>TERMINAL KIT / V0.1.0</span><span>MODERN PRIMITIVES. ANALOG CHARACTER.</span
             ><a href=${storybookUrl} target="_blank" rel="noreferrer"

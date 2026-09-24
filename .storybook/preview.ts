@@ -8,6 +8,10 @@ import '../src/themes.css';
 setCustomElementsManifest(manifest);
 const preview: Preview = {
   globalTypes: {
+    motion: {
+      description: 'Component motion (device reduced-motion preference always wins)',
+      toolbar: { title: 'Motion', icon: 'play', items: ['auto', 'off'], dynamicTitle: true },
+    },
     theme: {
       description: 'Color theme',
       toolbar: {
@@ -50,6 +54,7 @@ const preview: Preview = {
     },
   },
   initialGlobals: {
+    motion: 'auto',
     theme: 'amber',
     density: 'comfortable',
     lines: 'standard',
@@ -65,6 +70,7 @@ const preview: Preview = {
         data-lines=${context.globals.lines}
         data-glow=${context.globals.glow}
         data-scanlines=${context.globals.scanlines}
+        data-motion=${context.globals.motion}
         style="padding:32px;min-height:160px;background:var(--t-bg);color:var(--t-text);font:14px/1.6 var(--t-font)"
       >
         ${story()}

@@ -36,6 +36,10 @@
       "types": "./dist/adapters/react.d.ts",
       "import": "./dist/adapters/react.js"
     },
+    "./icons": {
+      "types": "./dist/icons.d.ts",
+      "import": "./dist/icons.js"
+    },
     "./vue": {
       "types": "./dist/adapters/vue.d.ts",
       "import": "./dist/adapters/vue.js"
@@ -53,12 +57,12 @@
     "dev": "vite --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
     "build": "node scripts/build.mjs",
-    "build:demo": "vite build",
+    "build:demo": "vite build && node scripts/icon-credits.mjs",
     "build:site": "npm run build:demo && npm run build:storybook && node scripts/site.mjs",
     "storybook": "npm run build && storybook dev -p 6006 --host 127.0.0.1 --no-open",
-    "build:storybook": "npm run build && storybook build",
+    "build:storybook": "npm run build && storybook build && node scripts/icon-credits.mjs",
     "test": "playwright test",
-    "test:a11y": "playwright test tests/accessibility-contrast.spec.ts tests/accessibility-layout.spec.ts tests/forms-accessibility.spec.ts",
+    "test:a11y": "playwright test tests/accessibility-contrast.spec.ts tests/accessibility-layout.spec.ts tests/forms-accessibility.spec.ts tests/extended-forms.spec.ts tests/extended-navigation.spec.ts tests/icons-motion.spec.ts",
     "test:stories": "vitest run --config vitest.config.ts",
     "size": "node scripts/size.mjs",
     "check": "npm run build && npm run format:check && npm run typecheck && npm test && npm run test:stories && npm run test:production && npm run size && npm run test:package",
@@ -67,6 +71,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "metadata": "node scripts/metadata.mjs",
+    "icons:demo": "node scripts/icon-samples.mjs",
     "test:package": "node scripts/verify-package.mjs",
     "prepack": "npm run build",
     "test:behavior": "playwright test --grep-invert \"screenshot|visual\""
@@ -83,6 +88,13 @@
     "@angular/platform-browser": "22.1.7",
     "@axe-core/playwright": "4.13.0",
     "@custom-elements-manifest/analyzer": "0.11.0",
+    "@fortawesome/free-brands-svg-icons": "7.3.1",
+    "@fortawesome/free-regular-svg-icons": "7.3.1",
+    "@fortawesome/free-solid-svg-icons": "7.3.1",
+    "@iconify-json/bi": "1.2.7",
+    "@iconify-json/heroicons": "1.2.3",
+    "@iconify-json/material-symbols": "1.2.93",
+    "@iconify-json/tabler": "1.2.40",
     "@lit/react": "1.0.8",
     "@playwright/test": "1.63.0",
     "@storybook/addon-a11y": "10.6.0",
@@ -94,6 +106,8 @@
     "@types/react-dom": "19.3.0",
     "@vitest/browser-playwright": "4.1.11",
     "esbuild": "0.28.2",
+    "ionicons": "8.1.0",
+    "lucide": "1.47.0",
     "prettier": "3.9.9",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -113,11 +127,11 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "peerDependencies": {
+    "@angular/core": "^22.1.0",
+    "@angular/forms": "^22.1.0",
     "@lit/react": "^1.0.8",
     "react": "^19.0.0",
-    "vue": "^3.5.0",
-    "@angular/core": "^22.1.0",
-    "@angular/forms": "^22.1.0"
+    "vue": "^3.5.0"
   },
   "peerDependenciesMeta": {
     "@lit/react": {

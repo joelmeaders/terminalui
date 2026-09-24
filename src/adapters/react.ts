@@ -9,7 +9,11 @@ import { TBreadcrumb as TBreadcrumbElement } from '../components/breadcrumb';
 import { TButton as TButtonElement } from '../components/button';
 import { TCard as TCardElement } from '../components/card';
 import { TCheckbox as TCheckboxElement } from '../components/checkbox';
+import { TColorPicker as TColorPickerElement } from '../components/color-picker';
 import { TCombobox as TComboboxElement } from '../components/combobox';
+import { TCommandPalette as TCommandPaletteElement } from '../components/command-palette';
+import { TCopyButton as TCopyButtonElement } from '../components/copy-button';
+import { TDescriptionList as TDescriptionListElement } from '../components/description-list';
 import { TDialog as TDialogElement } from '../components/dialog';
 import { TDivider as TDividerElement } from '../components/divider';
 import { TDrawer as TDrawerElement } from '../components/drawer';
@@ -19,21 +23,32 @@ import { TGrid as TGridElement } from '../components/grid';
 import { TIconButton as TIconButtonElement } from '../components/icon-button';
 import { TIcon as TIconElement } from '../components/icon';
 import { TInput as TInputElement } from '../components/input';
+import { TLink as TLinkElement } from '../components/link';
 import { TMenu as TMenuElement } from '../components/menu';
+import { TMeter as TMeterElement } from '../components/meter';
+import { TNumberInput as TNumberInputElement } from '../components/number-input';
 import { TPagination as TPaginationElement } from '../components/pagination';
+import { TPasswordInput as TPasswordInputElement } from '../components/password-input';
 import { TPopover as TPopoverElement } from '../components/popover';
 import { TProgress as TProgressElement } from '../components/progress';
 import { TRadioGroup as TRadioGroupElement } from '../components/radio-group';
 import { TRange as TRangeElement } from '../components/range';
+import { TRating as TRatingElement } from '../components/rating';
+import { TSegmentedControl as TSegmentedControlElement } from '../components/segmented-control';
 import { TSelect as TSelectElement } from '../components/select';
 import { TSkeleton as TSkeletonElement } from '../components/skeleton';
 import { TSpinner as TSpinnerElement } from '../components/spinner';
+import { TSplitPane as TSplitPaneElement } from '../components/split-pane';
 import { TStack as TStackElement } from '../components/stack';
+import { TSteps as TStepsElement } from '../components/steps';
 import { TSwitch as TSwitchElement } from '../components/switch';
 import { TTable as TTableElement } from '../components/table';
 import { TTabs as TTabsElement } from '../components/tabs';
+import { TTagsInput as TTagsInputElement } from '../components/tags-input';
 import { TTextarea as TTextareaElement } from '../components/textarea';
+import { TTimeline as TTimelineElement } from '../components/timeline';
 import { TToast as TToastElement } from '../components/toast';
+import { TToolbar as TToolbarElement } from '../components/toolbar';
 import { TTooltip as TTooltipElement } from '../components/tooltip';
 import { TTree as TTreeElement } from '../components/tree';
 export const TAccordion = createComponent({
@@ -92,10 +107,44 @@ export const TCheckbox = createComponent({
   elementClass: TCheckboxElement,
   events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
 });
+export const TColorPicker = createComponent({
+  react: React,
+  tagName: 't-color-picker',
+  elementClass: TColorPickerElement,
+  events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
+});
 export const TCombobox = createComponent({
   react: React,
   tagName: 't-combobox',
   elementClass: TComboboxElement,
+  events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
+});
+export const TCommandPalette = createComponent({
+  react: React,
+  tagName: 't-command-palette',
+  elementClass: TCommandPaletteElement,
+  events: {
+    onInput: 'input' as EventName<Event>,
+    onChange: 'change' as EventName<Event>,
+    onTSelect: 't-select' as EventName<CustomEvent<unknown>>,
+    onTClose: 't-close' as EventName<CustomEvent<unknown>>,
+  },
+});
+export const TCopyButton = createComponent({
+  react: React,
+  tagName: 't-copy-button',
+  elementClass: TCopyButtonElement,
+  events: {
+    onInput: 'input' as EventName<Event>,
+    onChange: 'change' as EventName<Event>,
+    onTCopy: 't-copy' as EventName<CustomEvent<unknown>>,
+    onTCopyError: 't-copy-error' as EventName<CustomEvent<unknown>>,
+  },
+});
+export const TDescriptionList = createComponent({
+  react: React,
+  tagName: 't-description-list',
+  elementClass: TDescriptionListElement,
   events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
 });
 export const TDialog = createComponent({
@@ -160,6 +209,12 @@ export const TInput = createComponent({
   elementClass: TInputElement,
   events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
 });
+export const TLink = createComponent({
+  react: React,
+  tagName: 't-link',
+  elementClass: TLinkElement,
+  events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
+});
 export const TMenu = createComponent({
   react: React,
   tagName: 't-menu',
@@ -170,6 +225,18 @@ export const TMenu = createComponent({
     onTSelect: 't-select' as EventName<CustomEvent<unknown>>,
   },
 });
+export const TMeter = createComponent({
+  react: React,
+  tagName: 't-meter',
+  elementClass: TMeterElement,
+  events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
+});
+export const TNumberInput = createComponent({
+  react: React,
+  tagName: 't-number-input',
+  elementClass: TNumberInputElement,
+  events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
+});
 export const TPagination = createComponent({
   react: React,
   tagName: 't-pagination',
@@ -178,6 +245,16 @@ export const TPagination = createComponent({
     onInput: 'input' as EventName<Event>,
     onChange: 'change' as EventName<Event>,
     onTChange: 't-change' as EventName<CustomEvent<unknown>>,
+  },
+});
+export const TPasswordInput = createComponent({
+  react: React,
+  tagName: 't-password-input',
+  elementClass: TPasswordInputElement,
+  events: {
+    onInput: 'input' as EventName<Event>,
+    onChange: 'change' as EventName<Event>,
+    onTVisibilityChange: 't-visibility-change' as EventName<CustomEvent<unknown>>,
   },
 });
 export const TPopover = createComponent({
@@ -208,6 +285,18 @@ export const TRange = createComponent({
   elementClass: TRangeElement,
   events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
 });
+export const TRating = createComponent({
+  react: React,
+  tagName: 't-rating',
+  elementClass: TRatingElement,
+  events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
+});
+export const TSegmentedControl = createComponent({
+  react: React,
+  tagName: 't-segmented-control',
+  elementClass: TSegmentedControlElement,
+  events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
+});
 export const TSelect = createComponent({
   react: React,
   tagName: 't-select',
@@ -226,11 +315,32 @@ export const TSpinner = createComponent({
   elementClass: TSpinnerElement,
   events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
 });
+export const TSplitPane = createComponent({
+  react: React,
+  tagName: 't-split-pane',
+  elementClass: TSplitPaneElement,
+  events: {
+    onInput: 'input' as EventName<Event>,
+    onChange: 'change' as EventName<Event>,
+    onTInput: 't-input' as EventName<CustomEvent<unknown>>,
+    onTChange: 't-change' as EventName<CustomEvent<unknown>>,
+  },
+});
 export const TStack = createComponent({
   react: React,
   tagName: 't-stack',
   elementClass: TStackElement,
   events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
+});
+export const TSteps = createComponent({
+  react: React,
+  tagName: 't-steps',
+  elementClass: TStepsElement,
+  events: {
+    onInput: 'input' as EventName<Event>,
+    onChange: 'change' as EventName<Event>,
+    onTSelect: 't-select' as EventName<CustomEvent<unknown>>,
+  },
 });
 export const TSwitch = createComponent({
   react: React,
@@ -259,10 +369,22 @@ export const TTabs = createComponent({
     onTChange: 't-change' as EventName<CustomEvent<unknown>>,
   },
 });
+export const TTagsInput = createComponent({
+  react: React,
+  tagName: 't-tags-input',
+  elementClass: TTagsInputElement,
+  events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
+});
 export const TTextarea = createComponent({
   react: React,
   tagName: 't-textarea',
   elementClass: TTextareaElement,
+  events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
+});
+export const TTimeline = createComponent({
+  react: React,
+  tagName: 't-timeline',
+  elementClass: TTimelineElement,
   events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
 });
 export const TToast = createComponent({
@@ -274,6 +396,12 @@ export const TToast = createComponent({
     onChange: 'change' as EventName<Event>,
     onTClose: 't-close' as EventName<CustomEvent<unknown>>,
   },
+});
+export const TToolbar = createComponent({
+  react: React,
+  tagName: 't-toolbar',
+  elementClass: TToolbarElement,
+  events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
 });
 export const TTooltip = createComponent({
   react: React,

@@ -18,7 +18,7 @@ export class TSpinner extends TerminalElement {
         border: var(--t-selection-width, 2px) solid var(--t-border);
         border-top-color: var(--t-accent);
         border-radius: 50%;
-        animation: rotate 900ms linear infinite;
+        animation: var(--_t-motion-name, rotate) 900ms linear infinite;
       }
       :host([size='small']) .ring {
         width: 16px;

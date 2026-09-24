@@ -87,13 +87,15 @@ export class TButton extends TerminalElement {
         font-weight: 600;
         letter-spacing: 0.06em;
         text-transform: uppercase;
-        transition: filter 0.15s;
+        transition:
+          filter var(--_t-motion-duration, var(--t-motion-fast, 120ms)),
+          transform var(--_t-motion-duration, var(--t-motion-fast, 120ms));
       }
       button:hover:not(:disabled) {
         filter: brightness(1.12);
       }
       button:active:not(:disabled) {
-        transform: translateY(1px);
+        transform: var(--_t-active-transform, translateY(1px));
       }
       :host([variant='secondary']) button {
         background: transparent;
@@ -124,7 +126,7 @@ export class TButton extends TerminalElement {
         border: 2px solid currentColor;
         border-right-color: transparent;
         border-radius: 50%;
-        animation: spin 0.8s linear infinite;
+        animation: var(--_t-motion-name, spin) 0.8s linear infinite;
       }
       @keyframes spin {
         to {

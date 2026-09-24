@@ -39,6 +39,8 @@ export class TCheckbox extends FormControl {
         position: relative;
       }
       :host([switch]) input::before {
+        transition: left var(--_t-motion-duration, var(--t-motion-fast, 120ms))
+          var(--t-motion-ease, ease);
         content: '';
         display: block;
         width: 12px;

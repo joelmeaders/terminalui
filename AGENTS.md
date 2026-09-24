@@ -30,6 +30,9 @@ Include accessibility in implementation, stories, tests, documentation, and revi
 - Keep glow and scanlines optional and off by default. Disable decorative effects in forced colors and increased-contrast preferences.
 - Screen texture must not reduce the readability of essential content. Review composited effects, not just underlying text colors.
 - Honor reduced motion. Do not introduce flashing or flickering terminal effects.
+- Use the shared motion tokens. Respect both `data-motion="off"` and device reduced-motion preferences, including nested regions.
+- Keep focus, validation, and overlay closing independent of animation timing. Floating entrance effects must not break viewport placement.
+- Verify that built-in and provider SVG icons draw visible geometry. An accessible name or a path node alone does not prove rendering.
 - Support 200% text enlargement, WCAG text-spacing overrides, and reflow at 320 CSS pixels without losing content or controls.
 - Allow scrolling within content that needs two dimensions, such as data tables. Do not hide essential content to eliminate overflow.
 - Meet the 24 CSS pixel minimum target requirement or a documented WCAG exception. Prefer larger targets where layout permits.

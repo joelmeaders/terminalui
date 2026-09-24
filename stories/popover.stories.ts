@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import '../src/components/popover';
-import { expect, userEvent } from 'storybook/test';
+import { expect, userEvent, waitFor } from 'storybook/test';
 const meta = {
   title: 'Components/Popover',
   component: 't-popover',
@@ -36,7 +36,7 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('t-popover')!.shadowRoot!;
     await userEvent.click(root.querySelector('button')!);
-    await expect(root.querySelector('[role=dialog]')).toBeVisible();
+    await waitFor(() => expect(root.querySelector('[role=dialog]')).toBeVisible());
     await userEvent.keyboard('{Escape}');
   },
 };

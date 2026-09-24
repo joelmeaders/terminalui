@@ -1,12 +1,26 @@
-import { css, html, nothing } from 'lit';
+import { css, html, svg, nothing } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
+import { getRegisteredIcon, subscribeIcons } from '../internal/icon-registry';
 
-/** Original, small stroke icons. Supply a label for meaningful icons; omit it for decoration. @csspart svg - Vector artwork. */
+/** Built-in or registered provider icon. Supply a label for meaningful icons; omit it for decoration. @csspart svg - Vector artwork. */
 export class TIcon extends TerminalElement {
   static properties = { name: {}, label: {}, size: { type: Number } };
-  name: IconName = 'info';
+  name: string = 'info';
   label = '';
   size = 20;
+  private unsubscribe?: () => void;
+  connectedCallback() {
+    super.connectedCallback();
+    this.unsubscribe = subscribeIcons((name) => {
+      if (name === this.name) this.requestUpdate();
+    });
+    this.requestUpdate();
+  }
+  disconnectedCallback() {
+    this.unsubscribe?.();
+    super.disconnectedCallback();
+  }
   static styles = [
     baseStyles,
     css`
@@ -14,6 +28,7 @@ export class TIcon extends TerminalElement {
         display: inline-flex;
         vertical-align: middle;
         flex: none;
+        color: inherit;
       }
       svg {
         display: block;
@@ -23,20 +38,29 @@ export class TIcon extends TerminalElement {
         stroke-linecap: square;
         stroke-linejoin: miter;
       }
+      svg[data-provider] {
+        fill: currentColor;
+        stroke: none;
+        stroke-width: 0;
+      }
     `,
   ];
   render() {
     const size = Number.isFinite(this.size) ? Math.max(8, Math.min(this.size, 128)) : 20;
+    const registered = getRegisteredIcon(this.name);
+    const paths = Object.hasOwn(icons, this.name) ? icons[this.name as IconName] : icons.info;
     return html`<svg
       part="svg"
-      viewBox="0 0 24 24"
+      viewBox=${registered?.viewBox ?? '0 0 24 24'}
+      ?data-provider=${!!registered}
+      focusable="false"
       width=${size}
       height=${size}
       role=${this.label ? 'img' : nothing}
       aria-label=${this.label || nothing}
       aria-hidden=${this.label ? nothing : 'true'}
     >
-      ${(icons[this.name] ?? icons.info).map((path) => html`<path d=${path}></path>`)}
+      ${registered ? unsafeSVG(registered.body) : paths.map((path) => svg`<path d=${path}></path>`)}
     </svg>`;
   }
 }

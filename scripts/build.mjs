@@ -9,7 +9,7 @@ const internal = (await readdir('src/internal'))
   .filter((f) => f.endsWith('.ts'))
   .map((f) => `src/internal/${f}`);
 const adapters = ['src/adapters/react.ts', 'src/adapters/vue.ts'];
-const sources = ['src/index.ts', ...components, ...internal, ...adapters];
+const sources = ['src/index.ts', 'src/icons.ts', ...components, ...internal, ...adapters];
 await mkdir('dist', { recursive: true });
 // ESM keeps one shared Lit dependency for applications using a bundler.
 await build({

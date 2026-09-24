@@ -1,16 +1,16 @@
 # Accessibility evaluation
 
-Terminal Kit targets WCAG 2.2 Level AA for its 35 browser components and shipped themes. This is an engineering target, not a conformance claim. Component checks cannot establish conformance for an application that uses the library. Application content, labels, navigation, validation, timing, and workflows also require evaluation. Use the [WCAG 2.2 standard](https://www.w3.org/TR/WCAG22/) as the normative reference.
+Terminal Kit targets WCAG 2.2 Level AA for its 50 browser components and shipped themes. This is an engineering target, not a conformance claim. Component checks cannot establish conformance for an application that uses the library. Application content, labels, navigation, validation, timing, and workflows also require evaluation. Use the [WCAG 2.2 standard](https://www.w3.org/TR/WCAG22/) as the normative reference.
 
 ## Evidence and limits
 
-Local validation on Windows on 2026-09-23 passed `npm run check`: 223 browser tests passed with 2 emulation skips, all 135 Storybook tests passed, and all 14 production checks passed. Type checks, formatting, size budgets, and the external package consumer also passed. The 66 focused accessibility cases are included in the browser total: 64 passed and 2 were skipped. These counts include behavior and packaging coverage; they are not a count of WCAG criteria or proof of conformance.
+Local validation of the 50-component library on Windows on 2026-09-23 passed `npm run check`: 316 browser tests passed with 2 emulation skips, all 195 Storybook tests passed, and all 15 production checks passed. Type checks, formatting, size budgets, and the external package consumer also passed. The focused accessibility selection contains 159 of those browser cases: 157 passed and 2 were skipped. The 33 icon, motion, and clipboard cases also passed after the final icon color-inheritance correction. These counts describe tested scenarios; they are not a count of WCAG criteria or proof of conformance.
 
 Contrast-pair measurements and axe review items are retained in the Playwright output. CI is configured to upload the browser test results even when the job succeeds; this local result does not establish a remote CI result.
 
 Browser tests, Storybook interactions, axe checks, contrast calculations, and screenshots provide evidence for their specific assertions and tested states. Preserve their reports for the exact source revision. A passing run does not prove that every accessibility requirement or assistive technology works.
 
-Run `npm run test:a11y` for the focused `forms-accessibility`, `accessibility-layout`, and `accessibility-contrast` suites. These checks cover their form assertions, layout simulations, and calculated contrast scenarios. The contrast checks use the actual text, control, and focus colors for all six palettes against background, surface, and raised colors. They also calculate contrast against composited default scanline backgrounds. This evidence does not establish screenshot-pixel measurements or manual coverage of every component state.
+Run `npm run test:a11y` for the focused contrast, layout, forms, extended forms, extended navigation, icons, and motion suites. These checks cover their form assertions, layout simulations, and calculated contrast scenarios. The contrast checks use the actual text, control, and focus colors for all six palettes against background, surface, and raised colors. They also calculate contrast against composited default scanline backgrounds. This evidence does not establish screenshot-pixel measurements or manual coverage of every component state.
 
 The paper palette uses darker muted and status colors. All palettes provide a separate `--t-control-border` token for controls. Recheck contrast when an application overrides any foreground, surface, boundary, focus, or effect color.
 
@@ -30,6 +30,12 @@ Keep these distinctions in test reports:
 
 ## Test setup and records
 
+The 50-component expansion adds native form, keyboard, modal search, split-pane, clipboard, SVG rendering, and motion checks. New form checks measure all six palettes. Navigation checks retain screenshots and geometry evidence for narrow layouts and text-spacing simulations. Provider checks use real data from seven icon sets, plus decorative and meaningful names. Motion checks cover automatic behavior, explicit off, reduced motion, nested overrides, and a runtime preference change in three browser engines.
+
+Additional axe review items remain recorded. The number step button's minus glyph has measured contrast of at least 4.5:1 in each palette. For the active command description, six narrow/spacing cases show unclipped text, successful hit tests, and 6.82:1 computed contrast. Axe still reports that description and decorative step symbols as incomplete. These targeted measurements do not close every rendered state or manual assistive-technology check.
+
+The actual demo was inspected through browser UI at desktop and 390 CSS pixels. This is visual review of those views, not a screen-reader, OS-preference, or real zoom result. Original component-area screenshot references remain intact. Expanded full-page references include the added catalog and repaired built-in SVG geometry.
+
 1. Build the current library and Storybook with `npm run build:site`.
 2. Start the compiled site with `npm run preview`.
 3. Record the source revision or archive digest, build commands, and full test URL.
@@ -45,7 +51,7 @@ Use **Pass**, **Fail**, **Blocked**, or **Pending** for each result. A pass appl
 
 ### Forms and actions
 
-- Test all nine form controls: input, textarea, select, checkbox, switch, radio group, range, combobox, and file input. Confirm each label, value, required state, help message, error message, and disabled state is available without visual guessing.
+- Test all 15 form controls: input, textarea, select, checkbox, switch, radio group, range, combobox, file input, password input, number input, segmented control, rating, tags input, and color picker. Confirm each label, value, required state, help message, error message, and disabled state is available without visual guessing.
 - Submit an empty required form. Correct each error, then submit again. Check the announced error, focus location, error clearing, and completion message. Test both browser constraints and application errors.
 - Toggle local disabled state and a disabled fieldset. Confirm disabled controls cannot receive unintended actions. Re-enable them and verify input, focus, and submission.
 - Test reset, Enter submission, external form association, submit-button values, keyboard file selection, and range adjustment. Check that state changes remain understandable with speech enabled.
@@ -55,6 +61,10 @@ Use the applicable [APG widget patterns](https://www.w3.org/WAI/ARIA/apg/pattern
 
 ### Collections and navigation
 
+- Command palette: open, search, traverse enabled commands, activate a result, check the empty/loading states, and dismiss. Confirm search focus, result announcements, and return to the opener.
+- Steps and toolbar: check ordered current-step information, unavailable actions, arrow navigation, Home/End, and focus when an action becomes disabled.
+- Split pane: identify each region and separator. Resize with arrow keys, Home/End, and pointer input. Check value announcements, bounds, orientation, and stacked narrow layouts.
+
 - Combobox: type a query, traverse results, select an option, dismiss with Escape, and reopen. Check announced expanded state, current option, selection, loading, and no-results feedback. Test disabled options and an empty list. Compare behavior with the [combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/).
 - Tree: traverse visible nodes, expand and collapse branches, and select a node. Confirm hierarchy, expanded state, selected state, and focus remain understandable. Verify disabled nodes and empty content. Consult the [tree view pattern](https://www.w3.org/WAI/ARIA/apg/patterns/treeview/).
 - Menu: open from the trigger, traverse actions, skip disabled actions, activate an item, and dismiss. Confirm focus returns to an appropriate trigger after dismissal. Consult the [menu button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/).
@@ -62,6 +72,10 @@ Use the applicable [APG widget patterns](https://www.w3.org/WAI/ARIA/apg/pattern
 - Tabs and accordion: use the documented arrow, Home/End, activation, and disclosure keys. Check selected or expanded state and the relationship to the visible panel. Ensure hidden panels do not expose active controls. Consult the [tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
 
 ### Overlays, status, and supporting content
+
+- Copy button: check successful and denied clipboard access, pending feedback, duplicate activation, visible completion text, and the live announcement. Focus must remain on the action.
+- Provider icons: verify useful names for meaningful artwork and icon-only actions. Confirm decorative artwork does not duplicate adjacent text.
+- Meter, timeline, and description list: read the measurement name/value, ordered events and dates, and term/value relationships without relying on color or visual placement.
 
 - Dialog and drawer: open with keyboard and pointer activation. Confirm the announced name, initial focus, focus containment, Escape behavior, and focus restoration. Check long content and a removed or disabled opener. Consult the [modal dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/).
 - Popover and tooltip: open with each supported input method. Dismiss without losing the current task. Check the relationship to the trigger, keyboard reachability of popover actions, and behavior near viewport edges. Tooltip content must remain usable when the pointer moves over it. Check [content on hover or focus](https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus.html).

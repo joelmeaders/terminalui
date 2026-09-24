@@ -41,6 +41,46 @@ export const baseStyles = css`
   button {
     cursor: pointer;
   }
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role='tab'],
+  [role='option'],
+  [role='treeitem'] {
+    transition:
+      background-color var(--_t-motion-duration, var(--t-motion-fast, 120ms))
+        var(--t-motion-ease, ease),
+      border-color var(--_t-motion-duration, var(--t-motion-fast, 120ms)) var(--t-motion-ease, ease),
+      box-shadow var(--_t-motion-duration, var(--t-motion-fast, 120ms)) var(--t-motion-ease, ease);
+  }
+  dialog[open],
+  [popover]:popover-open {
+    animation: var(--_t-motion-name, t-enter)
+      var(--_t-motion-duration, var(--t-motion-normal, 180ms)) var(--t-motion-ease, ease);
+  }
+  [popover]:popover-open {
+    animation-name: var(--_t-motion-name, t-fade);
+  }
+  @keyframes t-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes t-enter {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
   :focus-visible {
     outline: 2px solid var(--t-focus, #f5ba5b);
     outline-offset: 4px;
@@ -58,6 +98,9 @@ export const baseStyles = css`
       animation: none !important;
       transition: none !important;
       scroll-behavior: auto !important;
+    }
+    button:active {
+      transform: none !important;
     }
   }
   @media (forced-colors: active), (prefers-contrast: more) {

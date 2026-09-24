@@ -27,7 +27,7 @@ export class TSkeleton extends TerminalElement {
         height: var(--t-skeleton-height, 100px);
       }
       :host([animated]) span {
-        animation: pulse 1.8s ease-in-out infinite;
+        animation: var(--_t-motion-name, pulse) 1.8s ease-in-out infinite;
       }
       @keyframes pulse {
         50% {

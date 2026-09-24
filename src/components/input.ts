@@ -81,7 +81,7 @@ export class TInput extends FormControl {
     } else {
       const blockers = Array.from(this.form.elements).filter(
         (element) =>
-          (element instanceof HTMLInputElement || element.localName === 't-input') &&
+          (element instanceof HTMLInputElement || element instanceof TInput) &&
           [
             'text',
             'email',

@@ -365,6 +365,16 @@ h1 span {
   gap: 20px;
   padding: 4px 20px 20px;
 }
+.copy-example {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pane-content {
+  padding: 16px;
+  overflow-wrap: anywhere;
+}
 .display-options label {
   display: grid;
   flex: 1;

@@ -1,6 +1,5 @@
 import { css, html, nothing } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
-import { type IconName } from './icon';
 import './icon';
 /** Named native icon button. @slot - Optional replacement icon. @csspart button - Native button. */
 export class TIconButton extends TerminalElement {
@@ -11,7 +10,7 @@ export class TIconButton extends TerminalElement {
     pressed: { type: Boolean },
     size: { reflect: true },
   };
-  name: IconName = 'settings';
+  name = 'settings';
   label = 'Action';
   disabled = false;
   /** Null means a regular action; true/false exposes a toggle button. */

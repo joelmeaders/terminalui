@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile, readdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -21,6 +21,19 @@ const pack = JSON.parse(
   npmRun(['pack', '--ignore-scripts', '--json', '--pack-destination', consumer]),
 )[0];
 assert(pack.files.some((file) => file.path === 'dist/custom-elements.json'));
+assert(
+  pack.files.some((file) => file.path === 'docs/icon-licenses/index.html'),
+  'Packed credits index must exist.',
+);
+const noticeDirectories = (await readdir('docs/icon-licenses', { withFileTypes: true })).filter(
+  (entry) => entry.isDirectory(),
+);
+for (const directory of noticeDirectories) {
+  assert(
+    pack.files.some((file) => file.path === `docs/icon-licenses/${directory.name}/NOTICE`),
+    `Packed notice missing: ${directory.name}`,
+  );
+}
 assert(!pack.files.some((file) => file.path.startsWith('src/')));
 const pkg = JSON.parse(await readFile('package.json', 'utf8'));
 assert.deepEqual(
@@ -48,12 +61,32 @@ npmRun(
       '@angular/common',
       '@angular/forms',
       '@angular/compiler',
+      '@angular/platform-browser',
       'rxjs',
     ].map((name) => `${name}@${pkg.devDependencies[name]}`),
   ],
   consumer,
 );
+for (const directory of noticeDirectories) {
+  const path = `docs/icon-licenses/${directory.name}/NOTICE`;
+  assert.equal(
+    await readFile(join(consumer, 'node_modules/@terminal-kit/core', path), 'utf8'),
+    await readFile(path, 'utf8'),
+    `Installed notice differs: ${directory.name}`,
+  );
+}
 const catalog = JSON.parse(await readFile('dist/catalog.json', 'utf8'));
+const componentSources = (await readdir('src/components')).filter((file) => file.endsWith('.ts'));
+assert.equal(
+  catalog.length,
+  componentSources.length,
+  'Rebuild before verifying a changed component catalog.',
+);
+assert.equal(
+  new Set(catalog.map((entry) => entry.tagName)).size,
+  catalog.length,
+  'Catalog tags must be unique.',
+);
 const manifest = JSON.parse(await readFile('dist/custom-elements.json', 'utf8'));
 const manifestTags = manifest.modules.flatMap((module) =>
   (module.declarations ?? []).filter((item) => item.tagName).map((item) => item.tagName),
@@ -68,9 +101,11 @@ const coreBundle = await build({
 });
 assert(
   !Object.keys(coreBundle.metafile.inputs).some((file) =>
-    /node_modules\/(?:react|vue|@angular|@lit\/react)\//.test(file.replaceAll('\\', '/')),
+    /node_modules\/(?:react|vue|@angular|@lit\/react|ionicons|lucide|lucide-static|@fortawesome|@iconify-json|@iconify)\//.test(
+      file.replaceAll('\\', '/'),
+    ),
   ),
-  'Core bundle must exclude framework runtimes.',
+  'Core bundle must exclude framework runtimes and provider icon packs.',
 );
 const imports = catalog
   .map(
@@ -84,12 +119,23 @@ await writeFile(
 import '@terminal-kit/core';
 import '@terminal-kit/core/themes.css';
 import { TInput as ReactInput } from '@terminal-kit/core/react';
+import * as ReactComponents from '@terminal-kit/core/react';
 import { useTerminalModel } from '@terminal-kit/core/vue';
 import '@angular/compiler';
 import { TerminalValueAccessor } from '@terminal-kit/core/angular';
+import { registerIcon, unregisterIcon, registerFontAwesomeIcon, registerLucideIcon, registerIconSet, type IconData } from '@terminal-kit/core/icons';
+const testIcon: IconData = { width: 16, height: 16, body: '<path d="M2 2h12v12H2z"/>' };
+registerIcon('package:sample', testIcon);
+registerFontAwesomeIcon('package:fa', {icon:[16,16,[],'f000','M2 2h12v12H2z']});
+registerLucideIcon('package:lucide', [['circle', {cx:12,cy:12,r:8}]]);
+registerIconSet({prefix:'package-set',icons:{box:testIcon}}, ['box']);
+unregisterIcon('package:unused');
 const input = new TInput(); input.value = 'Installed';
 document.body.append(input);
-(globalThis as any).packageResult = { count: ${catalog.length}, value: input.value, react: !!ReactInput, vue: !!useTerminalModel, angular: !!TerminalValueAccessor };
+for (const name of ['package:sample','package:fa','package:lucide','package-set:box']) {
+  const icon = new TIcon(); icon.name = name; icon.dataset.packageIcon = name; document.body.append(icon);
+}
+(globalThis as any).packageResult = { count: ${catalog.length}, value: input.value, react: !!ReactInput, reactWrappers: [${catalog.map(({ name }) => `ReactComponents.${name}`).join(',')}].filter(Boolean).length, vue: !!useTerminalModel, angular: !!TerminalValueAccessor };
 `,
 );
 const config = {
@@ -117,8 +163,24 @@ await writeFile(
 import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TerminalValueAccessor } from '@terminal-kit/core/angular';
-@Component({selector:'consumer-app',standalone:true,schemas:[CUSTOM_ELEMENTS_SCHEMA],imports:[ReactiveFormsModule,TerminalValueAccessor],template:'<t-input [formControl]="name"></t-input>'})
-export class ConsumerApp { name = new FormControl('Installed', {nonNullable:true}); }
+@Component({selector:'consumer-app',standalone:true,schemas:[CUSTOM_ELEMENTS_SCHEMA],imports:[ReactiveFormsModule,TerminalValueAccessor],template:
+  '<t-input label="Name" [formControl]="name"></t-input>' +
+  '<t-password-input label="Password" [formControl]="password"></t-password-input>' +
+  '<t-number-input label="Quantity" [formControl]="quantity"></t-number-input>' +
+  '<t-segmented-control label="Plan" [options]="plans" [formControl]="plan"></t-segmented-control>' +
+  '<t-rating label="Rating" [formControl]="rating"></t-rating>' +
+  '<t-tags-input label="Tags" [formControl]="tags"></t-tags-input>' +
+  '<t-color-picker label="Color" [formControl]="color"></t-color-picker>'})
+export class ConsumerApp {
+  name = new FormControl('Installed', {nonNullable:true});
+  password = new FormControl('Initial-password', {nonNullable:true});
+  quantity = new FormControl('3', {nonNullable:true});
+  plan = new FormControl('basic', {nonNullable:true});
+  rating = new FormControl('3', {nonNullable:true});
+  tags = new FormControl('["alpha"]', {nonNullable:true});
+  color = new FormControl('#22aa88', {nonNullable:true});
+  plans = [{value:'basic',label:'Basic'},{value:'pro',label:'Pro'}];
+}
 `,
 );
 await writeFile(
@@ -149,6 +211,25 @@ execFileSync(
 );
 const angularOutput = await readFile(join(consumer, 'aot/angular-consumer.js'), 'utf8');
 assert(angularOutput.includes('ɵɵdefineComponent'), 'Consumer must compile with Angular AOT.');
+await writeFile(
+  join(consumer, 'angular-runner.js'),
+  `
+import '@angular/compiler';
+import '@terminal-kit/core';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { ConsumerApp } from './aot/angular-consumer.js';
+document.body.append(document.createElement('consumer-app'));
+bootstrapApplication(ConsumerApp).then((app) => { globalThis.angularConsumer = app.components[0].instance; });
+`,
+);
+const angularBundle = await build({
+  absWorkingDir: consumer,
+  entryPoints: ['angular-runner.js'],
+  bundle: true,
+  format: 'iife',
+  target: 'es2022',
+  write: false,
+});
 const result = await build({
   absWorkingDir: consumer,
   entryPoints: ['consumer.ts'],
@@ -171,6 +252,7 @@ try {
     count: catalog.length,
     value: 'Installed',
     react: true,
+    reactWrappers: catalog.length,
     vue: true,
     angular: true,
   });
@@ -179,15 +261,87 @@ try {
     catalog.map((entry) => entry.tagName),
   );
   assert(registered, 'All catalog tags must register from the installed package.');
-  await page.goto('about:blank');
-  await page.addScriptTag({
-    type: 'module',
-    content: await readFile(
-      join(consumer, 'node_modules/@terminal-kit/core/dist/terminal.js'),
-      'utf8',
+  await page.waitForFunction(() =>
+    [...document.querySelectorAll('[data-package-icon]')].every((icon) =>
+      icon.shadowRoot?.querySelector('svg path,svg circle'),
     ),
-  });
+  );
+  const iconBodies = await page
+    .locator('[data-package-icon]')
+    .evaluateAll((icons) => icons.map((icon) => icon.shadowRoot.querySelector('svg').innerHTML));
+  assert(iconBodies[0].includes('M2 2h12v12H2z'));
+  assert(iconBodies[1].includes('M2 2h12v12H2z'));
+  assert(iconBodies[2].includes('<circle'));
+  assert(iconBodies[3].includes('M2 2h12v12H2z'));
+  await page.goto('about:blank');
+  await page.addScriptTag({ content: angularBundle.outputFiles[0].text });
+  await page.waitForFunction(() => !!globalThis.angularConsumer);
+  const fields = [
+    ['t-password-input', 'password', 'Initial-password', 'Changed-password'],
+    ['t-number-input', 'quantity', '3', '4'],
+    ['t-segmented-control', 'plan', 'basic', 'pro'],
+    ['t-rating', 'rating', '3', '4'],
+    ['t-tags-input', 'tags', '["alpha"]', '["beta"]'],
+    ['t-color-picker', 'color', '#22aa88', '#8844cc'],
+  ];
+  for (const [tag, property, initial, changed] of fields) {
+    await page.waitForFunction(
+      ({ tag, initial }) => document.querySelector(tag)?.value === initial,
+      { tag, initial },
+    );
+    await page.evaluate(
+      ({ property, changed }) => globalThis.angularConsumer[property].setValue(changed),
+      { property, changed },
+    );
+    await page.waitForFunction(
+      ({ tag, changed }) => document.querySelector(tag)?.value === changed,
+      { tag, changed },
+    );
+    const state = await page.evaluate(
+      async ({ tag, property, initial }) => {
+        const element = document.querySelector(tag);
+        element.value = initial;
+        await element.updateComplete;
+        element.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+        element.dispatchEvent(new FocusEvent('focusout', { bubbles: true, composed: true }));
+        const control = globalThis.angularConsumer[property];
+        const result = { value: control.value, touched: control.touched };
+        control.disable();
+        await element.updateComplete;
+        return { ...result, disabled: element.disabled };
+      },
+      { tag, property, initial },
+    );
+    assert.deepEqual(
+      state,
+      { value: initial, touched: true, disabled: true },
+      `Angular accessor flow for ${tag}`,
+    );
+  }
+  await page.goto('about:blank');
+  await page.evaluate(
+    async (source) => {
+      const url = URL.createObjectURL(new Blob([source], { type: 'text/javascript' }));
+      try {
+        const { registerIcon } = await import(url);
+        registerIcon('standalone:check', {
+          width: 24,
+          height: 24,
+          body: '<path d="M2 12l6 6L22 4"/>',
+        });
+        const icon = document.createElement('t-icon');
+        icon.setAttribute('name', 'standalone:check');
+        icon.setAttribute('label', 'Standalone registration');
+        document.body.append(icon);
+        await icon.updateComplete;
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    },
+    await readFile(join(consumer, 'node_modules/@terminal-kit/core/dist/terminal.js'), 'utf8'),
+  );
   await page.waitForFunction(() => !!customElements.get('t-input'));
+  assert.equal(await page.locator('t-icon path').getAttribute('d'), 'M2 12l6 6L22 4');
   assert(
     await page.evaluate(
       (tags) => tags.every((tag) => !!customElements.get(tag)),
@@ -199,6 +353,6 @@ try {
   await browser.close();
 }
 console.log(
-  `Verified external npm install, all ${catalog.length} element exports, NodeNext types, optional adapters, Angular AOT consumer, and standalone registration.`,
+  `Verified external npm install, all ${catalog.length} element exports and React wrappers, NodeNext types, icon registry, provider isolation, Angular AOT consumer with six added form bindings, standalone registration, and ${noticeDirectories.length} exact provider notices.`,
 );
 console.log(`Consumer artifacts: ${consumer}`);

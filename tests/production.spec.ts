@@ -62,6 +62,21 @@ test('production demo retains component registration and working interactions', 
         't-grid',
         't-popover',
         't-toast',
+        't-password-input',
+        't-number-input',
+        't-segmented-control',
+        't-rating',
+        't-tags-input',
+        't-color-picker',
+        't-command-palette',
+        't-steps',
+        't-timeline',
+        't-meter',
+        't-description-list',
+        't-link',
+        't-toolbar',
+        't-split-pane',
+        't-copy-button',
       ].every((tag) => !!customElements.get(tag)),
     ),
   ).toBe(true);
@@ -77,6 +92,44 @@ test('production demo retains component registration and working interactions', 
   await expect(page.locator('.event-console')).toContainText('PRODUCTION / application');
   expect(errors).toEqual([]);
 });
+test('production extensions preserve form, search, copy, icons, and motion behavior', async ({
+  page,
+  context,
+  request,
+}) => {
+  await page.goto('/');
+  await expect(page.locator('.hero-meta')).toContainText('50 COMPONENTS');
+  await page.getByRole('spinbutton', { name: 'Crew size', exact: true }).fill('7');
+  await page.getByRole('textbox', { name: 'Mission tags', exact: true }).fill('science');
+  await page.getByRole('textbox', { name: 'Mission tags', exact: true }).press('Enter');
+  await page.getByRole('button', { name: 'Save example preferences', exact: true }).click();
+  await expect(page.locator('#extensions output')).toContainText(
+    'Crew: 7. Mode: balanced. Tags: survey, navigation, science.',
+  );
+  await expect(page.getByRole('button', { name: 'Remove science', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Find a command', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Search commands', exact: true }).fill('icons');
+  await page.getByRole('combobox', { name: 'Search commands', exact: true }).press('Enter');
+  await expect(page.getByRole('dialog', { name: 'Mission commands' })).not.toBeVisible();
+  await expect(page.locator('.event-console')).toContainText('Explore icon providers');
+  await expect(page.locator('#icon-providers t-icon svg[data-provider]')).toHaveCount(9);
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.getByRole('button', { name: 'Copy status command', exact: true }).click();
+  await expect(page.locator('t-copy-button [role=status]')).toHaveText('Copied to clipboard.');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('mission --status');
+  await page.locator('.display-settings summary').click();
+  await page.getByRole('combobox', { name: 'Component motion', exact: true }).selectOption('off');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-motion', 'off');
+  await expect(page.locator('t-spinner .ring')).toHaveCSS('animation-name', 'none');
+  const credits = await request.get('/icon-licenses/index.html');
+  expect(credits.ok()).toBe(true);
+  expect(await credits.text()).toContain('Font Awesome Free');
+  const notice = await request.get('/icon-licenses/font-awesome/NOTICE');
+  expect(notice.ok()).toBe(true);
+  expect(await notice.text()).toContain('Creative Commons');
+});
+
 test('built Storybook serves documentation and the real component canvas', async ({ page }) => {
   await page.goto('/storybook/?path=/docs/components-button--docs');
   const frame = page.frameLocator('#storybook-preview-iframe');
@@ -92,6 +145,10 @@ test('built Storybook serves documentation and the real component canvas', async
   await expect(page.locator('t-button button')).toHaveCSS('border-top-width', '2px');
   await expect(page.locator('.t-screen')).toHaveAttribute('data-glow', 'subtle');
   await expect(page.locator('.t-screen')).toHaveAttribute('data-scanlines', 'pronounced');
+  await page.goto('/storybook/iframe.html?id=patterns-icon-providers--providers&viewMode=story');
+  await expect(page.locator('t-icon svg[data-provider]')).toHaveCount(7);
+  await page.goto('/storybook/iframe.html?id=patterns-motion--disabled&viewMode=story');
+  await expect(page.locator('t-button .spinner')).toHaveCSS('animation-name', 'none');
 });
 
 for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {

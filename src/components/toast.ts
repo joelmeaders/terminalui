@@ -35,6 +35,8 @@ export class TToast extends TerminalElement {
         display: block;
       }
       .notice {
+        animation: var(--_t-motion-name, t-enter)
+          var(--_t-motion-duration, var(--t-motion-normal, 180ms)) var(--t-motion-ease, ease);
         display: flex;
         align-items: center;
         justify-content: space-between;

@@ -18,6 +18,21 @@
   --t-font-size: 14px;
   --t-control-height: 42px;
   --t-space: 16px;
+  --t-motion-fast: 120ms;
+  --t-motion-normal: 180ms;
+  --t-motion-slow: 240ms;
+  --t-motion-ease: cubic-bezier(0.2, 0, 0, 1);
+}
+/* Internal gates keep a local opt-out effective even when durations are customized. */
+[data-motion='auto'] {
+  --_t-motion-duration: initial;
+  --_t-motion-name: initial;
+  --_t-active-transform: initial;
+}
+[data-motion='off'] {
+  --_t-motion-duration: 0s;
+  --_t-motion-name: none;
+  --_t-active-transform: none;
 }
 [data-theme='phosphor'] {
   --t-bg: #0d1610;
@@ -224,6 +239,22 @@
 .t-native:focus-visible {
   outline: 2px solid var(--t-focus);
   outline-offset: 3px;
+}
+.t-native {
+  transition:
+    border-color var(--_t-motion-duration, var(--t-motion-fast)) var(--t-motion-ease),
+    background-color var(--_t-motion-duration, var(--t-motion-fast)) var(--t-motion-ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  [data-motion] {
+    --_t-motion-duration: 0s;
+    --_t-motion-name: none;
+    --_t-active-transform: none;
+  }
+  .t-native {
+    transition: none !important;
+  }
 }
 button.t-native {
   cursor: pointer;

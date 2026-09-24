@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Icon provider tests</title>
+    <link rel="stylesheet" href="/src/themes.css" />
+  </head>
+  <body style="background: var(--t-bg); color: var(--t-text)">
+    <main id="fixture"></main>
+    <script type="module">
+      import '/src/index.ts';
+      import * as icons from '/src/icons.ts';
+      import { providerExamples } from '/demo/icons.ts';
+      window.iconAPI = icons;
+      window.providerExamples = providerExamples;
+      document.body.dataset.ready = 'true';
+    </script>
+  </body>
+</html>
