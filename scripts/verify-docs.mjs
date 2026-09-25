@@ -309,6 +309,20 @@ try {
         await page.getByRole('textbox', { name: 'Callsign', exact: false }).fill('DOCUMENTED');
         assert.equal(await page.locator(tag).evaluate((el) => el.value), 'DOCUMENTED');
       }
+      if (tag === 't-multi-select') {
+        await page.getByRole('checkbox', { name: 'Engineering' }).check();
+        assert.deepEqual(
+          await page.locator(tag).evaluate((el) => el.values),
+          ['archive', 'engineering'],
+          `${framework}/${tag}: selection must update the bound values array.`,
+        );
+        await page.getByRole('searchbox', { name: 'Filter Departments' }).fill('engine');
+        assert.deepEqual(
+          await page.locator(tag).evaluate((el) => el.values),
+          ['archive', 'engineering'],
+          `${framework}/${tag}: filtering must keep selected values.`,
+        );
+      }
       if (tag === 't-toast') {
         assert.equal(
           (await page.locator('t-toast [role=status]').innerText()).trim(),

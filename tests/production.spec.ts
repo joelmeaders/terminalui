@@ -30,6 +30,7 @@ test('production demo retains component registration and working interactions', 
         't-button',
         't-input',
         't-select',
+        't-multi-select',
         't-checkbox',
         't-card',
         't-badge',
@@ -98,7 +99,7 @@ test('production extensions preserve form, search, copy, icons, and motion behav
   request,
 }) => {
   await page.goto('/');
-  await expect(page.locator('.hero-meta')).toContainText('50 COMPONENTS');
+  await expect(page.locator('.hero-meta')).toContainText('51 COMPONENTS');
   await page.getByRole('spinbutton', { name: 'Crew size', exact: true }).fill('7');
   await page.getByRole('textbox', { name: 'Mission tags', exact: true }).fill('science');
   await page.getByRole('textbox', { name: 'Mission tags', exact: true }).press('Enter');

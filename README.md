@@ -1,6 +1,6 @@
 # Terminal Kit
 
-A browser component library built with Lit. All 50 components share six terminal-inspired palettes and work in plain HTML, React, Vue, and Angular. Storybook contains API notes, interactive controls, component states, and browser interaction tests. The package includes typed framework adapters, generated editor metadata, optional icon providers, and an installable local tarball.
+A browser component library built with Lit. All 51 components share six terminal-inspired palettes and work in plain HTML, React, Vue, and Angular. Storybook contains API notes, interactive controls, component states, and browser interaction tests. The package includes typed framework adapters, generated editor metadata, optional icon providers, and an installable local tarball.
 
 ## License
 
@@ -69,6 +69,7 @@ Use `.t-h1` through `.t-h6` for heading appearance, `.t-text` for standalone tex
 | `t-button`            | Action and form button           | `variant`, `size`, `disabled`, `loading`, `type`, `name`, `value`, `form`, native `click`   |
 | `t-input`             | Text and numeric input           | `value`, `name`, `label`, `type`, `required`, `readonly`, `disabled`, `help`, `error`       |
 | `t-select`            | Native select                    | `options` property, `value`, `name`, `label`, `required`, `disabled`                        |
+| `t-multi-select`      | Multiple labeled choices         | `options`, `values`, JSON string `value`, `searchable`, `name`, `required`                  |
 | `t-checkbox`          | Checkbox or switch               | `checked`, `switch`, `value`, `name`, `label`, `required`, `disabled`                       |
 | `t-textarea`          | Multiline input                  | `value`, `rows`, `readonly`, `resize`, `minlength`, `maxlength`                             |
 | `t-radio-group`       | Single-choice field              | `options`, `value`, `orientation`, `label`                                                  |
@@ -149,13 +150,13 @@ import '@terminal-kit/core/components/button';
 import '@terminal-kit/core/themes.css';
 ```
 
-The package remains private and unpublished at version `0.1.0`. To install it in another repository, run `npm pack` here, then `npm install /path/to/terminal-kit-core-0.1.0.tgz` there. Importing the package root registers all 50 elements. Individual imports include only their component dependencies. Use one distribution path per page: do not load the standalone bundle and ESM package together.
+The package remains private and unpublished at version `0.1.0`. To install it in another repository, run `npm pack` here, then `npm install /path/to/terminal-kit-core-0.1.0.tgz` there. Importing the package root registers all 51 elements. Individual imports include only their component dependencies. Use one distribution path per page: do not load the standalone bundle and ESM package together.
 
 The build also creates TypeScript declarations, a Custom Elements Manifest, a component catalog, and VS Code HTML metadata. Storybook reads the generated manifest. See [framework integration](docs/frameworks.md) for editor configuration and [release preparation](docs/releasing.md) for package verification and publication boundaries.
 
 ## Forms and events
 
-All 15 form controls use `ElementInternals` to participate in HTML forms. They support FormData, browser validation, disabled fieldsets, and reset. Give each field a `name` for submission and a `label` for its internal native control. Reset restores the initial value or checked state and clears file selection. Set initial property values before the first render when using framework bindings. Tags expose a `values` array and a JSON string `value`; FormData contains one entry per tag under the same name. Number and rating values are strings.
+All 16 form controls use `ElementInternals` to participate in HTML forms. They support FormData, browser validation, disabled fieldsets, and reset. Give each field a `name` for submission and a `label` for its internal native control. Reset restores the initial value or checked state and clears file selection. Set initial property values before the first render when using framework bindings. Tags and multi-select expose a `values` array and a JSON string `value`; FormData contains one entry per selected item under the same name. Multi-select uses labeled native checkboxes and can filter choices without clearing selection. Number and rating values are strings.
 
 Use Terminal Kit or native submit and reset buttons:
 
@@ -223,7 +224,7 @@ React 19 uses typed wrappers from `@terminal-kit/core/react`, generated for ever
 
 Vue 3 uses `useTerminalModel` from `@terminal-kit/core/vue` to bind typed refs to element properties and events. For Vue SFC templates, configure `isCustomElement` for tags starting with `t-`. Use property binding for arrays and objects.
 
-Angular 22 uses `CUSTOM_ELEMENTS_SCHEMA` and the compiled `TerminalValueAccessor` from `@terminal-kit/core/angular`. The accessor supports reactive and template-driven bindings for all 15 controls. The package check compiles an external Angular AOT consumer. The included Vite application uses JIT for its application template. Angular validators and browser validation remain separate concerns. See [framework integration](docs/frameworks.md) for complete setup and examples.
+Angular 22 uses `CUSTOM_ELEMENTS_SCHEMA` and the compiled `TerminalValueAccessor` from `@terminal-kit/core/angular`. The accessor supports reactive and template-driven bindings for all 16 controls. The package check compiles an external Angular AOT consumer. The included Vite application uses JIT for its application template. Angular validators and browser validation remain separate concerns. See [framework integration](docs/frameworks.md) for complete setup and examples.
 
 ## Themes and styling
 
@@ -313,11 +314,11 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 41.5 KB for registration of all 50 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.2 KB gzip. The button and complete-catalog budgets remain 8 KB and 42 KB. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
+The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 42.6 KB for registration of all 51 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.2 KB gzip. The button and complete-catalog budgets are 8 KB and 43 KB. The catalog budget increased by 1 KB for multi-select. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
 
 ## Storybook and verification
 
-Storybook includes stories for all 50 components, introductions, appearance examples, and application patterns. Its toolbar changes palette, density, line weight, glow, screen scanlines, and motion. Appearance stories also demonstrate local overrides and the CRT preset. Docs describe slots, events, CSS parts, and form behavior. Stories include interaction checks, and the accessibility addon is configured to fail tests on detected violations.
+Storybook includes stories for all 51 components, introductions, appearance examples, and application patterns. Its toolbar changes palette, density, line weight, glow, screen scanlines, and motion. Appearance stories also demonstrate local overrides and the CRT preset. Docs describe slots, events, CSS parts, and form behavior. Stories include interaction checks, and the accessibility addon is configured to fail tests on detected violations.
 
 ```sh
 npm run build

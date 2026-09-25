@@ -12,7 +12,7 @@ export interface ComponentGuide {
   example: Omit<ExampleNode, 'tag'>;
   event?: { name: string; read: string; description: string };
   action?: { label: string; method: 'show' };
-  form?: 'value' | 'checked' | 'files';
+  form?: 'value' | 'values' | 'checked' | 'files';
   guide?: 'icons' | 'spinners';
 }
 const choices = [
@@ -567,6 +567,35 @@ export const guides: Record<string, ComponentGuide> = {
       'Supply options as an array, not a JSON attribute. Each option uses value, label, and optional disabled.',
       'Use t-combobox when users need to search a longer list.',
     ],
+  ),
+  't-multi-select': field(
+    'Choose several items from a labeled set of checkboxes.',
+    {
+      name: 'departments',
+      label: 'Departments',
+      options: choices,
+      values: ['archive'],
+      searchable: true,
+      help: 'Choose one or more departments.',
+    },
+    [
+      'Supply unique option values through the options property. Each option has value, label, and optional disabled.',
+      'Read and set the values array. The value string is its JSON form. Each selection produces one FormData entry under name.',
+      'Use searchable to filter the visible choices. Filtering keeps the current selection.',
+    ],
+    {
+      form: 'values',
+      event: {
+        name: 'input',
+        read: 'target.values',
+        description:
+          'Read the new string array from event.target.values. Programmatic updates do not emit input.',
+      },
+      accessibility: [
+        'The fieldset names the group. Every choice is a native checkbox with its own label.',
+        'The optional filter only changes the visible choices. Selected choices remain selected when the filter changes.',
+      ],
+    },
   ),
   't-skeleton': {
     purpose: 'Reserve space while content is loading.',

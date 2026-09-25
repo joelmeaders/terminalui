@@ -1,10 +1,14 @@
 # Accessibility evaluation
 
-Terminal Kit targets WCAG 2.2 Level AA for its 50 browser components and shipped themes. This is an engineering target, not a conformance claim. Component checks cannot establish conformance for an application that uses the library. Application content, labels, navigation, validation, timing, and workflows also require evaluation. Use the [WCAG 2.2 standard](https://www.w3.org/TR/WCAG22/) as the normative reference.
+Terminal Kit targets WCAG 2.2 Level AA for its 51 browser components and shipped themes. This is an engineering target, not a conformance claim. Component checks cannot establish conformance for an application that uses the library. Application content, labels, navigation, validation, timing, and workflows also require evaluation. Use the [WCAG 2.2 standard](https://www.w3.org/TR/WCAG22/) as the normative reference.
 
 ## Evidence and limits
 
 Local validation of the 50-component library, native typography, and appearance inheritance on Windows on 2026-09-23 covered all required check stages. The complete `npm run check` passed build, formatting, types, all 204 framework examples, and 546 browser tests with six emulation skips. It also passed all 249 Storybook tests across 56 files, 76 production checks, size budgets, and the external package consumer. The focused accessibility selection passed 387 cases with six emulation skips. These counts describe tested scenarios. They are not a count of WCAG criteria or proof of conformance.
+
+The 2026-09-24 multi-select addition uses a native fieldset, legend, labeled checkboxes, and an optional labeled filter. Focused Playwright tests passed 18 cases across Chromium, Firefox, and WebKit. They cover keyboard selection, group and choice names, required and application errors, focus, disabled choices and fieldsets, repeated FormData entries, reset, filtering, malformed state, and narrow layout with simulated text enlargement inside the shadow root. The six palette scans reported no axe violations in their tested states. No axe incomplete review items were attached by those scans. The 208 generated documentation examples compiled and rendered in Chromium; multi-select selection and filtering also worked in each framework example. An external Angular AOT consumer passed array model and input-event checks. These automated results do not establish spoken output.
+
+A visual review of Playwright Chromium screenshots on Windows on 2026-09-24 checked the multi-select at 600 and 320 CSS pixels in amber and at 320 CSS pixels in paper. The selected, unselected, and disabled checkboxes, labels, help text, and filter were visible. Browser version and actual zoom setting were not recorded. Manual NVDA, VoiceOver, real zoom, physical touch, and operating-system contrast checks remain pending.
 
 The previous slot update recorded an intermittent Firefox meter-motion failure after a runtime reduced-motion change. Its focused reruns and the current complete browser and accessibility runs pass. This history remains recorded; the passing runs do not establish that the intermittent issue can never recur.
 
@@ -77,7 +81,7 @@ Use **Pass**, **Fail**, **Blocked**, or **Pending** for each result. A pass appl
 
 ### Forms and actions
 
-- Test all 15 form controls: input, textarea, select, checkbox, switch, radio group, range, combobox, file input, password input, number input, segmented control, rating, tags input, and color picker. Confirm each label, value, required state, help message, error message, and disabled state is available without visual guessing.
+- Test all 16 form controls: input, textarea, select, multi-select, checkbox, switch, radio group, range, combobox, file input, password input, number input, segmented control, rating, tags input, and color picker. Confirm each label, value, required state, help message, error message, and disabled state is available without visual guessing.
 - Submit an empty required form. Correct each error, then submit again. Check the announced error, focus location, error clearing, and completion message. Test both browser constraints and application errors.
 - Toggle local disabled state and a disabled fieldset. Confirm disabled controls cannot receive unintended actions. Re-enable them and verify input, focus, and submission.
 - Test reset, Enter submission, external form association, submit-button values, keyboard file selection, and range adjustment. Check that state changes remain understandable with speech enabled.

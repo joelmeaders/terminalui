@@ -136,7 +136,7 @@ function draw() {
                 websites and applications.
               </p>
               <div class="hero-meta">
-                <span>50 COMPONENTS</span><b>+</b><span>06 THEMES</span><b>+</b
+                <span>51 COMPONENTS</span><b>+</b><span>06 THEMES</span><b>+</b
                 ><span>ONE SHARED SYSTEM</span>
               </div>
             </div>

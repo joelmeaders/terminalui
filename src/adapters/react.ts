@@ -26,6 +26,7 @@ import { TInput as TInputElement } from '../components/input';
 import { TLink as TLinkElement } from '../components/link';
 import { TMenu as TMenuElement } from '../components/menu';
 import { TMeter as TMeterElement } from '../components/meter';
+import { TMultiSelect as TMultiSelectElement } from '../components/multi-select';
 import { TNumberInput as TNumberInputElement } from '../components/number-input';
 import { TPagination as TPaginationElement } from '../components/pagination';
 import { TPasswordInput as TPasswordInputElement } from '../components/password-input';
@@ -229,6 +230,12 @@ export const TMeter = createComponent({
   react: React,
   tagName: 't-meter',
   elementClass: TMeterElement,
+  events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
+});
+export const TMultiSelect = createComponent({
+  react: React,
+  tagName: 't-multi-select',
+  elementClass: TMultiSelectElement,
   events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
 });
 export const TNumberInput = createComponent({

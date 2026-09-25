@@ -81,7 +81,7 @@ useTerminalModel(element, name, 'value');
 <template><t-input ref="element" label="Name" /></template>
 ```
 
-Use property `checked` with boolean refs, or `files` with `FileList | null` refs.
+Use property `checked` with boolean refs, `files` with `FileList | null` refs, or `values` with string-array refs for `t-multi-select`.
 The fourth argument selects an event, such as `t-change` for tabs. The default is `input`.
 For direct binding without the helper, use `:value.prop="name"` and an `@input` handler.
 Use `.prop` for array/object values such as options, columns, and rows.
@@ -110,9 +110,9 @@ export class Settings {
 }
 ```
 
-The accessor supports `formControl`, `formControlName`, and `ngModel` for all fifteen form controls.
+The accessor supports `formControl`, `formControlName`, and `ngModel` for all sixteen form controls.
 Input, textarea, select, radio, range, combobox, password input, number input, segmented control, rating, tags input, and color picker use string values.
-Checkboxes and switches use booleans. File inputs use `FileList | null`.
+Checkboxes and switches use booleans. File inputs use `FileList | null`. Multi-select uses a `string[]` model and submits repeated entries under its form name.
 Number inputs and ratings use numeric strings, not JavaScript numbers. Tags use a JSON array string, such as `'["alpha","beta"]'`.
 Use `new FormControl('["alpha"]', { nonNullable: true })` with `t-tags-input`; do not pass an array to this accessor.
 It forwards input, touched, disabled, and application reset states.
@@ -121,7 +121,7 @@ Add Angular validators when your application requires Angular `FormControl.error
 
 The Vite example loads `@angular/compiler` for its application template at runtime.
 The library adapter itself is compiled with `ngc`, and the external package check also compiles an AOT application.
-That consumer exercises model-to-element writes, element input events, touched state, and disabled state for the six added form controls.
+That consumer exercises model-to-element writes, element input events, touched state, and disabled state for the prior six added controls and array-valued multi-select.
 Angular 22.1.7 requires TypeScript `>=6.0 <6.1`, as declared by its compiler peer dependency.
 Use a supported Node version from [Angular's compatibility reference](https://angular.dev/reference/versions).
 

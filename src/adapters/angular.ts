@@ -6,12 +6,13 @@ type TerminalControl = HTMLElement & {
   disabled: boolean;
   checked?: boolean;
   files?: FileList | null;
+  values?: string[];
 };
 
 /** Angular reactive and template-driven forms adapter for Terminal Kit controls. */
 @Directive({
   selector:
-    't-input[formControl],t-input[formControlName],t-input[ngModel],t-textarea[formControl],t-textarea[formControlName],t-textarea[ngModel],t-select[formControl],t-select[formControlName],t-select[ngModel],t-checkbox[formControl],t-checkbox[formControlName],t-checkbox[ngModel],t-switch[formControl],t-switch[formControlName],t-switch[ngModel],t-range[formControl],t-range[formControlName],t-range[ngModel],t-radio-group[formControl],t-radio-group[formControlName],t-radio-group[ngModel],t-combobox[formControl],t-combobox[formControlName],t-combobox[ngModel],t-file-input[formControl],t-file-input[formControlName],t-file-input[ngModel],t-password-input[formControl],t-password-input[formControlName],t-password-input[ngModel],t-number-input[formControl],t-number-input[formControlName],t-number-input[ngModel],t-segmented-control[formControl],t-segmented-control[formControlName],t-segmented-control[ngModel],t-rating[formControl],t-rating[formControlName],t-rating[ngModel],t-tags-input[formControl],t-tags-input[formControlName],t-tags-input[ngModel],t-color-picker[formControl],t-color-picker[formControlName],t-color-picker[ngModel]',
+    't-input[formControl],t-input[formControlName],t-input[ngModel],t-textarea[formControl],t-textarea[formControlName],t-textarea[ngModel],t-select[formControl],t-select[formControlName],t-select[ngModel],t-multi-select[formControl],t-multi-select[formControlName],t-multi-select[ngModel],t-checkbox[formControl],t-checkbox[formControlName],t-checkbox[ngModel],t-switch[formControl],t-switch[formControlName],t-switch[ngModel],t-range[formControl],t-range[formControlName],t-range[ngModel],t-radio-group[formControl],t-radio-group[formControlName],t-radio-group[ngModel],t-combobox[formControl],t-combobox[formControlName],t-combobox[ngModel],t-file-input[formControl],t-file-input[formControlName],t-file-input[ngModel],t-password-input[formControl],t-password-input[formControlName],t-password-input[ngModel],t-number-input[formControl],t-number-input[formControlName],t-number-input[ngModel],t-segmented-control[formControl],t-segmented-control[formControlName],t-segmented-control[ngModel],t-rating[formControl],t-rating[formControlName],t-rating[ngModel],t-tags-input[formControl],t-tags-input[formControlName],t-tags-input[ngModel],t-color-picker[formControl],t-color-picker[formControlName],t-color-picker[ngModel]',
   standalone: true,
   host: { '(input)': 'input()', '(focusout)': 'onTouched()' },
   providers: [
@@ -26,18 +27,22 @@ export class TerminalValueAccessor implements ControlValueAccessor {
   private readonly element = inject<ElementRef<TerminalControl>>(ElementRef);
   private onChange: (value: unknown) => void = () => {};
   onTouched: () => void = () => {};
-  private get property(): 'value' | 'checked' | 'files' {
+  private get property(): 'value' | 'checked' | 'files' | 'values' {
     const tag = this.element.nativeElement.localName;
     return tag === 't-file-input'
       ? 'files'
-      : tag === 't-checkbox' || tag === 't-switch'
-        ? 'checked'
-        : 'value';
+      : tag === 't-multi-select'
+        ? 'values'
+        : tag === 't-checkbox' || tag === 't-switch'
+          ? 'checked'
+          : 'value';
   }
   writeValue(value: unknown): void {
     const control = this.element.nativeElement;
     if (this.property === 'checked') control.checked = Boolean(value);
     else if (this.property === 'files') control.files = value instanceof FileList ? value : null;
+    else if (this.property === 'values')
+      control.values = Array.isArray(value) ? value.map(String) : [];
     else control.value = value == null ? '' : String(value);
   }
   registerOnChange(callback: (value: unknown) => void): void {

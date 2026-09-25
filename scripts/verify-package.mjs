@@ -181,6 +181,7 @@ import { TerminalValueAccessor } from '@terminal-kit/core/angular';
   '<t-segmented-control label="Plan" [options]="plans" [formControl]="plan"></t-segmented-control>' +
   '<t-rating label="Rating" [formControl]="rating"></t-rating>' +
   '<t-tags-input label="Tags" [formControl]="tags"></t-tags-input>' +
+  '<t-multi-select label="Departments" [options]="departments" [formControl]="selectedDepartments"></t-multi-select>' +
   '<t-color-picker label="Color" [formControl]="color"></t-color-picker>'})
 export class ConsumerApp {
   name = new FormControl('Installed', {nonNullable:true});
@@ -189,8 +190,10 @@ export class ConsumerApp {
   plan = new FormControl('basic', {nonNullable:true});
   rating = new FormControl('3', {nonNullable:true});
   tags = new FormControl('["alpha"]', {nonNullable:true});
+  selectedDepartments = new FormControl(['archive'], {nonNullable:true});
   color = new FormControl('#22aa88', {nonNullable:true});
   plans = [{value:'basic',label:'Basic'},{value:'pro',label:'Pro'}];
+  departments = [{value:'archive',label:'Archive'},{value:'engineering',label:'Engineering'}];
 }
 `,
 );
@@ -329,6 +332,21 @@ try {
       `Angular accessor flow for ${tag}`,
     );
   }
+  await page.waitForFunction(
+    () => document.querySelector('t-multi-select')?.values?.join(',') === 'archive',
+  );
+  await page.evaluate(() =>
+    globalThis.angularConsumer.selectedDepartments.setValue(['engineering']),
+  );
+  await page.waitForFunction(
+    () => document.querySelector('t-multi-select')?.values?.join(',') === 'engineering',
+  );
+  await page.getByRole('checkbox', { name: 'Archive' }).check();
+  assert.deepEqual(
+    await page.evaluate(() => globalThis.angularConsumer.selectedDepartments.value),
+    ['engineering', 'archive'],
+    'Angular accessor must read the multi-select array after input.',
+  );
   await page.goto('about:blank');
   await page.evaluate(
     async (source) => {
@@ -384,6 +402,6 @@ try {
   await browser.close();
 }
 console.log(
-  `Verified external npm install, all ${catalog.length} element exports and React wrappers, NodeNext types, icon registry, provider isolation, Angular AOT consumer with six added form bindings, standalone registration, native typography CSS, and ${noticeDirectories.length} exact provider notices.`,
+  `Verified external npm install, all ${catalog.length} element exports and React wrappers, NodeNext types, icon registry, provider isolation, Angular AOT consumer with array-valued multi-select and six other form bindings, standalone registration, native typography CSS, and ${noticeDirectories.length} exact provider notices.`,
 );
 console.log(`Consumer artifacts: ${consumer}`);

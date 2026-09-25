@@ -31,7 +31,7 @@ for (const [name, contents] of Object.entries(scenarios)) {
         ? 10000
         : name === 'One Ionicons icon'
           ? 12000
-          : 42000;
+          : 43000;
   if (bytes.length === 0 || gzipBytes > budget)
     throw new Error(
       `${name}: ${gzipBytes} B exceeds its ${budget} B gzip budget or has no output.`,

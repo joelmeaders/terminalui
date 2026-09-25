@@ -132,9 +132,11 @@ export function exampleFor(tag: string, framework: Framework): string {
       ? null
       : form === 'checked'
         ? (node.props?.checked ?? false)
-        : tag === 't-tags-input'
-          ? JSON.stringify(node.props?.values ?? [])
-          : (node.props?.value ?? '');
+        : form === 'values'
+          ? (node.props?.values ?? [])
+          : tag === 't-tags-input'
+            ? JSON.stringify(node.props?.values ?? [])
+            : (node.props?.value ?? '');
   const omitted = form ? [form, ...(tag === 't-tags-input' ? ['values'] : [])] : [];
   const event = guide.event;
   const needsElementType =
@@ -186,7 +188,7 @@ export function exampleFor(tag: string, framework: Framework): string {
     if (form)
       additions.push(
         `${form}={value}`,
-        `${form === 'value' ? 'onInput' : 'onChange'}={(event) => setValue((event.target as ${type}).${form})}`,
+        `${form === 'value' || form === 'values' ? 'onInput' : 'onChange'}={(event) => setValue((event.target as ${type}).${form})}`,
       );
     else if (event)
       additions.push(
@@ -199,7 +201,7 @@ export function exampleFor(tag: string, framework: Framework): string {
     const hooks = [form && 'useState', guide.action && 'useRef'].filter(Boolean);
     const declarations = [
       form &&
-        `const [value, setValue] = useState${form === 'files' ? '<FileList | null>' : ''}(${json(initial)});`,
+        `const [value, setValue] = useState${form === 'files' ? '<FileList | null>' : form === 'values' ? '<string[]>' : ''}(${json(initial)});`,
       guide.action && `const element = useRef<${type} | null>(null);`,
     ]
       .filter(Boolean)
