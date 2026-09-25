@@ -32,7 +32,7 @@ export class TMenu extends TerminalElement {
   };
   /** Accessible trigger text. */
   label = 'Actions';
-  /** Actions with unique values. A separator entry displays a divider. */
+  /** Actions with unique values. Replace the array to update the menu. Focus follows a surviving value. A separator entry displays a divider. */
   options: MenuOption[] = [];
   /** Prevents opening the menu. */
   disabled = false;
@@ -41,6 +41,8 @@ export class TMenu extends TerminalElement {
   private search = '';
   private searchTime = 0;
   private cleanup?: () => void;
+  private focusedOption?: { value: string; index: number };
+  private menuHadFocus = false;
   static styles = [
     baseStyles,
     inlineSlotStyles,
@@ -108,6 +110,16 @@ export class TMenu extends TerminalElement {
     document.removeEventListener('pointerdown', this.outside);
     document.removeEventListener('focusin', this.outside);
   }
+  protected willUpdate(changed: PropertyValues) {
+    if (!changed.has('options') || !this.open) return;
+    const active = this.shadowRoot?.activeElement;
+    const panel = this.renderRoot.querySelector<HTMLElement>('[role=menu]');
+    this.menuHadFocus = active === panel || active?.getAttribute('role') === 'menuitem';
+    const item = active?.getAttribute('role') === 'menuitem' ? (active as HTMLButtonElement) : null;
+    this.focusedOption = item
+      ? { value: item.dataset.value ?? '', index: this.buttons().indexOf(item) }
+      : undefined;
+  }
   protected updated(changed: PropertyValues) {
     if (this.disabled && this.open) {
       this.open = false;
@@ -124,8 +136,21 @@ export class TMenu extends TerminalElement {
     if (!this.open) {
       this.cleanup?.();
       this.cleanup = undefined;
+      this.menuHadFocus = false;
+      this.focusedOption = undefined;
     }
     if (changed.has('open') && this.open) (this.buttons()[0] ?? panel).focus();
+    else if (changed.has('options') && this.open && this.menuHadFocus) {
+      const buttons = this.buttons();
+      const match = buttons.find((button) => button.dataset.value === this.focusedOption?.value);
+      (
+        match ??
+        buttons[Math.min(this.focusedOption?.index ?? 0, buttons.length - 1)] ??
+        panel
+      ).focus();
+    }
+    this.menuHadFocus = false;
+    this.focusedOption = undefined;
   }
   private buttons() {
     return [
@@ -224,7 +249,7 @@ export class TMenu extends TerminalElement {
         aria-label=${this.label}
         @keydown=${this.onKey}
       >
-        ${this.options.map((option) => (option.separator ? html`<div role="separator"></div>` : html`<button part="item" type="button" role="menuitem" tabindex="-1" ?disabled=${option.disabled} @click=${() => this.choose(option)}>${option.label}</button>`))}
+        ${this.options.map((option) => (option.separator ? html`<div role="separator"></div>` : html`<button part="item" type="button" role="menuitem" data-value=${option.value} tabindex="-1" ?disabled=${option.disabled} @click=${() => this.choose(option)}>${option.label}</button>`))}
       </div>`;
   }
 }

@@ -18,7 +18,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Single-level action menu. Set the `options` property to `{ value, label, disabled?, separator? }[]`. Arrow keys, Home/End, typeahead, Escape, Tab, and outside interaction work with a native trigger. `t-select` emits `{ value, option }`. Disabled actions are skipped. The menu uses a native top-layer popover and adjusts its position at viewport edges. Nested menus and checkbox actions are outside its scope.',
+          'Single-level action menu. Set the `options` property to `{ value, label, disabled?, separator? }[]`. Replace the array to update an open menu. Focus follows a surviving action value, or moves to an available action if its value disappears. Arrow keys, Home/End, typeahead, Escape, Tab, and outside interaction work with a native trigger. `t-select` emits `{ value, option }`. Disabled actions are skipped. The menu uses a native top-layer popover and adjusts its position at viewport edges. Nested menus and checkbox actions are outside its scope.',
       },
     },
   },
@@ -43,6 +43,27 @@ export const Default: Story = {
 };
 export const Disabled: Story = {
   render: () => html`<t-menu label="Unavailable actions" disabled .options=${options}></t-menu>`,
+};
+export const LiveOptions: Story = {
+  render: () =>
+    html`<div style="min-height:200px">
+      <t-menu label="Live actions" .options=${options}></t-menu>
+    </div>`,
+  play: async ({ canvasElement }) => {
+    const menu = canvasElement.querySelector('t-menu')!;
+    await userEvent.click(menu.shadowRoot!.querySelector('.trigger')!);
+    await userEvent.keyboard('{End}');
+    await expect(menu.shadowRoot!.activeElement?.textContent).toBe('Save a copy');
+    menu.options = [
+      { value: 'save', label: 'Save a copy' },
+      { value: 'open', label: 'Open' },
+    ];
+    await menu.updateComplete;
+    await expect(menu.shadowRoot!.activeElement?.textContent).toBe('Save a copy');
+    menu.options = [{ value: 'open', label: 'Open' }];
+    await menu.updateComplete;
+    await expect(menu.shadowRoot!.activeElement?.textContent).toBe('Open');
+  },
 };
 export const Empty: Story = {
   render: () => html`<t-menu label="No available actions" disabled></t-menu>`,

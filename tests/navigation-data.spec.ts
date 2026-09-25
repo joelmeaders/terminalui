@@ -89,6 +89,51 @@ test('menu exposes popup state without an unresolved ID reference', async ({ pag
   expect(await trigger.getAttribute('aria-controls')).toBeNull();
 });
 
+test('menu preserves a focused action through live option changes and recovers when it disappears', async ({
+  page,
+}) => {
+  await fixture(page, '<t-menu label="Actions"></t-menu>');
+  const menu = page.locator('t-menu');
+  await menu.evaluate((element: import('../src').TMenu) => {
+    element.options = [
+      { value: 'open', label: 'Open' },
+      { value: 'save', label: 'Save' },
+      { value: 'share', label: 'Share' },
+    ];
+  });
+  const trigger = page.getByRole('button', { name: 'Actions' });
+  await trigger.click();
+  await page.keyboard.press('End');
+  await expect(page.getByRole('menuitem', { name: 'Share' })).toBeFocused();
+  await menu.evaluate((element: import('../src').TMenu) => {
+    element.options = [
+      { value: 'share', label: 'Share' },
+      { value: 'open', label: 'Open' },
+      { value: 'save', label: 'Save' },
+    ];
+  });
+  await expect(page.getByRole('menuitem', { name: 'Share' })).toBeFocused();
+  await menu.evaluate((element: import('../src').TMenu) => {
+    element.options = [
+      { value: 'share', label: 'Share', disabled: true },
+      { value: 'open', label: 'Open' },
+    ];
+  });
+  await expect(page.getByRole('menuitem', { name: 'Open' })).toBeFocused();
+  await menu.evaluate((element: import('../src').TMenu) => {
+    element.options = [];
+  });
+  await expect(page.getByRole('menu')).toBeFocused();
+  await menu.evaluate((element: import('../src').TMenu) => {
+    element.options = [{ value: 'retry', label: 'Retry' }];
+  });
+  await expect(page.getByRole('menuitem', { name: 'Retry' })).toBeFocused();
+  const axe = await new AxeBuilder({ page }).include('t-menu').analyze();
+  expect(axe.violations, JSON.stringify(axe.violations)).toEqual([]);
+  await page.keyboard.press('Escape');
+  await expect(trigger).toBeFocused();
+});
+
 test('menu escapes clipping and stays inside viewport edges', async ({ page }) => {
   await fixture(
     page,

@@ -574,9 +574,11 @@ export const guides: Record<string, ComponentGuide> = {
     usage: [
       'Options use { value, label, disabled? }. Handle t-select to run the chosen action.',
       'This is a single-level action menu. Use links or a tree for deeper navigation.',
+      'Replace options to update an open menu. Keep values stable so focus stays with the same action.',
     ],
     accessibility: [
       'Arrow keys, Home/End, and typeahead move through enabled actions. Escape dismisses and restores focus.',
+      'If the focused action disappears or becomes disabled, focus moves to an available action. An empty open menu keeps focus on its named panel.',
     ],
     example: {
       props: {
