@@ -279,11 +279,44 @@ for (const id of ['components-icon--docs', 'components-input--docs', 'components
     await controls.evaluate((element) => {
       element.scrollLeft = 0;
     });
+    await expect(category).toBeVisible();
+    const categoryContrast = await category.evaluate((element) => {
+      const rgba = (value: string) => {
+        const values = value.match(/[\d.]+/g)?.map(Number) ?? [];
+        return [values[0] ?? 0, values[1] ?? 0, values[2] ?? 0, values[3] ?? 1];
+      };
+      const foreground = rgba(getComputedStyle(element).color);
+      const background = rgba(getComputedStyle(element.parentElement!).backgroundColor);
+      if (background[3] !== 1) throw new Error('Category background must be opaque');
+      const rendered = foreground
+        .slice(0, 3)
+        .map((value, index) => value * foreground[3] + background[index] * (1 - foreground[3]));
+      const luminance = (color: number[]) =>
+        color
+          .map((value) => {
+            const channel = value / 255;
+            return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+          })
+          .reduce((total, value, index) => total + value * [0.2126, 0.7152, 0.0722][index], 0);
+      const [light, dark] = [luminance(rendered), luminance(background.slice(0, 3))].sort(
+        (left, right) => right - left,
+      );
+      return {
+        foreground: rendered,
+        background: background.slice(0, 3),
+        ratio: (light + 0.05) / (dark + 0.05),
+      };
+    });
+    expect(categoryContrast.ratio).toBeGreaterThanOrEqual(4.5);
     const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
     const reportPath = testInfo.outputPath('documentation-axe-review.json');
     await writeFile(
       reportPath,
-      JSON.stringify({ violations: report.violations, incomplete: report.incomplete }, null, 2),
+      JSON.stringify(
+        { violations: report.violations, incomplete: report.incomplete, categoryContrast },
+        null,
+        2,
+      ),
     );
     await testInfo.attach('documentation-axe-review', {
       path: reportPath,

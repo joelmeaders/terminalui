@@ -22,6 +22,9 @@
 .tk-docs-controls label[aria-disabled='false'] > span[aria-hidden='true'] {
   color: var(--docs-muted);
 }
+.tk-docs-controls tr[title] > td:first-child > span {
+  color: var(--docs-muted);
+}
 .tk-docs a.sbdocs-a {
   color: var(--docs-accent);
 }
