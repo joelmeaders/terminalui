@@ -608,6 +608,13 @@ test('all component manuals reflow at actual 400% Chromium browser zoom', async 
     devicePixelRatio: number;
     documentWidth: number;
   }[] = [];
+  const scrollRegions: {
+    tag: string;
+    name: string;
+    scrollWidth: number;
+    clientWidth: number;
+    keyboardScrollLeft: number;
+  }[] = [];
   try {
     await page.goto(`/storybook/iframe.html?id=${entries[0].id}&viewMode=docs`);
     await expect(page.locator('.tk-docs')).toBeVisible();
@@ -632,12 +639,32 @@ test('all component manuals reflow at actual 400% Chromium browser zoom', async 
         }));
         results.push({ tag, framework, zoom, ...layout });
       }
+      for (const name of ['Properties and attributes', 'Live preview controls']) {
+        const region = page.getByRole('region', { name, exact: true });
+        if (!(await region.count()) || !(await region.locator('table').count())) continue;
+        const dimensions = await region.evaluate((element) => {
+          element.scrollLeft = 0;
+          return { scrollWidth: element.scrollWidth, clientWidth: element.clientWidth };
+        });
+        if (dimensions.scrollWidth <= dimensions.clientWidth) continue;
+        await region.focus();
+        await page.keyboard.press('ArrowRight');
+        await expect
+          .poll(() => region.evaluate((element) => element.scrollLeft))
+          .toBeGreaterThan(0);
+        scrollRegions.push({
+          tag,
+          name,
+          ...dimensions,
+          keyboardScrollLeft: await region.evaluate((element) => element.scrollLeft),
+        });
+      }
     }
     const reportPath = testInfo.outputPath('storybook-400-percent-reflow.json');
     await writeFile(
       reportPath,
       JSON.stringify(
-        { browser: context.browser()?.version(), os: process.platform, results },
+        { browser: context.browser()?.version(), os: process.platform, results, scrollRegions },
         null,
         2,
       ),
@@ -647,6 +674,7 @@ test('all component manuals reflow at actual 400% Chromium browser zoom', async 
       contentType: 'application/json',
     });
     expect(results).toHaveLength(entries.length * 4);
+    expect(scrollRegions.length).toBeGreaterThanOrEqual(entries.length);
     expect(errors).toEqual([]);
     expect(
       results.filter(
