@@ -141,22 +141,25 @@ for (const { tag, id } of entries) {
   });
 }
 
-test('API reference text stays readable in every built component manual', async ({
+test('API and Controls table text stays readable in every built component manual', async ({
   page,
 }, testInfo) => {
   await page.setViewportSize({ width: 320, height: 900 });
   const evidence: {
     tag: string;
+    source: 'api' | 'controls';
     text: string;
     ratio: number;
     foreground: number[];
     background: number[];
+    alpha: number;
+    categoryToggle: boolean;
     reachable: boolean;
     effects: string[];
   }[] = [];
   for (const { tag, id } of entries) {
     await page.goto(`/storybook/iframe.html?id=${id}&viewMode=docs`);
-    const pairs = await page.locator('#api-reference').evaluate((section) => {
+    const pairs = await page.locator('.tk-docs').evaluate((article) => {
       type RGB = [number, number, number];
       type RGBA = [number, number, number, number];
       const rgba = (value: string): RGBA => {
@@ -176,57 +179,75 @@ test('API reference text stays readable in every built component manual', async 
           })
           .reduce((total, value, index) => total + value * [0.2126, 0.7152, 0.0722][index], 0);
       const pairs: {
+        source: 'api' | 'controls';
         text: string;
         ratio: number;
         foreground: RGB;
         background: RGB;
+        alpha: number;
+        categoryToggle: boolean;
         reachable: boolean;
         effects: string[];
       }[] = [];
-      for (const region of section.querySelectorAll<HTMLElement>('.tk-docs-table')) {
-        const headings = region.querySelectorAll('th');
-        const bounds = region.getBoundingClientRect();
-        region.scrollLeft = 0;
-        const first = headings[0]?.getBoundingClientRect();
-        const firstReachable =
-          !first || (first.left >= bounds.left - 1 && first.right <= bounds.right + 1);
-        region.scrollLeft = region.scrollWidth;
-        const last = headings[headings.length - 1]?.getBoundingClientRect();
-        const reachable =
-          firstReachable &&
-          (!last || (last.left >= bounds.left - 1 && last.right <= bounds.right + 1));
-        for (const cell of region.querySelectorAll('caption, th, td')) {
-          const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
-          for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-            const text = node.textContent?.trim();
-            if (!text) continue;
-            const element = node.parentElement!;
-            const layers: RGBA[] = [];
-            const effects: string[] = [];
-            for (
-              let ancestor: Element | null = element;
-              ancestor;
-              ancestor = ancestor.parentElement
-            ) {
-              const style = getComputedStyle(ancestor);
-              layers.unshift(rgba(style.backgroundColor));
-              if (style.backgroundImage !== 'none') effects.push('background image');
-              if (style.opacity !== '1') effects.push('opacity');
+      const regions: { source: 'api' | 'controls'; selector: string }[] = [
+        { source: 'api', selector: '#api-reference .tk-docs-table' },
+        { source: 'controls', selector: '.tk-docs-controls' },
+      ];
+      for (const { source, selector } of regions) {
+        for (const region of article.querySelectorAll<HTMLElement>(selector)) {
+          const headings = region.querySelectorAll('th');
+          const bounds = region.getBoundingClientRect();
+          region.scrollLeft = 0;
+          const first = headings[0]?.getBoundingClientRect();
+          const firstReachable =
+            !first || (first.left >= bounds.left - 1 && first.right <= bounds.right + 1);
+          region.scrollLeft = region.scrollWidth;
+          const last = headings[headings.length - 1]?.getBoundingClientRect();
+          const reachable =
+            firstReachable &&
+            (!last || (last.left >= bounds.left - 1 && last.right <= bounds.right + 1));
+          for (const cell of region.querySelectorAll('caption, th, td')) {
+            const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+            for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+              const text = node.textContent?.trim();
+              if (!text) continue;
+              const element = node.parentElement!;
+              const layers: RGBA[] = [];
+              const effects: string[] = [];
+              for (
+                let ancestor: Element | null = element;
+                ancestor;
+                ancestor = ancestor.parentElement
+              ) {
+                const style = getComputedStyle(ancestor);
+                layers.unshift(rgba(style.backgroundColor));
+                if (style.backgroundImage !== 'none') effects.push('background image');
+                if (style.opacity !== '1') effects.push('opacity');
+              }
+              if (!layers.some((layer) => layer[3] === 1)) effects.push('transparent canvas');
+              const background = layers.reduce<RGB>(blend, [255, 255, 255]);
+              const color = rgba(getComputedStyle(element).color);
+              const foreground = blend(background, color);
+              const [bright, dark] = [luminance(foreground), luminance(background)].sort(
+                (left, right) => right - left,
+              );
+              pairs.push({
+                source,
+                text: text.slice(0, 80),
+                ratio: (bright + 0.05) / (dark + 0.05),
+                foreground,
+                background,
+                alpha: color[3],
+                categoryToggle:
+                  element.tagName === 'BUTTON' &&
+                  !!element
+                    .closest('tr[title]')
+                    ?.querySelector('td:first-child > span')
+                    ?.textContent?.trim(),
+                reachable,
+                effects,
+              });
             }
-            if (!layers.some((layer) => layer[3] === 1)) effects.push('transparent canvas');
-            const background = layers.reduce<RGB>(blend, [255, 255, 255]);
-            const foreground = blend(background, rgba(getComputedStyle(element).color));
-            const [bright, dark] = [luminance(foreground), luminance(background)].sort(
-              (left, right) => right - left,
-            );
-            pairs.push({
-              text: text.slice(0, 80),
-              ratio: (bright + 0.05) / (dark + 0.05),
-              foreground,
-              background,
-              reachable,
-              effects,
-            });
           }
         }
       }
@@ -234,15 +255,23 @@ test('API reference text stays readable in every built component manual', async 
     });
     evidence.push(...pairs.map((pair) => ({ tag, ...pair })));
   }
-  const evidencePath = testInfo.outputPath('api-reference-contrast.json');
+  const evidencePath = testInfo.outputPath('documentation-table-contrast.json');
   await writeFile(evidencePath, JSON.stringify(evidence, null, 2));
-  await testInfo.attach('api-reference-contrast', {
+  await testInfo.attach('documentation-table-contrast', {
     path: evidencePath,
     contentType: 'application/json',
   });
   expect(evidence.length).toBeGreaterThan(0);
+  expect(new Set(evidence.map((pair) => pair.tag)).size).toBe(entries.length);
+  expect(evidence.some((pair) => pair.source === 'api')).toBe(true);
+  expect(evidence.some((pair) => pair.source === 'controls')).toBe(true);
   expect(
-    evidence.filter((pair) => !pair.reachable || pair.effects.length || pair.ratio < 4.5),
+    evidence.filter(
+      (pair) =>
+        !pair.reachable ||
+        pair.effects.length ||
+        (pair.alpha === 0 ? !pair.categoryToggle : pair.ratio < 4.5),
+    ),
   ).toEqual([]);
 });
 
@@ -437,6 +466,27 @@ for (const id of ['components-icon--docs', 'components-input--docs', 'components
       };
     });
     expect(categoryContrast.ratio).toBeGreaterThanOrEqual(4.5);
+    if (id === 'components-input--docs') {
+      const toggle = controls.getByRole('button', { name: 'Hide attributes items' }).first();
+      await controls.focus();
+      await page.keyboard.press('Tab');
+      await page.keyboard.press('Tab');
+      await expect(toggle).toBeFocused();
+      expect(
+        await toggle.evaluate((element) => parseFloat(getComputedStyle(element).outlineWidth)),
+      ).toBeGreaterThanOrEqual(2);
+      const screenshotPath = testInfo.outputPath('controls-category-keyboard-focus.png');
+      await page.screenshot({ path: screenshotPath });
+      await testInfo.attach('controls-category-keyboard-focus', {
+        path: screenshotPath,
+        contentType: 'image/png',
+      });
+      await page.keyboard.press('Enter');
+      const show = controls.getByRole('button', { name: 'Show attributes items' }).first();
+      await expect(show).toBeFocused();
+      await page.keyboard.press('Enter');
+      await expect(toggle).toBeFocused();
+    }
     const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
     const reportPath = testInfo.outputPath('documentation-axe-review.json');
     await writeFile(
