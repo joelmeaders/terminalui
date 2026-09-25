@@ -321,7 +321,7 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 49.6 KB for registration of all 54 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.2 KB gzip. The button and complete-catalog budgets are 8 KB and 50 KB. The catalog budget includes multi-select, local table filtering and paging, the inline calendar, both form date pickers, and manual tab activation. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
+The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 49.7 KB for registration of all 54 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.2 KB gzip. The button and complete-catalog budgets are 8 KB and 50 KB. The catalog budget includes multi-select, local table filtering and paging, the inline calendar, both form date pickers, and manual tab activation. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
 
 ## Storybook and verification
 
@@ -356,6 +356,6 @@ Accessibility requirements are part of [AGENTS.md](AGENTS.md). The [accessibilit
 - Server rendering and hydration are not implemented. This is a browser component kit.
 - React 19, Vue 3, and Angular 22 adapters have concrete consumer checks. Other framework versions and third-party form libraries require application-specific verification.
 - Tooltips provide short, noninteractive help. Tooltips and popovers use viewport-aware placement with flipping and bounds adjustment during scrolling and resizing. Use a popover for interactive content.
-- Tables support local sorting, loading, empty states, and row selection. The library does not provide a virtualized data grid, cell editing, rich-text editor, or custom date picker.
+- Tables support local sorting, filtering, paging, loading, empty states, and row selection. The library does not provide a virtualized data grid, cell editing, or a rich-text editor.
 - The theme choice in the demo persists locally. The component package itself does not write to storage.
 - Version `0.1.0` remains private and unpublished. Release checks and CI configuration are included, but publication still needs an approved package name, registry identity, version, and explicit release authorization. See [release preparation](docs/releasing.md).

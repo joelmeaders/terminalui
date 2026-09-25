@@ -313,6 +313,18 @@ export class TDateRangePicker extends FormControl {
   focus(options?: FocusOptions) {
     this.startInput?.focus(options);
   }
+  protected renderDescription() {
+    const visible = this.hasVisibleError;
+    const message = visible ? this.issue().message : this.help;
+    return html`<p
+      id="help"
+      class="help ${visible ? 'error' : ''}"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      ${message}
+    </p>`;
+  }
   render() {
     const issue = this.issue();
     const visible = this.hasVisibleError;

@@ -170,12 +170,17 @@ test('programmatic values, malformed intervals, and reset do not emit user event
     'validationMessage',
     'Enter a range as YYYY-MM-DD/YYYY-MM-DD.',
   );
+  await expect(picker.locator('#help')).toHaveText('Enter a range as YYYY-MM-DD/YYYY-MM-DD.');
   await expect(picker).toHaveJSProperty('value', 'not-an-interval');
   await page.locator('form').evaluate((form) => (form as HTMLFormElement).reset());
   await expect(picker).toHaveJSProperty('value', '2026-09-24/2026-10-01');
   await expect(picker.getByRole('textbox', { name: 'Start date' })).toHaveValue('2026-09-24');
   await expect(picker.getByRole('textbox', { name: 'End date' })).toHaveValue('2026-10-01');
   expect(await picker.evaluate((element: any) => element.events)).toBe(0);
+  await mount(page, 'value="malformed"');
+  await expect(page.locator('t-date-range-picker #help')).toHaveText(
+    'Enter a range as YYYY-MM-DD/YYYY-MM-DD.',
+  );
 });
 
 test('readonly and disabled states preserve or omit the form value as expected', async ({
