@@ -360,6 +360,47 @@ try {
           '2026-09-25',
         ]);
       }
+      if (tag === 't-date-range-picker') {
+        const picker = page.locator(tag);
+        const start = picker.getByRole('textbox', { name: 'Start date' });
+        const end = picker.getByRole('textbox', { name: 'End date' });
+        assert.equal(
+          await picker.getByRole('group', { name: 'Mission window', exact: true }).count(),
+          1,
+        );
+        assert.equal(await start.inputValue(), '2026-09-24');
+        assert.equal(await end.inputValue(), '2026-10-01');
+        await picker.evaluate((element) => {
+          element.userEvents = [];
+          element.addEventListener('input', () => element.userEvents.push('input'));
+          element.addEventListener('t-change', (event) =>
+            element.userEvents.push(event.detail.value),
+          );
+        });
+        await picker.getByRole('button', { name: 'Change date range' }).click();
+        const first = picker.locator('t-calendar [data-date="2026-10-03"]');
+        await first.focus();
+        assert.equal(
+          await first.evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        await first.click();
+        assert.equal(await picker.evaluate((element) => element.value), '2026-09-24/2026-10-01');
+        const logged =
+          framework === 'html'
+            ? page.waitForEvent('console', {
+                predicate: (message) => message.text().includes('2026-10-03/2026-10-05'),
+              })
+            : null;
+        await picker.locator('t-calendar [data-date="2026-10-05"]').click();
+        if (logged) await logged;
+        assert.equal(await start.inputValue(), '2026-10-03');
+        assert.equal(await end.inputValue(), '2026-10-05');
+        assert.deepEqual(await picker.evaluate((element) => element.userEvents), [
+          'input',
+          '2026-10-03/2026-10-05',
+        ]);
+      }
       if (tag === 't-multi-select') {
         await page.getByRole('checkbox', { name: 'Engineering' }).check();
         assert.deepEqual(

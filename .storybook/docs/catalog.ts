@@ -175,7 +175,8 @@ export const guides: Record<string, ComponentGuide> = {
       'Use a YYYY-MM-DD value and optional min/max bounds. month sets the displayed YYYY-MM month.',
       'An invalid or out-of-range programmatic value stays unchanged and shows a status. Choosing an available date corrects it.',
       'Set firstDayOfWeek from 0 (Sunday) through 6 (Saturday). locale controls month, weekday, and date names.',
-      'The calendar is a selection widget, not a form field. Use t-date-picker for typed entry, validation, and FormData.',
+      'The calendar is a selection widget, not a form field. Use t-date-picker or t-date-range-picker for typed entry, validation, and FormData.',
+      'Set range with rangeStart and rangeEnd to mark an interval. Selection events still identify one chosen day.',
     ],
     accessibility: [
       'One day is in the Tab order. Arrow keys move by day or week; Home/End move within a week; Page Up/Down move by month and Shift moves by year.',
@@ -230,6 +231,40 @@ export const guides: Record<string, ComponentGuide> = {
       read: 'target.value',
       description:
         'Read the ISO date from event.target.value after typing or calendar selection. Calendar selection also emits t-change with detail.value.',
+    },
+    form: 'value',
+  },
+  't-date-range-picker': {
+    purpose: 'Enter or choose a start and end date as one form value.',
+    usage: [
+      'Enter two YYYY-MM-DD dates, or open the calendar and choose a start followed by an end.',
+      'value uses START/END, such as 2026-09-24/2026-10-01. FormData submits that one string under name.',
+      'Calendar choices stay in a draft until both days are selected. Escape cancels the draft. Choosing an earlier second day starts a new draft.',
+      'required needs both dates. min and max bound each date; the end cannot precede the start.',
+      'readonly keeps the submitted range without edits. disabled omits it from FormData.',
+    ],
+    accessibility: [
+      'A native fieldset names the two labeled text inputs. A visible format note and one error message describe them.',
+      'The calendar button opens a modal and moves focus into the date grid. A polite instruction changes once when selection moves from start to end.',
+      'The grid names range endpoints and marks intervening dates. Escape returns focus without changing the form value. Test speech and touch with target devices.',
+    ],
+    example: {
+      props: {
+        name: 'mission',
+        label: 'Mission window',
+        value: '2026-09-24/2026-10-01',
+        min: '2026-09-01',
+        max: '2026-10-31',
+        locale: 'en-US',
+        firstDayOfWeek: 1,
+        required: true,
+      },
+    },
+    event: {
+      name: 'input',
+      read: 'target.value',
+      description:
+        'Read START/END from event.target.value after typing or a completed calendar selection. Calendar completion also emits t-change with detail.start, detail.end, and detail.value.',
     },
     form: 'value',
   },

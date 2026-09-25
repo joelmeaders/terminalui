@@ -110,10 +110,11 @@ export class Settings {
 }
 ```
 
-The accessor supports `formControl`, `formControlName`, and `ngModel` for all seventeen form controls.
-Input, textarea, select, radio, range, combobox, password input, number input, segmented control, rating, tags input, color picker, and date picker use string values.
+The accessor supports `formControl`, `formControlName`, and `ngModel` for all eighteen form controls.
+Input, textarea, select, radio, range, combobox, password input, number input, segmented control, rating, tags input, color picker, date picker, and date-range picker use string values.
 Checkboxes and switches use booleans. File inputs use `FileList | null`. Multi-select uses a `string[]` model and submits repeated entries under its form name.
 Number inputs and ratings use numeric strings, not JavaScript numbers. Tags use a JSON array string, such as `'["alpha","beta"]'`.
+The date-range picker uses one ISO interval string, such as `2026-09-24/2026-10-01`. Its `start` and `end` properties expose the two dates. Bind the form control to `value`.
 Use `new FormControl('["alpha"]', { nonNullable: true })` with `t-tags-input`; do not pass an array to this accessor.
 It forwards input, touched, disabled, and application reset states.
 Browser validity remains available through `checkValidity()` and `reportValidity()`.

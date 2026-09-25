@@ -36,6 +36,7 @@ const today = () => {
 /**
  * Inline calendar for selecting one ISO date. Use a form control for native date entry and submission.
  * The seven-column grid has one day in the tab order; arrow, Home/End, and Page keys move that focus.
+ * Range mode marks the days between rangeStart and rangeEnd. Selection events still report one chosen day.
  *
  * @fires input - User selected a date. Read `event.target.value`.
  * @fires change - User selected a date. Read `event.target.value`.
@@ -58,6 +59,9 @@ export class TCalendar extends TerminalElement {
     locale: {},
     firstDayOfWeek: { type: Number, attribute: 'first-day-of-week' },
     disabled: { type: Boolean, reflect: true },
+    range: { type: Boolean, reflect: true },
+    rangeStart: { attribute: 'range-start' },
+    rangeEnd: { attribute: 'range-end' },
     focusedDate: { state: true },
   };
   /** Accessible name for the calendar group. */
@@ -76,6 +80,12 @@ export class TCalendar extends TerminalElement {
   firstDayOfWeek = 0;
   /** Prevents date selection and month navigation. */
   disabled = false;
+  /** Mark a range while retaining one-day selection events. */
+  range = false;
+  /** First marked day in range mode. */
+  rangeStart = '';
+  /** Last marked day in range mode. */
+  rangeEnd = '';
   private focusedDate = '';
 
   static styles = [
@@ -157,6 +167,10 @@ export class TCalendar extends TerminalElement {
         color: var(--t-on-accent);
         font-weight: 700;
       }
+      td[data-range-between] button {
+        background: var(--t-raised);
+        color: var(--t-text);
+      }
       td button[aria-current='date']:not(:disabled) {
         text-decoration: underline;
         text-decoration-thickness: 2px;
@@ -181,6 +195,11 @@ export class TCalendar extends TerminalElement {
         td[aria-selected='true'] button {
           background: Highlight;
           color: HighlightText;
+        }
+        td[data-range-between] button {
+          background: Canvas;
+          color: CanvasText;
+          border-color: Highlight;
         }
       }
     `,
@@ -337,7 +356,7 @@ export class TCalendar extends TerminalElement {
   private select(date: Date) {
     if (!this.allowed(date)) return;
     const value = isoDate(date);
-    if (value === this.value) return;
+    if (value === this.value && !this.range) return;
     this.value = value;
     this.focusedDate = this.value;
     this.showMonth(isoMonth(date));
@@ -351,6 +370,8 @@ export class TCalendar extends TerminalElement {
     const { min, max } = this.bounds();
     const invalidRange = !!(min && max && min > max);
     const selected = this.value ? parseDate(this.value) : null;
+    const rangeStart = this.range ? parseDate(this.rangeStart) : null;
+    const rangeEnd = this.range ? parseDate(this.rangeEnd) : null;
     const status = invalidRange
       ? 'No dates are available in this range.'
       : this.value && !selected
@@ -434,10 +455,31 @@ export class TCalendar extends TerminalElement {
                 html`<tr>
                   ${days.slice(week * 7, week * 7 + 7).map((date) => {
                     const value = isoDate(date);
-                    const selected = this.value === value;
+                    const first = !!rangeStart && value === this.rangeStart;
+                    const last = !!rangeEnd && value === this.rangeEnd;
+                    const between = !!(
+                      rangeStart &&
+                      rangeEnd &&
+                      date > rangeStart &&
+                      date < rangeEnd
+                    );
+                    const selected = this.range ? first || last || between : this.value === value;
+                    const rangeLabel =
+                      first && last
+                        ? ', start and end of range'
+                        : first
+                          ? ', start of range'
+                          : last
+                            ? ', end of range'
+                            : between
+                              ? ', in selected range'
+                              : '';
                     const outside = isoMonth(date) !== isoMonth(month);
                     return html`<td
                       ?data-outside=${outside}
+                      ?data-range-start=${first}
+                      ?data-range-end=${last}
+                      ?data-range-between=${between}
                       aria-selected=${selected ? 'true' : nothing}
                       aria-disabled=${this.allowed(date) ? nothing : 'true'}
                     >
@@ -445,7 +487,7 @@ export class TCalendar extends TerminalElement {
                         type="button"
                         part="day"
                         data-date=${value}
-                        aria-label=${dateName.format(date)}
+                        aria-label=${`${dateName.format(date)}${rangeLabel}`}
                         aria-current=${value === current ? 'date' : nothing}
                         tabindex=${value === tabStop && this.allowed(date) ? 0 : -1}
                         ?disabled=${!this.allowed(date)}
