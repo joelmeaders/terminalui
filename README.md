@@ -178,6 +178,8 @@ Set arrays such as `options`, `tabs`, `items`, `columns`, and `rows` as JavaScri
 
 Tabs default to a horizontal list. Set `orientation="vertical"` for a side list that moves above its panel on narrow screens. Horizontal arrow keys follow text direction; vertical tabs use Up and Down.
 
+Tabs activate as arrows move by default. Set `activation="manual"` when panels load slowly. Arrow keys then move focus without opening a panel; Enter, Space, or click selects it.
+
 ```js
 select.options = [{ value: 'web', label: 'Website' }];
 select.value = 'web';
@@ -318,7 +320,7 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 47.5 KB for registration of all 53 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.2 KB gzip. The button and complete-catalog budgets are 8 KB and 48 KB. The catalog budget includes multi-select, local table filtering and paging, the inline calendar, and the form-associated date picker. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
+The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 48.1 KB for registration of all 53 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.2 KB gzip. The button and complete-catalog budgets are 8 KB and 49 KB. The catalog budget includes multi-select, local table filtering and paging, the inline calendar, the form-associated date picker, and manual tab activation. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
 
 ## Storybook and verification
 

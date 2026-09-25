@@ -6,7 +6,7 @@ export interface TabItem {
   disabled?: boolean;
 }
 /**
- * Tabs with automatic keyboard activation. Slots use each tab's id. Emits t-change with {value}.
+ * Tabs with automatic or manual keyboard activation. Slots use each tab's id.
  * @slot id - Use each tab's ID as the slot name for its panel content.
  * @csspart tab - tab element.
  * @csspart panel - panel element.
@@ -18,6 +18,8 @@ export class TTabs extends TerminalElement {
     active: { reflect: true },
     label: {},
     orientation: { reflect: true },
+    activation: { reflect: true },
+    focusedId: { state: true },
   };
   /** Tab labels and IDs. Each ID must name one content slot. Replace the array to update it. */
   tabs: TabItem[] = [];
@@ -27,6 +29,9 @@ export class TTabs extends TerminalElement {
   label = 'Sections';
   /** Layout and arrow-key axis. */
   orientation: 'horizontal' | 'vertical' = 'horizontal';
+  /** Automatic selection follows arrow focus. Manual selection waits for Enter, Space, or click. */
+  activation: 'automatic' | 'manual' = 'automatic';
+  private focusedId = '';
   private hadTabFocus = false;
   static styles = [
     baseStyles,
@@ -107,23 +112,50 @@ export class TTabs extends TerminalElement {
     `,
   ];
   protected willUpdate(changed: PropertyValues) {
-    if (changed.has('tabs') || changed.has('active')) {
+    if (
+      changed.has('tabs') ||
+      changed.has('active') ||
+      changed.has('activation') ||
+      changed.has('focusedId')
+    ) {
       this.hadTabFocus = this.shadowRoot?.activeElement?.matches('[role=tab]') ?? false;
+      const previousActive = this.active;
       if (!this.tabs.some((t) => t.id === this.active && !t.disabled))
         this.active = this.tabs.find((t) => !t.disabled)?.id ?? '';
+      if (
+        changed.has('active') ||
+        changed.has('activation') ||
+        this.active !== previousActive ||
+        !this.tabs.some((tab) => tab.id === this.focusedId && !tab.disabled)
+      )
+        this.focusedId = this.active;
     }
   }
   protected updated(changed: PropertyValues) {
-    if (this.hadTabFocus && (changed.has('tabs') || changed.has('active'))) {
-      const selected = this.renderRoot.querySelector<HTMLButtonElement>(
-        'button[aria-selected=true]',
-      );
-      if (selected && this.shadowRoot?.activeElement !== selected) {
-        selected.focus();
-        selected.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    if (
+      this.hadTabFocus &&
+      (changed.has('tabs') ||
+        changed.has('active') ||
+        changed.has('activation') ||
+        changed.has('focusedId'))
+    ) {
+      const targetId = this.activation === 'manual' ? this.focusedId : this.active;
+      const target = Array.from(
+        this.renderRoot.querySelectorAll<HTMLButtonElement>('[role=tab]'),
+      ).find((tab) => tab.dataset.tabId === targetId);
+      if (target && this.shadowRoot?.activeElement !== target) {
+        target.focus();
+        target.scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
     }
     this.hadTabFocus = false;
+  }
+  private onFocusOut(event: FocusEvent) {
+    if (
+      this.activation === 'manual' &&
+      !(event.currentTarget as HTMLElement).contains(event.relatedTarget as Node | null)
+    )
+      this.focusedId = this.active;
   }
   private activate(id: string) {
     if (id === this.active) return;
@@ -132,7 +164,8 @@ export class TTabs extends TerminalElement {
   }
   private onKey(event: KeyboardEvent) {
     const enabled = this.tabs.filter((t) => !t.disabled);
-    const index = enabled.findIndex((t) => t.id === this.active);
+    const id = (event.target as HTMLElement).dataset.tabId;
+    const index = enabled.findIndex((t) => t.id === id);
     const vertical = this.orientation === 'vertical';
     const rtl = getComputedStyle(this).direction === 'rtl';
     let next: number;
@@ -144,7 +177,10 @@ export class TTabs extends TerminalElement {
     else if (event.key === 'End') next = enabled.length - 1;
     else return;
     event.preventDefault();
-    if (enabled[next]) this.activate(enabled[next].id);
+    if (enabled[next]) {
+      if (this.activation === 'manual') this.focusedId = enabled[next].id;
+      else this.activate(enabled[next].id);
+    }
   }
   render() {
     return html`<div
@@ -152,8 +188,28 @@ export class TTabs extends TerminalElement {
         aria-label=${this.label}
         aria-orientation=${this.orientation}
         @keydown=${this.onKey}
+        @focusout=${this.onFocusOut}
       >
-        ${this.tabs.map((tab, i) => html`<button part="tab" role="tab" type="button" id=${`tab-${i}`} aria-controls=${`panel-${i}`} aria-selected=${this.active === tab.id ? 'true' : 'false'} tabindex=${this.active === tab.id ? 0 : -1} ?disabled=${tab.disabled} @click=${() => this.activate(tab.id)}>${tab.label}</button>`)}
+        ${this.tabs.map(
+          (tab, i) =>
+            html`<button
+              part="tab"
+              role="tab"
+              type="button"
+              id=${`tab-${i}`}
+              data-tab-id=${tab.id}
+              aria-controls=${`panel-${i}`}
+              aria-selected=${this.active === tab.id ? 'true' : 'false'}
+              tabindex=${(this.activation === 'manual' ? this.focusedId || this.active : this.active) === tab.id ? 0 : -1}
+              ?disabled=${tab.disabled}
+              @focus=${() => {
+                if (this.activation === 'manual') this.focusedId = tab.id;
+              }}
+              @click=${() => this.activate(tab.id)}
+            >
+              ${tab.label}
+            </button>`,
+        )}
       </div>
       ${this.tabs.map((tab, i) => html`<div part="panel" role="tabpanel" id=${`panel-${i}`} aria-labelledby=${`tab-${i}`} tabindex="0" ?hidden=${this.active !== tab.id}><slot name=${tab.id}></slot></div>`)}`;
   }

@@ -5,12 +5,12 @@ const meta = {
   title: 'Components/Tabs',
   component: 't-tabs',
   tags: ['autodocs'],
-  args: { active: 'overview', orientation: 'horizontal', dir: 'ltr' },
+  args: { active: 'overview', orientation: 'horizontal', activation: 'automatic', dir: 'ltr' },
   parameters: {
     docs: {
       description: {
         component:
-          'Set `tabs` to `{id, label, disabled?}[]`. Supply a named slot for each ID. `active` selects a tab. Horizontal tabs use Left/Right, reversed in RTL. Set `orientation="vertical"` for Up/Down. Home/End select the first/last enabled tab. Emits `t-change` with `detail.value`. CSS parts: `tab`, `panel`.',
+          'Set `tabs` to `{id, label, disabled?}[]`. Supply a named slot for each ID. `active` selects a tab. Set `activation="manual"` when panel content takes time to load: arrows move focus, and Enter or Space selects. Horizontal tabs use Left/Right, reversed in RTL. Set `orientation="vertical"` for Up/Down. Home/End reach the first/last enabled tab. Emits `t-change` with `detail.value`. CSS parts: `tab`, `panel`.',
       },
     },
   },
@@ -19,6 +19,7 @@ const meta = {
       label="Workspace sections"
       active=${a.active}
       orientation=${a.orientation}
+      activation=${a.activation}
       dir=${a.dir}
       .tabs=${[
         { id: 'overview', label: 'Overview' },
@@ -63,5 +64,19 @@ export const RightToLeft: Story = {
     await userEvent.keyboard('{ArrowLeft}');
     await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
     await expect(host.shadowRoot!.activeElement).toBe(tabs[2]);
+  },
+};
+export const ManualActivation: Story = {
+  args: { activation: 'manual' },
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-tabs')!;
+    const tabs = host.shadowRoot!.querySelectorAll<HTMLButtonElement>('[role=tab]');
+    tabs[0].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(host.shadowRoot!.activeElement).toBe(tabs[2]);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'false');
+    await userEvent.keyboard('{Enter}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
   },
 };
