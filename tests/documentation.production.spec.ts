@@ -141,6 +141,111 @@ for (const { tag, id } of entries) {
   });
 }
 
+test('API reference text stays readable in every built component manual', async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  const evidence: {
+    tag: string;
+    text: string;
+    ratio: number;
+    foreground: number[];
+    background: number[];
+    reachable: boolean;
+    effects: string[];
+  }[] = [];
+  for (const { tag, id } of entries) {
+    await page.goto(`/storybook/iframe.html?id=${id}&viewMode=docs`);
+    const pairs = await page.locator('#api-reference').evaluate((section) => {
+      type RGB = [number, number, number];
+      type RGBA = [number, number, number, number];
+      const rgba = (value: string): RGBA => {
+        const channels = value.match(/[\d.]+/g)?.map(Number) ?? [];
+        return [channels[0] ?? 0, channels[1] ?? 0, channels[2] ?? 0, channels[3] ?? 1];
+      };
+      const blend = (under: RGB, [red, green, blue, alpha]: RGBA): RGB => [
+        red * alpha + under[0] * (1 - alpha),
+        green * alpha + under[1] * (1 - alpha),
+        blue * alpha + under[2] * (1 - alpha),
+      ];
+      const luminance = (color: RGB) =>
+        color
+          .map((value) => {
+            const channel = value / 255;
+            return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+          })
+          .reduce((total, value, index) => total + value * [0.2126, 0.7152, 0.0722][index], 0);
+      const pairs: {
+        text: string;
+        ratio: number;
+        foreground: RGB;
+        background: RGB;
+        reachable: boolean;
+        effects: string[];
+      }[] = [];
+      for (const region of section.querySelectorAll<HTMLElement>('.tk-docs-table')) {
+        const headings = region.querySelectorAll('th');
+        const bounds = region.getBoundingClientRect();
+        region.scrollLeft = 0;
+        const first = headings[0]?.getBoundingClientRect();
+        const firstReachable =
+          !first || (first.left >= bounds.left - 1 && first.right <= bounds.right + 1);
+        region.scrollLeft = region.scrollWidth;
+        const last = headings[headings.length - 1]?.getBoundingClientRect();
+        const reachable =
+          firstReachable &&
+          (!last || (last.left >= bounds.left - 1 && last.right <= bounds.right + 1));
+        for (const cell of region.querySelectorAll('caption, th, td')) {
+          const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+          for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+            const text = node.textContent?.trim();
+            if (!text) continue;
+            const element = node.parentElement!;
+            const layers: RGBA[] = [];
+            const effects: string[] = [];
+            for (
+              let ancestor: Element | null = element;
+              ancestor;
+              ancestor = ancestor.parentElement
+            ) {
+              const style = getComputedStyle(ancestor);
+              layers.unshift(rgba(style.backgroundColor));
+              if (style.backgroundImage !== 'none') effects.push('background image');
+              if (style.opacity !== '1') effects.push('opacity');
+            }
+            if (!layers.some((layer) => layer[3] === 1)) effects.push('transparent canvas');
+            const background = layers.reduce<RGB>(blend, [255, 255, 255]);
+            const foreground = blend(background, rgba(getComputedStyle(element).color));
+            const [bright, dark] = [luminance(foreground), luminance(background)].sort(
+              (left, right) => right - left,
+            );
+            pairs.push({
+              text: text.slice(0, 80),
+              ratio: (bright + 0.05) / (dark + 0.05),
+              foreground,
+              background,
+              reachable,
+              effects,
+            });
+          }
+        }
+      }
+      return pairs;
+    });
+    evidence.push(...pairs.map((pair) => ({ tag, ...pair })));
+  }
+  const evidencePath = testInfo.outputPath('api-reference-contrast.json');
+  await writeFile(evidencePath, JSON.stringify(evidence, null, 2));
+  await testInfo.attach('api-reference-contrast', {
+    path: evidencePath,
+    contentType: 'application/json',
+  });
+  expect(evidence.length).toBeGreaterThan(0);
+  expect(
+    evidence.filter((pair) => !pair.reachable || pair.effects.length || pair.ratio < 4.5),
+  ).toEqual([]);
+});
+
 test('global framework selection changes code and survives navigation and reload', async ({
   page,
 }) => {
