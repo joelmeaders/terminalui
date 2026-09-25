@@ -590,3 +590,71 @@ test('Input documentation stays usable at actual 400% Chromium browser zoom', as
     await context.close();
   }
 });
+
+test('all component manuals reflow at actual 400% Chromium browser zoom', async ({}, testInfo) => {
+  test.setTimeout(180_000);
+  const zoomBrowser = await launchBrowserZoom(testInfo, 'http://127.0.0.1:4173', {
+    width: 1280,
+    height: 900,
+  });
+  const { context, page } = zoomBrowser;
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const results: {
+    tag: string;
+    framework: 'html' | 'react' | 'vue' | 'angular';
+    zoom: number;
+    viewport: number;
+    devicePixelRatio: number;
+    documentWidth: number;
+  }[] = [];
+  try {
+    await page.goto(`/storybook/iframe.html?id=${entries[0].id}&viewMode=docs`);
+    await expect(page.locator('.tk-docs')).toBeVisible();
+    const zoom = await zoomBrowser.setZoom(4);
+    expect(zoom).toBeCloseTo(4, 3);
+    for (const { tag, id } of entries) {
+      await page.goto(`/storybook/iframe.html?id=${id}&viewMode=docs`);
+      const select = page.getByRole('combobox', { name: 'Documentation framework' });
+      await expect(select).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'API reference', exact: true })).toBeVisible();
+      for (const framework of ['html', 'react', 'vue', 'angular'] as const) {
+        await select.selectOption(framework);
+        await expect(select).toHaveValue(framework);
+        if (framework === 'angular') {
+          await page.getByText('Project setup for Angular', { exact: true }).click();
+          await expect(page.locator('#getting-started .tk-docs-setup')).toHaveAttribute('open', '');
+        }
+        const layout = await page.evaluate(() => ({
+          viewport: innerWidth,
+          devicePixelRatio,
+          documentWidth: document.documentElement.scrollWidth,
+        }));
+        results.push({ tag, framework, zoom, ...layout });
+      }
+    }
+    const reportPath = testInfo.outputPath('storybook-400-percent-reflow.json');
+    await writeFile(
+      reportPath,
+      JSON.stringify(
+        { browser: context.browser()?.version(), os: process.platform, results },
+        null,
+        2,
+      ),
+    );
+    await testInfo.attach('storybook-400-percent-reflow', {
+      path: reportPath,
+      contentType: 'application/json',
+    });
+    expect(results).toHaveLength(entries.length * 4);
+    expect(errors).toEqual([]);
+    expect(
+      results.filter(
+        ({ viewport, devicePixelRatio, documentWidth }) =>
+          viewport !== 320 || devicePixelRatio !== 4 || documentWidth > viewport + 1,
+      ),
+    ).toEqual([]);
+  } finally {
+    await context.close();
+  }
+});
