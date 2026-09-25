@@ -62,6 +62,10 @@ import '@terminal-kit/core/typography.css';
 
 Use `.t-h1` through `.t-h6` for heading appearance, `.t-text` for standalone text, and `.t-text-small`, `.t-text-medium`, or `.t-text-large` for size. The layer adds no JavaScript and does not reset unmarked content. Plain HTML can load `dist/themes.css` and `dist/typography.css` with stylesheet links. See **Introduction → Typography** in Storybook for the scale, inline elements, anchors, code, palettes, RTL, tokens, and all four framework examples. The shared [typography guide](docs/typography.md) explains scope and accessibility.
 
+## Image effects
+
+Import the optional [image effects stylesheet](docs/image-effects.md) for scanlines, theme tint, and scaled pixel rendering on native images. For true pixelation or ASCII, import the separate `image-pixelate` or `image-ascii` runtime subpath. These effects are opt-in and do not enter the main component bundle. Storybook's **Introduction → Image Effects** page shows the results and integration code for HTML, Angular, Vue, and React.
+
 ## Components
 
 | Element               | Purpose                          | Main API                                                                                    |

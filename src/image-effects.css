@@ -1,0 +1,91 @@
+/* Native images remain the accessible source. Generated output is decorative. */
+.t-image-effect {
+  position: relative;
+  display: inline-grid;
+  max-inline-size: 100%;
+  vertical-align: middle;
+  isolation: isolate;
+}
+.t-image-effect > img {
+  display: block;
+  grid-area: 1 / 1;
+  max-inline-size: 100%;
+  block-size: auto;
+}
+.t-image-effect[data-image-scaling='pixelated'] > img {
+  image-rendering: pixelated;
+}
+.t-image-effect[data-image-tint]:not([data-image-effect-ready='ascii']) {
+  background: var(--t-accent);
+}
+.t-image-effect[data-image-tint]:not([data-image-effect-ready='ascii']) > img,
+.t-image-effect[data-image-tint]:not([data-image-effect-ready='ascii'])
+  > [data-t-image-output='pixelate'] {
+  filter: grayscale(1);
+  mix-blend-mode: luminosity;
+}
+.t-image-effect > [data-t-image-output] {
+  position: absolute;
+  inset: 0;
+  display: none;
+  inline-size: 100%;
+  block-size: 100%;
+  pointer-events: none;
+}
+.t-image-effect[data-image-effect-ready] > img {
+  opacity: 0;
+}
+.t-image-effect[data-image-effect-ready] > [data-t-image-output] {
+  display: block;
+}
+.t-image-effect > canvas[data-t-image-output] {
+  image-rendering: pixelated;
+}
+.t-image-effect > pre[data-t-image-output] {
+  overflow: hidden;
+  margin: 0;
+  color: var(--t-accent);
+  background: var(--t-bg);
+  font: var(--t-image-ascii-font, 10px/10px monospace);
+  letter-spacing: 0;
+  white-space: pre;
+  user-select: none;
+}
+.t-image-effect:where([data-image-scanlines='subtle'], [data-image-scanlines='pronounced'])::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0 calc(var(--t-image-scanline-spacing, 4px) - var(--t-image-scanline-width, 1px)),
+    color-mix(
+        in srgb,
+        var(--t-image-scanline-color, var(--t-accent))
+          calc(var(--t-image-scanline-opacity, 0.12) * 100%),
+        transparent
+      )
+      calc(var(--t-image-scanline-spacing, 4px) - var(--t-image-scanline-width, 1px))
+      var(--t-image-scanline-spacing, 4px)
+  );
+}
+.t-image-effect[data-image-scanlines='pronounced'] {
+  --t-image-scanline-width: 2px;
+  --t-image-scanline-opacity: 0.24;
+}
+@media (forced-colors: active), (prefers-contrast: more) {
+  .t-image-effect {
+    background: transparent !important;
+  }
+  .t-image-effect > img {
+    filter: none !important;
+    mix-blend-mode: normal !important;
+    image-rendering: auto !important;
+    opacity: 1 !important;
+  }
+  .t-image-effect > [data-t-image-output],
+  .t-image-effect::after {
+    display: none !important;
+  }
+}

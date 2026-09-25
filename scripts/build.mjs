@@ -9,7 +9,17 @@ const internal = (await readdir('src/internal'))
   .filter((f) => f.endsWith('.ts'))
   .map((f) => `src/internal/${f}`);
 const adapters = ['src/adapters/react.ts', 'src/adapters/vue.ts'];
-const sources = ['src/index.ts', 'src/icons.ts', ...components, ...internal, ...adapters];
+const effects = (await readdir('src/effects'))
+  .filter((f) => f.endsWith('.ts'))
+  .map((f) => `src/effects/${f}`);
+const sources = [
+  'src/index.ts',
+  'src/icons.ts',
+  ...components,
+  ...internal,
+  ...adapters,
+  ...effects,
+];
 await mkdir('dist', { recursive: true });
 // ESM keeps one shared Lit dependency for applications using a bundler.
 await build({
@@ -55,7 +65,7 @@ for (const source of sources) {
   const content = await readFile(file, 'utf8');
   await writeFile(file, esmExtensions(content));
 }
-for (const name of ['themes', 'typography']) {
+for (const name of ['themes', 'typography', 'image-effects']) {
   await copyFile(`src/${name}.css`, `dist/${name}.css`);
   await writeFile(`dist/${name}.css.d.ts`, 'export {};\n');
 }

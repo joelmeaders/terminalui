@@ -116,6 +116,34 @@ const buttonBundle = await build({
   write: false,
   metafile: true,
 });
+for (const [entry, symbol, expected, excluded] of [
+  ['image-pixelate', 'mountPixelation', 'pixelate.js', 'ascii.js'],
+  ['image-ascii', 'mountAscii', 'ascii.js', 'pixelate.js'],
+]) {
+  const effectBundle = await build({
+    absWorkingDir: consumer,
+    stdin: {
+      contents: `import { ${symbol} } from '@terminal-kit/core/${entry}'; globalThis.effectFactory = ${symbol};`,
+      resolveDir: consumer,
+    },
+    bundle: true,
+    write: false,
+    metafile: true,
+  });
+  const inputs = Object.keys(effectBundle.metafile.inputs).map((file) =>
+    file.replaceAll('\\', '/'),
+  );
+  assert(
+    inputs.some((file) => file.endsWith(`/dist/effects/${expected}`)),
+    `${entry} is missing.`,
+  );
+  assert(
+    !inputs.some((file) => file.endsWith(`/dist/effects/${excluded}`)),
+    `${entry} imports ${excluded}.`,
+  );
+  assert(!inputs.some((file) => file.endsWith('/dist/index.js')), `${entry} imports the catalog.`);
+  assert(effectBundle.outputFiles[0].text.includes('effectFactory'), `${entry} was removed.`);
+}
 const buttonInputs = Object.keys(buttonBundle.metafile.inputs).map((file) =>
   file.replaceAll('\\', '/'),
 );
@@ -138,6 +166,12 @@ assert(
   ),
   'Core bundle must exclude framework runtimes and provider icon packs.',
 );
+assert(
+  !Object.keys(coreBundle.metafile.inputs).some((file) =>
+    file.replaceAll('\\', '/').includes('/dist/effects/'),
+  ),
+  'Core bundle must exclude optional image effects.',
+);
 const imports = catalog
   .map(
     ({ name, path }) =>
@@ -150,6 +184,9 @@ await writeFile(
 import '@terminal-kit/core';
 import '@terminal-kit/core/themes.css';
 import '@terminal-kit/core/typography.css';
+import '@terminal-kit/core/image-effects.css';
+import { mountPixelation, type PixelationOptions } from '@terminal-kit/core/image-pixelate';
+import { mountAscii, type AsciiOptions, type ImageEffectController } from '@terminal-kit/core/image-ascii';
 import { TInput as ReactInput } from '@terminal-kit/core/react';
 import * as ReactComponents from '@terminal-kit/core/react';
 import { useTerminalModel } from '@terminal-kit/core/vue';
@@ -157,6 +194,8 @@ import '@angular/compiler';
 import { TerminalValueAccessor } from '@terminal-kit/core/angular';
 import { registerIcon, unregisterIcon, registerFontAwesomeIcon, registerLucideIcon, registerIconSet, type IconData } from '@terminal-kit/core/icons';
 const testIcon: IconData = { width: 16, height: 16, body: '<path d="M2 2h12v12H2z"/>' };
+const imageEffectTypes: [typeof mountPixelation, typeof mountAscii, PixelationOptions, AsciiOptions, ImageEffectController<AsciiOptions> | undefined] = [mountPixelation, mountAscii, {pixelSize:8}, {cellSize:10,characters:' .#',invert:false}, undefined];
+void imageEffectTypes;
 registerIcon('package:sample', testIcon);
 registerFontAwesomeIcon('package:fa', {icon:[16,16,[],'f000','M2 2h12v12H2z']});
 registerLucideIcon('package:lucide', [['circle', {cx:12,cy:12,r:8}]]);

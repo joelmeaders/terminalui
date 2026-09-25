@@ -43,6 +43,26 @@ for (const [name, contents] of Object.entries(scenarios)) {
     `${name}: raw ${bytes.length} B | gzip ${gzipSync(bytes).length} B | Brotli ${brotliCompressSync(bytes).length} B`,
   );
 }
+for (const [name, entry, symbol] of [
+  ['Optional pixelation', './src/effects/pixelate.ts', 'mountPixelation'],
+  ['Optional ASCII', './src/effects/ascii.ts', 'mountAscii'],
+]) {
+  const result = await build({
+    stdin: {
+      contents: `import { ${symbol} } from '${entry}'; globalThis.effectFactory = ${symbol};`,
+      resolveDir: process.cwd(),
+    },
+    bundle: true,
+    minify: true,
+    format: 'esm',
+    target: 'es2022',
+    write: false,
+  });
+  const bytes = result.outputFiles[0].contents;
+  console.log(
+    `${name}: raw ${bytes.length} B | gzip ${gzipSync(bytes).length} B | Brotli ${brotliCompressSync(bytes).length} B`,
+  );
+}
 const css = await readFile('src/themes.css');
 console.log(
   `All six themes: raw ${css.length} B | gzip ${gzipSync(css).length} B | Brotli ${brotliCompressSync(css).length} B`,
@@ -53,4 +73,8 @@ if (typographyGzip > 2500)
   throw new Error(`Typography: ${typographyGzip} B exceeds its 2500 B gzip budget.`);
 console.log(
   `Optional typography CSS: raw ${typography.length} B | gzip ${typographyGzip} B | Brotli ${brotliCompressSync(typography).length} B`,
+);
+const imageEffects = await readFile('src/image-effects.css');
+console.log(
+  `Optional image effects CSS: raw ${imageEffects.length} B | gzip ${gzipSync(imageEffects).length} B | Brotli ${brotliCompressSync(imageEffects).length} B`,
 );

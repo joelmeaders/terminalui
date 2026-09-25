@@ -82,6 +82,44 @@ test('typography docs share the framework selector and include complete native C
   await expect(select).toHaveValue('vue');
 });
 
+test('image effects docs explain optional imports in each framework at narrow widths', async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto('/storybook/?path=/docs/introduction-image-effects--docs');
+  const frame = page.frameLocator('#storybook-preview-iframe');
+  const select = frame.getByRole('combobox', { name: 'Documentation framework' });
+  for (const [value, snippet] of [
+    ['html', '/assets/effects/ascii.js'],
+    ['react', 'useEffect'],
+    ['angular', 'ngOnDestroy'],
+    ['vue', 'onBeforeUnmount'],
+  ]) {
+    await select.selectOption(value);
+    await expect(frame.locator('.tk-docs')).toHaveAttribute('data-docs-framework', value);
+    await expect(frame.getByTestId('image-example')).toContainText(snippet);
+    await expect(frame.getByTestId('image-example')).toContainText('image-effects.css');
+  }
+  await expect(frame.locator('#image-guide')).toContainText('cross-origin');
+  await expect(frame.locator('#image-guide')).toContainText('alt');
+  await expect(
+    frame
+      .locator('#live-preview')
+      .getByRole('img', { name: 'Dark square and gray circle on a light background' }),
+  ).toHaveCount(1);
+  await page.goto('/storybook/iframe.html?id=introduction-image-effects--docs&viewMode=docs');
+  await expect(page.locator('.tk-docs')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
+    true,
+  );
+  const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
+  await writeFile(
+    testInfo.outputPath('image-effects-documentation-axe-review.json'),
+    JSON.stringify({ violations: report.violations, incomplete: report.incomplete }, null, 2),
+  );
+  expect(report.violations).toEqual([]);
+});
+
 test('typography documentation stays usable at 320 CSS pixels', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 320, height: 900 });
   await page.goto('/storybook/iframe.html?id=introduction-typography--docs&viewMode=docs');

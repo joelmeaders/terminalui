@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-theme="amber">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Image effects fixture</title>
+    <link rel="stylesheet" href="/src/themes.css" />
+    <link rel="stylesheet" href="/src/image-effects.css" />
+    <style>
+      body {
+        margin: 16px;
+        color: var(--t-text);
+        background: var(--t-bg);
+      }
+      .t-image-effect {
+        width: 180px;
+      }
+      .t-image-effect > img {
+        width: 180px;
+        height: 120px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Image effects</h1>
+      <span class="t-image-effect" id="frame">
+        <img
+          id="source"
+          width="180"
+          height="120"
+          src="/tests/assets/effect-image.svg"
+          alt="Dark square and gray circle on a light background"
+        />
+      </span>
+    </main>
+    <script type="module">
+      import { mountPixelation } from '/src/effects/pixelate.ts';
+      import { mountAscii } from '/src/effects/ascii.ts';
+      window.effects = { mountPixelation, mountAscii };
+    </script>
+  </body>
+</html>
