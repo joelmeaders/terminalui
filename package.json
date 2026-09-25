@@ -123,7 +123,7 @@
     "vitest": "4.1.11",
     "vue": "3.5.43"
   },
-  "license": "UNLICENSED",
+  "license": "SEE LICENSE IN LICENSE",
   "engines": {
     "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
   },

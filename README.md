@@ -2,6 +2,10 @@
 
 A browser component library built with Lit. All 50 components share six terminal-inspired palettes and work in plain HTML, React, Vue, and Angular. Storybook contains API notes, interactive controls, component states, and browser interaction tests. The package includes typed framework adapters, generated editor metadata, optional icon providers, and an installable local tarball.
 
+## License
+
+Terminal Kit uses the [PolyForm Perimeter License 1.0.1](LICENSE). This is a **source-available license, not an OSI open source license**. It allows use, changes, and distribution for purposes that do not compete with Terminal Kit. A noncompeting website or application may use the components. The license bars products marketed as substitutes for Terminal Kit, including kit forks, even when offered for free. Read the license text for the exact terms. Third-party icon assets keep their own licenses. See [icon credits](docs/icons.md).
+
 ## Run locally
 
 Requires npm and Node 22.22.3+, Node 24.15+, or Node 26 within those major versions. Tested with Node 24.18. The Angular adapter build uses TypeScript 6.0 and Angular 22.1.
@@ -145,7 +149,7 @@ import '@terminal-kit/core/components/button';
 import '@terminal-kit/core/themes.css';
 ```
 
-The package remains private and unpublished at version `0.1.0`, with `UNLICENSED` metadata pending an owner-approved license. To install it in another repository, run `npm pack` here, then `npm install /path/to/terminal-kit-core-0.1.0.tgz` there. Importing the package root registers all 50 elements. Individual imports include only their component dependencies. Use one distribution path per page: do not load the standalone bundle and ESM package together.
+The package remains private and unpublished at version `0.1.0`. To install it in another repository, run `npm pack` here, then `npm install /path/to/terminal-kit-core-0.1.0.tgz` there. Importing the package root registers all 50 elements. Individual imports include only their component dependencies. Use one distribution path per page: do not load the standalone bundle and ESM package together.
 
 The build also creates TypeScript declarations, a Custom Elements Manifest, a component catalog, and VS Code HTML metadata. Storybook reads the generated manifest. See [framework integration](docs/frameworks.md) for editor configuration and [release preparation](docs/releasing.md) for package verification and publication boundaries.
 
@@ -346,4 +350,4 @@ Accessibility requirements are part of [AGENTS.md](AGENTS.md). The [accessibilit
 - Tooltips provide short, noninteractive help. Tooltips and popovers use viewport-aware placement with flipping and bounds adjustment during scrolling and resizing. Use a popover for interactive content.
 - Tables support local sorting, loading, empty states, and row selection. The library does not provide a virtualized data grid, cell editing, rich-text editor, or custom date picker.
 - The theme choice in the demo persists locally. The component package itself does not write to storage.
-- Version `0.1.0` remains private and unpublished. Release checks and CI configuration are included, but publication needs an owner-approved license and explicit release authorization. See [release preparation](docs/releasing.md).
+- Version `0.1.0` remains private and unpublished. Release checks and CI configuration are included, but publication still needs an approved package name, registry identity, version, and explicit release authorization. See [release preparation](docs/releasing.md).

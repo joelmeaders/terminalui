@@ -1,7 +1,7 @@
 # Release preparation
 
-This repository remains private and unpublished. `UNLICENSED` records the absence of an approved distribution license.
-No workflow publishes a package. A public release needs an owner-approved package name, license, registry, and version.
+This repository remains private and unpublished. Terminal Kit uses the [PolyForm Perimeter License 1.0.1](../LICENSE), a source-available license that bars competing products. It is not an OSI open source license. Third-party icon assets retain their own terms in [icon credits](icons.md).
+No workflow publishes a package. A public release needs an owner-approved package name, registry, and version.
 
 ## Local verification
 
@@ -15,7 +15,7 @@ The Angular build uses TypeScript 6.0 and Angular compiler 22.1.
 5. Inspect the generated artifact with `npm pack --dry-run`.
 6. Run `npm pack` to create a local installable tarball.
 
-The external package test installs the tarball outside this repository. It verifies all component exports and strict NodeNext type resolution.
+The external package test installs the tarball outside this repository. It verifies the license, all component exports, and strict NodeNext type resolution.
 It also tests optional adapter imports, compiles an Angular AOT consumer, and checks standalone browser registration.
 The test preserves its temporary consumer path in the output for inspection.
 
@@ -33,7 +33,7 @@ The workflow files require a connected repository before remote CI results exist
 
 ## Public release decision
 
-An owner must approve the distribution license and registry identity before publication.
-Set the approved license, select a release version, and remove `private` only after that decision.
+An owner must approve the registry identity and legal distribution details before publication.
+Confirm that the license reflects the copyright holders' intended terms. Select a release version and remove `private` only after that decision.
 Review the complete tarball and rerun all checks for that version. Publish only with explicit release authorization.
 This preparation does not create a registry release, Git tag, deployment, or publishing credential.

@@ -20,6 +20,10 @@ function npmRun(args, cwd = root) {
 const pack = JSON.parse(
   npmRun(['pack', '--ignore-scripts', '--json', '--pack-destination', consumer]),
 )[0];
+assert(
+  pack.files.some((file) => file.path === 'LICENSE'),
+  'Packed license must exist.',
+);
 assert(pack.files.some((file) => file.path === 'dist/custom-elements.json'));
 assert(
   pack.files.some((file) => file.path === 'docs/icon-licenses/index.html'),
@@ -36,6 +40,7 @@ for (const directory of noticeDirectories) {
 }
 assert(!pack.files.some((file) => file.path.startsWith('src/')));
 const pkg = JSON.parse(await readFile('package.json', 'utf8'));
+assert.equal(pkg.license, 'SEE LICENSE IN LICENSE');
 assert.deepEqual(
   Object.keys(pkg.dependencies),
   ['lit'],
@@ -66,6 +71,11 @@ npmRun(
     ].map((name) => `${name}@${pkg.devDependencies[name]}`),
   ],
   consumer,
+);
+assert.equal(
+  await readFile(join(consumer, 'node_modules/@terminal-kit/core/LICENSE'), 'utf8'),
+  await readFile('LICENSE', 'utf8'),
+  'Installed license differs from the repository license.',
 );
 for (const directory of noticeDirectories) {
   const path = `docs/icon-licenses/${directory.name}/NOTICE`;

@@ -161,7 +161,7 @@ Provider research was checked on 2026-09-23. Pin package versions and preserve t
 
 Maintain an application attribution file or credits page listing each included provider, exact package version, source URL, license, and modifications. Copy the relevant license and copyright notices into the distributed application. For Font Awesome icon data, retain the CC BY attribution information and identify changes. For Apache assets, retain applicable license and notice information. Keep Lucide's Feather notices when they apply. These steps should follow the actual installed licenses rather than a blanket “all icons are MIT” statement.
 
-Keep icon attribution when an optimizer strips SVG comments. Review brand and trademark usage separately from the artwork license. Registry registration does not transfer ownership or change license terms. Terminal Kit itself remains private and `UNLICENSED` until an owner approves its distribution license.
+Keep icon attribution when an optimizer strips SVG comments. Review brand and trademark usage separately from the artwork license. Registry registration does not transfer ownership or change license terms. Terminal Kit uses the [PolyForm Perimeter License 1.0.1](../LICENSE); the third-party icon licenses listed above remain separate.
 
 The demonstration includes three Ionicons, Font Awesome Free solid/regular/brand samples, two Lucide icons, and selected Iconify data. Its pinned package versions, selected names, conversion notes, and upstream license copies are recorded here:
 
