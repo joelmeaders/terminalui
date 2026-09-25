@@ -157,7 +157,7 @@ import '@terminal-kit/core/components/button';
 import '@terminal-kit/core/themes.css';
 ```
 
-The package remains private and unpublished at version `0.1.0`. To install it in another repository, run `npm pack` here, then `npm install /path/to/terminal-kit-core-0.1.0.tgz` there. Importing the package root registers all 51 elements. Individual imports include only their component dependencies. Use one distribution path per page: do not load the standalone bundle and ESM package together.
+The package remains private and unpublished at version `0.1.0`. To install it in another repository, run `npm pack` here, then `npm install /path/to/terminal-kit-core-0.1.0.tgz` there. Importing the package root registers all 56 elements. Individual imports include only their component dependencies. Use one distribution path per page: do not load the standalone bundle and ESM package together.
 
 The build also creates TypeScript declarations, a Custom Elements Manifest, a component catalog, and VS Code HTML metadata. Storybook reads the generated manifest. See [framework integration](docs/frameworks.md) for editor configuration and [release preparation](docs/releasing.md) for package verification and publication boundaries.
 
@@ -325,7 +325,7 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 51.8 KB for registration of all 56 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.2 KB gzip. The button and complete-catalog budgets are 8 KB and 52 KB. The catalog budget includes multi-select, local table filtering and paging, the inline calendar, both form date pickers, the time picker, manual tab activation, and selectable chips. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
+The local size check measures 7,959 bytes gzip for one button, 9,896 bytes for the original three form controls, and 52,571 bytes for registration of all 56 components. One selected Ionicons example, its registry, and `t-icon` measure 10,640 bytes. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS measures 2,165 bytes gzip. The button and complete-catalog budgets are 8,000 and 52,750 bytes. The catalog budget covers every component, including live toolbar focus recovery. The form budget remains 10,000 bytes. Import individual component subpaths to avoid registering the full catalog; importing and using more exported APIs adds their code.
 
 ## Storybook and verification
 
@@ -345,7 +345,7 @@ npm run format:check
 
 `npm run check` runs the full validation sequence. No tests contact application backends or alter external data.
 
-The package check installs the tarball into an external temporary consumer. It checks strict NodeNext types, individual exports, framework isolation, Angular AOT compilation, and standalone registration. The size check retains separate budgets for one button, the original three form controls, and the complete catalog. CI configuration runs browser and package checks on Linux and production screenshot checks on Windows. A configured workflow does not establish a remote CI result.
+The package check installs the tarball into an external temporary consumer. It checks strict NodeNext types, individual exports, that the button subpath bundles without other components, framework isolation, Angular AOT compilation, and standalone registration. The size check retains separate budgets for one button, the original three form controls, and the complete catalog. CI configuration runs browser and package checks on Linux and production screenshot checks on Windows. A configured workflow does not establish a remote CI result.
 
 Production tests compare saved screenshots for all six palettes, a mobile layout, a modal dialog, and selected display styles. Component-area references include the accessibility contrast corrections; the original `base-components` images remain as historical references. Browser tests cover nested overrides, texture boundaries, persistence, forced colors, and accessibility with effects enabled. The committed reference images use Playwright Chromium on Windows. Review intentional visual changes before regenerating references with `npx playwright test --config playwright.production.config.ts --update-snapshots`. Other operating systems need their own reviewed reference images.
 

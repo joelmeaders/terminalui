@@ -238,6 +238,42 @@ test('toolbar roves native and shadow actions, skips disabled buttons, and resto
   expect(restored).toEqual([null, '-1', null]);
 });
 
+test('toolbar keeps focus inside when live actions disappear or become disabled', async ({
+  page,
+}) => {
+  await fixture(
+    page,
+    '<button id="before">Before</button><t-toolbar label="Live actions"><button id="one">One</button><button id="two">Two</button><button id="three">Three</button></t-toolbar><button id="after">After</button>',
+  );
+  const toolbar = page.getByRole('toolbar', { name: 'Live actions' });
+  await page.getByRole('button', { name: 'Two' }).focus();
+  await page.locator('#two').evaluate((element) => element.remove());
+  await expect(page.getByRole('button', { name: 'Three' })).toBeFocused();
+  await page.locator('#three').evaluate((element: HTMLButtonElement) => {
+    element.disabled = true;
+  });
+  await expect(page.getByRole('button', { name: 'One' })).toBeFocused();
+  await page.locator('#one').evaluate((element) => element.remove());
+  await expect(toolbar).toBeFocused();
+  await page.locator('t-toolbar').evaluate((element) => {
+    element.append(Object.assign(document.createElement('button'), { textContent: 'Four' }));
+  });
+  await expect(page.getByRole('button', { name: 'Four' })).toBeFocused();
+  await page.locator('#after').focus();
+  await page.locator('t-toolbar').evaluate((element) => {
+    element.append(Object.assign(document.createElement('button'), { textContent: 'Five' }));
+  });
+  await expect(page.locator('#after')).toBeFocused();
+  await page.locator('t-toolbar').evaluate((element) => {
+    element.insertAdjacentHTML('beforeend', '<t-button id="six">Six</t-button>');
+  });
+  await page.getByRole('button', { name: 'Six' }).focus();
+  await page.locator('t-toolbar t-button#six').evaluate((element) => element.remove());
+  await expect(page.getByRole('button', { name: 'Five' })).toBeFocused();
+  const axe = await new AxeBuilder({ page }).include('t-toolbar').analyze();
+  expect(axe.violations, JSON.stringify(axe.violations)).toEqual([]);
+});
+
 test('native toolbar actions keep readable text in every palette', async ({ page }) => {
   await fixture(
     page,

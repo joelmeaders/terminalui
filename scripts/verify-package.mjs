@@ -109,6 +109,27 @@ const coreBundle = await build({
   write: false,
   metafile: true,
 });
+const buttonBundle = await build({
+  absWorkingDir: consumer,
+  stdin: { contents: "import '@terminal-kit/core/components/button';", resolveDir: consumer },
+  bundle: true,
+  write: false,
+  metafile: true,
+});
+const buttonInputs = Object.keys(buttonBundle.metafile.inputs).map((file) =>
+  file.replaceAll('\\', '/'),
+);
+assert.deepEqual(
+  buttonInputs
+    .filter((file) => file.includes('@terminal-kit/core/dist/components/'))
+    .map((file) => file.split('/').at(-1)),
+  ['button.js'],
+  'A button subpath must not pull in other components.',
+);
+assert(
+  !buttonInputs.some((file) => file.endsWith('@terminal-kit/core/dist/index.js')),
+  'A button subpath must not register the complete catalog.',
+);
 assert(
   !Object.keys(coreBundle.metafile.inputs).some((file) =>
     /node_modules\/(?:react|vue|@angular|@lit\/react|ionicons|lucide|lucide-static|@fortawesome|@iconify-json|@iconify)\//.test(
@@ -402,6 +423,6 @@ try {
   await browser.close();
 }
 console.log(
-  `Verified external npm install, all ${catalog.length} element exports and React wrappers, NodeNext types, icon registry, provider isolation, Angular AOT consumer with array-valued multi-select and six other form bindings, standalone registration, native typography CSS, and ${noticeDirectories.length} exact provider notices.`,
+  `Verified external npm install, button subpath isolation, all ${catalog.length} element exports and React wrappers, NodeNext types, icon registry, provider isolation, Angular AOT consumer with array-valued multi-select and six other form bindings, standalone registration, native typography CSS, and ${noticeDirectories.length} exact provider notices.`,
 );
 console.log(`Consumer artifacts: ${consumer}`);

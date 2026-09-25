@@ -4,6 +4,7 @@ import { activeElement } from '../internal/floating';
 
 /**
  * Roving toolbar for native buttons/links and buttons in open shadow roots.
+ * Focus moves to an available action when the focused action leaves or becomes disabled.
  * Text fields and other composite widgets must remain outside this toolbar.
  *
  * @slot - Action buttons or links. Native separators may separate action groups.
@@ -19,6 +20,7 @@ export class TToolbar extends TerminalElement {
   private empty = true;
   private actions: HTMLElement[] = [];
   private current?: HTMLElement;
+  private focusedAction?: HTMLElement;
   private originals = new Map<HTMLElement, string | null>();
   private observer = new MutationObserver(() => this.syncActions());
   private resize = new ResizeObserver(() => this.syncActions());
@@ -69,6 +71,9 @@ export class TToolbar extends TerminalElement {
     this.observer.disconnect();
     this.resize.disconnect();
     this.restore();
+    this.focusedAction = undefined;
+    this.current = undefined;
+    this.actions = [];
     super.disconnectedCallback();
   }
   protected updated() {
@@ -85,6 +90,7 @@ export class TToolbar extends TerminalElement {
   }
   private syncActions() {
     this.observer.disconnect();
+    const previousIndex = this.actions.indexOf(this.focusedAction!);
     const found: HTMLElement[] = [];
     const visit = (element: Element) => {
       if (!(element instanceof HTMLElement)) return;
@@ -123,12 +129,14 @@ export class TToolbar extends TerminalElement {
         Boolean(element.getClientRects().length),
     );
     const active = activeElement(),
-      hadFocus = found.includes(active!);
+      toolbar = this.renderRoot.querySelector<HTMLElement>('[role=toolbar]'),
+      lostAction = previousIndex >= 0 && !this.actions.includes(this.focusedAction!);
+    if (lostAction) this.current = this.actions[Math.min(previousIndex, this.actions.length - 1)];
     if (!this.actions.includes(this.current!)) this.current = this.actions[0];
     if (this.actions.includes(active!)) this.current = active;
     for (const element of found) element.tabIndex = element === this.current ? 0 : -1;
     this.empty = this.actions.length === 0;
-    if (hadFocus && !this.actions.includes(active!)) this.current?.focus();
+    if (lostAction || active === toolbar) (this.current ?? toolbar)?.focus();
   }
   private focusAction(element: HTMLElement) {
     this.current = element;
@@ -139,8 +147,19 @@ export class TToolbar extends TerminalElement {
     const action = this.actions.find((element) => event.composedPath().includes(element));
     if (action) {
       this.current = action;
+      this.focusedAction = action;
       for (const element of this.actions) element.tabIndex = element === action ? 0 : -1;
-    }
+    } else this.focusedAction = undefined;
+  }
+  private onFocusOut() {
+    queueMicrotask(() => {
+      if (
+        this.focusedAction?.isConnected &&
+        !this.focusedAction.matches(':disabled,[aria-disabled=true]') &&
+        !this.actions.includes(activeElement()!)
+      )
+        this.focusedAction = undefined;
+    });
   }
   private onKey(event: KeyboardEvent) {
     const action = this.actions.find((element) => event.composedPath().includes(element));
@@ -167,6 +186,7 @@ export class TToolbar extends TerminalElement {
       aria-orientation=${this.orientation}
       tabindex=${this.empty ? 0 : -1}
       @focusin=${this.onFocus}
+      @focusout=${this.onFocusOut}
       @keydown=${this.onKey}
     >
       <slot @slotchange=${this.syncActions}></slot>

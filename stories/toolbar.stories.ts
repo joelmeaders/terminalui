@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
-import { expect, userEvent } from 'storybook/test';
+import { expect, userEvent, waitFor } from 'storybook/test';
 import '../src/components/toolbar';
 import '../src/components/button';
 const meta = {
@@ -11,7 +11,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Roving toolbar for native buttons/links and action controls with open shadow roots, including `t-button` and `t-icon-button`. Tab enters one action; arrow keys and Home/End move through enabled actions. Horizontal arrows follow text direction. Disabled actions are skipped. Existing tabindex values return when controls leave the toolbar. Text inputs, selects, and nested composite widgets must remain outside this toolbar.',
+          'Roving toolbar for native buttons/links and action controls with open shadow roots, including `t-button` and `t-icon-button`. Tab enters one action; arrow keys and Home/End move through enabled actions. Horizontal arrows follow text direction. Disabled actions are skipped. When a focused action disappears or becomes disabled, focus moves to an available action or the empty toolbar. Existing tabindex values return when controls leave the toolbar. Text inputs, selects, and nested composite widgets must remain outside this toolbar.',
       },
     },
   },
@@ -39,6 +39,21 @@ export const Vertical: Story = {
       ><button>Cut selection</button><button>Copy selection</button
       ><button>Paste selection</button></t-toolbar
     >`,
+};
+export const LiveActions: Story = {
+  render: () =>
+    html`<t-toolbar label="Live actions"
+      ><button>One</button><button>Two</button><button>Three</button></t-toolbar
+    >`,
+  play: async ({ canvasElement }) => {
+    const [first, second, third] =
+      canvasElement.querySelectorAll<HTMLButtonElement>('t-toolbar button');
+    second.focus();
+    second.remove();
+    await waitFor(() => expect(document.activeElement).toBe(third));
+    third.disabled = true;
+    await waitFor(() => expect(document.activeElement).toBe(first));
+  },
 };
 export const Empty: Story = {
   render: () => html`<t-toolbar label="No available document actions"></t-toolbar>`,

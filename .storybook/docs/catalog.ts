@@ -1004,6 +1004,7 @@ export const guides: Record<string, ComponentGuide> = {
     ],
     accessibility: [
       'A roving tab stop supports arrows and Home/End. Give each toolbar a distinct label.',
+      'If a focused action disappears or becomes disabled, focus moves to an available action. An empty toolbar keeps a focusable named container.',
     ],
     example: {
       props: { label: 'Archive actions' },
