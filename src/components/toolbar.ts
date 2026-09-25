@@ -45,6 +45,19 @@ export class TToolbar extends TerminalElement {
       ::slotted(*) {
         max-width: 100%;
       }
+      ::slotted(button) {
+        min-height: var(--t-control-height, 42px);
+        padding: 8px 12px;
+        border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
+        background: var(--t-surface);
+        color: var(--t-text);
+        font: inherit;
+      }
+      ::slotted(a[href]) {
+        padding: 8px 12px;
+        color: var(--t-accent);
+        text-decoration: underline;
+      }
     `,
   ];
   connectedCallback() {

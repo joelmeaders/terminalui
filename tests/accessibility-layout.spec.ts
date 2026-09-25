@@ -1,44 +1,11 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { writeFile } from 'node:fs/promises';
+import { readdirSync } from 'node:fs';
 
-const tags = [
-  'button',
-  'input',
-  'select',
-  'checkbox',
-  'card',
-  'badge',
-  'alert',
-  'progress',
-  'accordion',
-  'tabs',
-  'dialog',
-  'tooltip',
-  'textarea',
-  'radio-group',
-  'range',
-  'switch',
-  'combobox',
-  'file-input',
-  'menu',
-  'breadcrumb',
-  'pagination',
-  'table',
-  'drawer',
-  'tree',
-  'icon',
-  'icon-button',
-  'spinner',
-  'skeleton',
-  'divider',
-  'avatar',
-  'empty-state',
-  'stack',
-  'grid',
-  'popover',
-  'toast',
-];
+const tags = readdirSync(new URL('../src/components/', import.meta.url))
+  .filter((file) => file.endsWith('.ts'))
+  .map((file) => file.slice(0, -3));
 
 async function catalog(page: Page) {
   await page.route('**/@vite/client', (route) => route.abort());
@@ -52,26 +19,44 @@ async function catalog(page: Page) {
       <section><h2>Actions and forms</h2><t-stack>
         <t-button>Save workspace changes</t-button><t-input label="Workspace name" value="Mission archive" help="Choose a recognizable name."></t-input>
         <t-select label="Destination"></t-select><t-checkbox label="Include archived records" checked></t-checkbox>
+        <t-multi-select label="Teams" help="Choose relevant teams."></t-multi-select>
         <t-textarea label="Request details" value="Request a copy of the mission records."></t-textarea>
         <t-radio-group label="Priority" value="normal"></t-radio-group><t-range label="Signal strength" value="65"></t-range>
         <t-switch label="Notify the team" checked></t-switch><t-combobox label="Department" value="archive"></t-combobox>
         <t-file-input label="Attachments" help="Files remain in this browser."></t-file-input>
+        <t-password-input label="Access code" autocomplete="new-password"></t-password-input>
+        <t-number-input label="Crew size" value="4" min="1" max="12"></t-number-input>
+        <t-segmented-control label="Connection mode"></t-segmented-control>
+        <t-rating label="Mission rating" value="4" max="5" clearable></t-rating>
+        <t-tags-input label="Mission tags"></t-tags-input>
+        <t-color-picker label="Marker color" value="#f5ba5b"></t-color-picker>
+        <t-date-picker label="Launch date" value="2026-09-25"></t-date-picker>
+        <t-date-range-picker label="Mission window" value="2026-09-25/2026-10-01"></t-date-range-picker>
+        <t-time-picker label="Launch time" value="09:30"></t-time-picker>
       </t-stack></section>
       <section><h2>Content and feedback</h2><t-card><span slot="heading">Mission summary</span><p>Review the latest records before you continue.</p><span slot="footer">Updated today</span></t-card>
         <t-badge>Review required</t-badge><t-alert dismissible>Review the selected destination before continuing.</t-alert>
+        <t-chip label="Engineering" selectable></t-chip><t-copy-button label="Copy status command" value="mission --status"></t-copy-button>
         <t-progress label="Upload progress" value="42"></t-progress><t-accordion label="Additional information" open><p>All controls must remain usable with larger text and adjusted spacing.</p></t-accordion>
         <t-avatar name="Ellen Ripley"></t-avatar><t-icon name="folder" label="Folder"></t-icon><t-icon-button name="settings" label="Workspace settings"></t-icon-button>
         <t-spinner label="Loading records"></t-spinner><t-skeleton></t-skeleton><t-divider></t-divider><t-empty-state heading="No pending tasks">Everything is up to date.</t-empty-state>
         <t-toast open message="Workspace settings are saved."></t-toast>
+        <t-steps label="Mission setup"></t-steps><t-timeline label="Mission history"></t-timeline>
+        <t-meter label="Storage used" value="42" max="100" value-text="42 GB of 100 GB"></t-meter>
+        <t-description-list></t-description-list><t-link href="#records">Open mission records</t-link>
       </section>
       <section><h2>Navigation and data</h2><t-breadcrumb></t-breadcrumb><t-menu label="Record actions"></t-menu>
         <t-tabs label="Record sections"><p slot="overview">Overview content remains readable.</p><p slot="activity">Activity content remains readable.</p></t-tabs>
         <t-pagination total="125" page="6"></t-pagination><t-table caption="Mission records" selectable></t-table><t-tree label="Project files"></t-tree>
+        <t-calendar label="Mission date" value="2026-09-25" month="2026-09"></t-calendar>
         <t-grid columns="2"><p>First responsive cell.</p><p>Second responsive cell.</p></t-grid>
+        <t-toolbar label="Archive actions"><button type="button">Refresh</button><button type="button">Export</button></t-toolbar>
+        <t-split-pane label="Archive divider" primary-label="Record list" secondary-label="Record details"><p slot="primary">Atmospheric survey</p><p slot="secondary">Survey details and metadata.</p></t-split-pane>
       </section>
       <section><h2>Overlays</h2><t-tooltip label="More help" message="Review the information before you continue."></t-tooltip><t-popover label="Quick settings" heading="Quick settings"><t-checkbox label="Show metadata"></t-checkbox></t-popover>
         <t-dialog heading="Review workspace settings"><p>Review all settings before saving.</p><t-input label="Dialog workspace name" value="Mission archive"></t-input><t-button slot="footer">Save dialog settings</t-button></t-dialog>
         <t-drawer heading="Workspace configuration details"><p>Review all settings before saving.</p><t-input label="Drawer workspace name" value="Mission archive"></t-input><t-button slot="footer">Save drawer settings</t-button></t-drawer>
+        <t-command-palette heading="Workspace commands"></t-command-palette>
       </section>`;
     const options = [
       { value: 'archive', label: 'Archive' },
@@ -80,6 +65,8 @@ async function catalog(page: Page) {
     ];
     document.querySelector('t-select')!.options = options;
     document.querySelector('t-combobox')!.options = options;
+    document.querySelector('t-multi-select')!.options = options;
+    document.querySelector('t-multi-select')!.values = ['archive'];
     document.querySelector('t-radio-group')!.options = [
       { value: 'normal', label: 'Normal priority' },
       { value: 'urgent', label: 'Urgent priority' },
@@ -116,6 +103,29 @@ async function catalog(page: Page) {
       },
     ];
     document.querySelector('t-tree')!.expandedIds = ['project'];
+    document.querySelector('t-segmented-control')!.options = [
+      { value: 'quiet', label: 'Quiet' },
+      { value: 'balanced', label: 'Balanced' },
+    ];
+    document.querySelector('t-segmented-control')!.value = 'balanced';
+    document.querySelector('t-tags-input')!.values = ['survey', 'navigation'];
+    document.querySelector('t-steps')!.items = [
+      { id: 'configure', label: 'Configure', status: 'complete' },
+      { id: 'review', label: 'Review', status: 'pending' },
+    ];
+    document.querySelector('t-steps')!.value = 'review';
+    document.querySelector('t-timeline')!.items = [
+      { id: 'loaded', title: 'Configuration loaded', date: '09:41', status: 'Complete' },
+      { id: 'ready', title: 'Awaiting command', status: 'Current' },
+    ];
+    document.querySelector('t-description-list')!.items = [
+      { term: 'Vessel', value: 'Nostromo' },
+      { term: 'Status', value: 'Ready' },
+    ];
+    document.querySelector('t-command-palette')!.commands = [
+      { value: 'archive', label: 'Open archive' },
+      { value: 'settings', label: 'Workspace settings' },
+    ];
   });
   await expect(page.locator('t-tree [role=treeitem]')).toHaveCount(3);
   const present = await page
@@ -221,7 +231,9 @@ for (const scenario of [
   },
   { name: 'WCAG text spacing overrides at 320 CSS pixels', width: 320, mode: 'text-spacing' },
 ] as const) {
-  test(`all 35 components preserve content under ${scenario.name}`, async ({ page }, testInfo) => {
+  test(`all ${tags.length} components preserve content under ${scenario.name}`, async ({
+    page,
+  }, testInfo) => {
     await page.setViewportSize({ width: scenario.width, height: 900 });
     await catalog(page);
     await adjust(page, scenario.mode);
@@ -364,13 +376,18 @@ test('modal close and footer actions stay visible and unobscured with enlarged t
   await catalog(page);
   await adjust(page, 'text-200');
   for (const tag of ['t-dialog', 't-drawer'] as const) {
-    await page
-      .locator(tag)
-      .evaluate((element: import('../src').TDialog | import('../src').TDrawer) => element.show());
-    const modal = page.locator(`${tag} dialog`);
+    const host = page.locator(
+      tag === 't-dialog'
+        ? 't-dialog[heading="Review workspace settings"]'
+        : 't-drawer[heading="Workspace configuration details"]',
+    );
+    await host.evaluate((element: import('../src').TDialog | import('../src').TDrawer) =>
+      element.show(),
+    );
+    const modal = host.locator('dialog');
     for (const button of [
       modal.getByRole('button', { name: `Close ${tag === 't-dialog' ? 'dialog' : 'drawer'}` }),
-      page.locator(`${tag} t-button`).getByRole('button'),
+      host.locator('t-button').getByRole('button'),
     ]) {
       await button.focus();
       await expect(button).toBeFocused();

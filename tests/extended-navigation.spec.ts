@@ -238,6 +238,53 @@ test('toolbar roves native and shadow actions, skips disabled buttons, and resto
   expect(restored).toEqual([null, '-1', null]);
 });
 
+test('native toolbar actions keep readable text in every palette', async ({ page }) => {
+  await fixture(
+    page,
+    '<t-toolbar label="Archive actions"><button type="button">Refresh</button><a href="#records">Open records</a></t-toolbar>',
+  );
+  const ratio = (a: string, b: string) => {
+    const luminance = (color: string) =>
+      color
+        .match(/[\d.]+/g)!
+        .slice(0, 3)
+        .map(Number)
+        .map((value) => {
+          const channel = value / 255;
+          return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+        })
+        .reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+    const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (light + 0.05) / (dark + 0.05);
+  };
+  for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {
+    await page
+      .locator('html')
+      .evaluate((element, value) => element.setAttribute('data-theme', value), theme);
+    const colors = await page.locator('t-toolbar').evaluate((element) => {
+      const toolbar = element.shadowRoot!.querySelector<HTMLElement>('[role=toolbar]')!;
+      const button = element.querySelector('button')!;
+      const link = element.querySelector('a')!;
+      return {
+        buttonText: getComputedStyle(button).color,
+        buttonBackground: getComputedStyle(button).backgroundColor,
+        linkText: getComputedStyle(link).color,
+        toolbarBackground: getComputedStyle(toolbar).backgroundColor,
+      };
+    });
+    expect(
+      ratio(colors.buttonText, colors.buttonBackground),
+      `${theme} native button`,
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      ratio(colors.linkText, colors.toolbarBackground),
+      `${theme} native link`,
+    ).toBeGreaterThanOrEqual(4.5);
+    const axe = await new AxeBuilder({ page }).include('t-toolbar').analyze();
+    expect(axe.violations, `${theme}: ${JSON.stringify(axe.violations)}`).toEqual([]);
+  }
+});
+
 test('split pane supports bounded keyboard and pointer resizing with responsive semantics', async ({
   page,
 }) => {
