@@ -9,6 +9,27 @@ import '../src/typography.css';
 import { ComponentDocs } from './docs/ComponentDocs';
 setCustomElementsManifest(manifest);
 const preview: Preview = {
+  argTypesEnhancers: [
+    ({ argTypes, initialArgs }) => {
+      const accessibleArgTypes = { ...argTypes };
+      for (const [name, argType] of Object.entries(argTypes)) {
+        const control = argType.control;
+        if (
+          control === false ||
+          (control && (typeof control === 'string' ? control : control.type) !== 'boolean')
+        )
+          continue;
+        if (argType.type?.name === 'boolean' || typeof initialArgs[name] === 'boolean') {
+          accessibleArgTypes[name] = {
+            ...argType,
+            control: { type: 'inline-radio' },
+            options: [true, false],
+          };
+        }
+      }
+      return accessibleArgTypes;
+    },
+  ],
   globalTypes: {
     framework: {
       description:

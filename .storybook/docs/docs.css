@@ -177,6 +177,17 @@
   .tk-docs-controls tr[title] > td:first-child > span {
     white-space: nowrap;
   }
+  .tk-docs-controls fieldset > legend.sb-sr-only {
+    position: static;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    clip: auto;
+    overflow: visible;
+    color: var(--docs-muted);
+    font-size: 12px;
+    line-height: 1.4;
+  }
   .tk-docs .tk-docs-lead {
     font-size: 18px;
   }

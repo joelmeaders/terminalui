@@ -123,6 +123,16 @@ for (const { tag, id } of entries) {
     await expect(article.locator('#states')).toContainText('States and examples');
     await expect(article.locator('h1,h2,h3,h4').filter({ hasText: /^$/ })).toHaveCount(0);
     await expect(article.locator('#live-preview')).not.toContainText('unsubscribe');
+    await expect(article.locator('.tk-docs-controls label[aria-label]')).toHaveCount(0);
+    expect(
+      await article
+        .locator('.tk-docs-controls input[type="radio"]')
+        .evaluateAll((inputs) =>
+          inputs.every(
+            (input) => !!input.closest('fieldset')?.querySelector('legend')?.textContent?.trim(),
+          ),
+        ),
+    ).toBe(true);
     expect(errors).toEqual([]);
   });
 }
@@ -280,8 +290,29 @@ for (const id of ['components-icon--docs', 'components-input--docs', 'components
       contentType: 'application/json',
     });
     expect(report.violations).toEqual([]);
+    expect(report.incomplete.filter((item) => item.id === 'aria-prohibited-attr')).toEqual([]);
   });
 }
+
+test('boolean preview controls have named choices and preserve keyboard changes', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto('/storybook/iframe.html?id=components-input--docs&viewMode=docs');
+  const choices = page.getByRole('group', { name: 'required', exact: true });
+  const trueChoice = choices.getByRole('radio', { name: 'true' });
+  const falseChoice = choices.getByRole('radio', { name: 'false' });
+  const preview = page.locator('.sb-story t-input').first();
+  await expect(choices).toBeVisible();
+  await expect(choices.locator('legend')).toBeVisible();
+  await falseChoice.check();
+  await falseChoice.press('ArrowLeft');
+  await expect(trueChoice).toBeChecked();
+  await expect(preview).toHaveAttribute('required', '');
+  await trueChoice.press('ArrowRight');
+  await expect(falseChoice).toBeChecked();
+  await expect(preview).not.toHaveAttribute('required');
+});
 
 test('Input documentation stays usable at actual 400% Chromium browser zoom', async ({}, testInfo) => {
   const zoomBrowser = await launchBrowserZoom(testInfo, 'http://127.0.0.1:4173', {
@@ -342,6 +373,7 @@ test('Input documentation stays usable at actual 400% Chromium browser zoom', as
       contentType: 'application/json',
     });
     expect(report.violations).toEqual([]);
+    expect(report.incomplete.filter((item) => item.id === 'aria-prohibited-attr')).toEqual([]);
   } finally {
     await context.close();
   }
