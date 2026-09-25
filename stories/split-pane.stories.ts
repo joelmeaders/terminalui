@@ -10,7 +10,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Two accessible scroll regions with a 24px separator target. Drag the separator or use arrows, Shift+arrows, Home, and End. `size`, `min`, and `max` are primary-pane percentages. `orientation` describes pane layout, so side-by-side panes have a vertical separator. Horizontal panes stack below `stack-at` pixels (480 by default, 0 disables). `--t-split-height` controls height (360px default). Slots are `primary` and `secondary`. `t-input` reports previews; `t-change` reports completed pointer changes or keyboard changes. Details contain `{ size, orientation, source }`.',
+          'Two accessible scroll regions with a 24px separator target. Drag the separator or use arrows, Shift+arrows, Home, and End. Enter moves the primary pane to its minimum size or restores its previous size. The separator uses the primary pane name by default. `size`, `min`, and `max` are primary-pane percentages. `orientation` describes pane layout, so side-by-side panes have a vertical separator. Horizontal panes stack below `stack-at` pixels (480 by default, 0 disables). `--t-split-height` controls height (360px default). Slots are `primary` and `secondary`. `t-input` reports previews; `t-change` reports completed pointer changes or keyboard changes. Details contain `{ size, orientation, source }`.',
       },
     },
   },
@@ -28,6 +28,10 @@ export const Default: Story = {
     const handle = split.shadowRoot!.querySelector<HTMLElement>('[role=separator]')!;
     await userEvent.click(handle);
     await userEvent.keyboard('{ArrowRight}');
+    await expect(split.size).toBe(51);
+    await userEvent.keyboard('{Enter}');
+    await expect(split.size).toBe(10);
+    await userEvent.keyboard('{Enter}');
     await expect(split.size).toBe(51);
   },
 };

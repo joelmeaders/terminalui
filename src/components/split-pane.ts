@@ -50,8 +50,8 @@ export class TSplitPane extends TerminalElement {
   orientation: 'horizontal' | 'vertical' = 'horizontal';
   /** Horizontal layouts stack below this host width in CSS pixels. Zero disables this behavior. */
   stackAt = 480;
-  /** Separator accessible name. */
-  label = 'Resize panes';
+  /** Separator accessible name. Defaults to the primary pane name; an explicit name should match it. */
+  label = '';
   /** Accessible primary region name. */
   primaryLabel = 'Primary pane';
   /** Accessible secondary region name. */
@@ -59,6 +59,7 @@ export class TSplitPane extends TerminalElement {
   /** Disables separator input while keeping both regions accessible. */
   disabled = false;
   private narrow = false;
+  private restoreSize?: number;
   private resize = new ResizeObserver((entries) => {
     this.narrow = this.stackAt > 0 && entries[0].contentRect.width < this.stackAt;
   });
@@ -162,7 +163,15 @@ export class TSplitPane extends TerminalElement {
     const increase = horizontal ? (rtl ? 'ArrowLeft' : 'ArrowRight') : 'ArrowDown',
       decrease = horizontal ? (rtl ? 'ArrowRight' : 'ArrowLeft') : 'ArrowUp';
     let value = this.size;
-    if (event.key === increase) value += this.step * (event.shiftKey ? 10 : 1);
+    if (event.key === 'Enter') {
+      if (this.size > this.min) {
+        this.restoreSize = this.size;
+        value = this.min;
+      } else if (this.restoreSize !== undefined) {
+        value = this.restoreSize;
+        this.restoreSize = undefined;
+      }
+    } else if (event.key === increase) value += this.step * (event.shiftKey ? 10 : 1);
     else if (event.key === decrease) value -= this.step * (event.shiftKey ? 10 : 1);
     else if (event.key === 'Home') value = this.min;
     else if (event.key === 'End') value = this.max;
@@ -214,30 +223,25 @@ export class TSplitPane extends TerminalElement {
   }
   render() {
     const horizontal = this.effectiveOrientation === 'horizontal',
-      tracks = `minmax(0,calc((100% - 24px) * ${this.size / 100})) 24px minmax(0,1fr)`;
+      tracks = `minmax(0,calc((100% - 24px) * ${this.size / 100})) 24px minmax(0,1fr)`,
+      primaryLabel = this.primaryLabel?.trim() || 'Primary pane';
     return html`<div
       class="layout"
       style=${styleMap({ gridTemplateColumns: horizontal ? tracks : 'minmax(0,1fr)', gridTemplateRows: horizontal ? 'minmax(0,1fr)' : tracks })}
     >
-      <section
-        class="pane"
-        id="primary"
-        part="primary"
-        tabindex="0"
-        aria-label=${this.primaryLabel}
-      >
+      <section class="pane" id="primary" part="primary" tabindex="0" aria-label=${primaryLabel}>
         <slot name="primary"></slot>
       </section>
       <div
         part="separator"
         role="separator"
         tabindex=${this.disabled ? -1 : 0}
-        aria-label=${this.label}
+        aria-label=${this.label?.trim() || primaryLabel}
         aria-orientation=${horizontal ? 'vertical' : 'horizontal'}
         aria-valuemin=${this.min}
         aria-valuemax=${this.max}
         aria-valuenow=${this.size}
-        aria-valuetext=${`${this.size}% ${this.primaryLabel}`}
+        aria-valuetext=${`${this.size}% ${primaryLabel}`}
         aria-controls="primary"
         aria-disabled=${this.disabled}
         @keydown=${this.onKey}

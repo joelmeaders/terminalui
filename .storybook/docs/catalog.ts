@@ -790,12 +790,12 @@ export const guides: Record<string, ComponentGuide> = {
       'Horizontal panes stack below stackAt CSS pixels. Set stackAt=0 to disable that behavior.',
     ],
     accessibility: [
-      'The separator supports arrows, Home/End, and Shift for a larger step. Give the separator and both panes clear labels.',
+      'The separator supports arrows, Home/End, and Shift for a larger step. Enter moves the primary pane to its minimum size or restores its previous size.',
+      'Name both panes. The separator uses the primary pane name unless you set label; keep an explicit label aligned with that pane.',
     ],
     example: {
       props: {
         size: 40,
-        label: 'Archive divider',
         primaryLabel: 'Record list',
         secondaryLabel: 'Record details',
       },

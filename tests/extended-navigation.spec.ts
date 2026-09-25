@@ -301,9 +301,17 @@ test('split pane supports bounded keyboard and pointer resizing with responsive 
         (event) => (element.dataset.change = JSON.stringify((event as CustomEvent).detail)),
       ),
     );
-  const separator = page.getByRole('separator', { name: 'Resize panes' });
+  const separator = page.getByRole('separator', { name: 'Files' });
   await expect(separator).toHaveAttribute('aria-orientation', 'vertical');
   await separator.focus();
+  await page.keyboard.press('Enter');
+  await expect(separator).toHaveAttribute('aria-valuenow', '20');
+  await expect(page.locator('t-split-pane')).toHaveAttribute(
+    'data-change',
+    /"size":20,"orientation":"horizontal","source":"keyboard"/,
+  );
+  await page.keyboard.press('Enter');
+  await expect(separator).toHaveAttribute('aria-valuenow', '50');
   await page.keyboard.press('ArrowRight');
   await expect(separator).toHaveAttribute('aria-valuenow', '51');
   await page.keyboard.press('Shift+ArrowRight');
@@ -335,6 +343,26 @@ test('split pane supports bounded keyboard and pointer resizing with responsive 
   await expect(separator).toHaveAttribute('tabindex', '-1');
   await expect(page.getByRole('region', { name: 'Files' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Open file' })).toBeEnabled();
+});
+
+test('split pane keeps its separator name with the primary pane and honors explicit labels', async ({
+  page,
+}) => {
+  await fixture(page, '<t-split-pane primary-label="Files"></t-split-pane>');
+  const split = page.locator('t-split-pane');
+  const separator = page.getByRole('separator', { name: 'Files' });
+  await expect(separator).toHaveAttribute('aria-controls', 'primary');
+  await split.evaluate((element: import('../src/components/split-pane').TSplitPane) => {
+    element.primaryLabel = 'Projects';
+  });
+  await expect(page.getByRole('separator', { name: 'Projects' })).toBeVisible();
+  await split.evaluate((element) => element.setAttribute('label', 'Project list'));
+  await expect(page.getByRole('separator', { name: 'Project list' })).toBeVisible();
+  await split.evaluate((element) => element.removeAttribute('label'));
+  await expect(page.getByRole('separator', { name: 'Projects' })).toBeVisible();
+  const axe = await new AxeBuilder({ page }).include('t-split-pane').analyze();
+  expect(axe.violations, JSON.stringify(axe.violations)).toEqual([]);
+  expect(axe.incomplete, JSON.stringify(axe.incomplete)).toEqual([]);
 });
 
 for (const [mode, scenario] of [
