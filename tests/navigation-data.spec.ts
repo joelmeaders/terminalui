@@ -65,6 +65,30 @@ test('menu skips disabled actions, supports typeahead, returns focus, and dismis
   await expect(trigger).toBeFocused();
 });
 
+test('menu exposes popup state without an unresolved ID reference', async ({ page }) => {
+  await fixture(page, '<t-menu label="Actions"></t-menu>');
+  await page.locator('t-menu').evaluate((element: import('../src').TMenu) => {
+    element.options = [{ value: 'open', label: 'Open' }];
+  });
+  const trigger = page.getByRole('button', { name: 'Actions' });
+  await expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  expect(await trigger.getAttribute('aria-controls')).toBeNull();
+  const closed = await new AxeBuilder({ page }).include('t-menu').analyze();
+  expect(closed.violations).toEqual([]);
+  expect(closed.incomplete.filter((result) => result.id === 'aria-valid-attr-value')).toEqual([]);
+  await trigger.click();
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  expect(await trigger.getAttribute('aria-controls')).toBeNull();
+  await expect(page.locator('t-menu #menu')).toBeVisible();
+  const open = await new AxeBuilder({ page }).include('t-menu').analyze();
+  expect(open.violations).toEqual([]);
+  expect(open.incomplete.filter((result) => result.id === 'aria-valid-attr-value')).toEqual([]);
+  await page.keyboard.press('Escape');
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  expect(await trigger.getAttribute('aria-controls')).toBeNull();
+});
+
 test('menu escapes clipping and stays inside viewport edges', async ({ page }) => {
   await fixture(
     page,

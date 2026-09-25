@@ -204,7 +204,6 @@ export class TMenu extends TerminalElement {
         ?disabled=${this.disabled}
         aria-haspopup="menu"
         aria-expanded=${this.open}
-        aria-controls="menu"
         @click=${() => (this.open ? this.dismiss() : this.show())}
         @keydown=${(event: KeyboardEvent) => {
           if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {

@@ -353,6 +353,10 @@ test('slot compositions reflow with enlarged text and pass six-palette axe check
     }, theme);
     const result = await new AxeBuilder({ page }).include('#fixture').analyze();
     expect(result.violations, theme).toEqual([]);
+    expect(
+      result.incomplete.filter((item) => item.id === 'aria-valid-attr-value'),
+      `${theme}: menu has no unresolved ARIA reference`,
+    ).toEqual([]);
     await writeFile(
       testInfo.outputPath(`slots-${theme}-axe-review.json`),
       JSON.stringify(result.incomplete, null, 2),
