@@ -121,6 +121,9 @@
   border: 1px solid #626d58;
   border-radius: 4px;
 }
+.tk-docs .tk-docs-table-hint {
+  display: none;
+}
 .tk-docs .tk-docs-table table {
   margin: 0;
   width: 100%;
@@ -173,6 +176,11 @@
     min-width: 680px;
   }
   .tk-docs-controls-hint {
+    display: block;
+    color: var(--docs-muted);
+    font-size: 12px;
+  }
+  .tk-docs .tk-docs-table-hint {
     display: block;
     color: var(--docs-muted);
     font-size: 12px;

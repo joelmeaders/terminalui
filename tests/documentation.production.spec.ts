@@ -283,6 +283,26 @@ for (const id of ['components-icon--docs', 'components-input--docs', 'components
     await controls.evaluate((element) => {
       element.scrollLeft = 0;
     });
+    if (id === 'components-input--docs') {
+      const apiTable = page.getByRole('region', { name: 'Properties and attributes' });
+      await expect(page.locator('#api-table-scroll-help')).toBeVisible();
+      await expect(apiTable).toHaveAttribute('aria-describedby', 'api-table-scroll-help');
+      expect(await apiTable.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(
+        true,
+      );
+      await apiTable.focus();
+      await page.keyboard.press('ArrowRight');
+      await expect
+        .poll(() => apiTable.evaluate((element) => element.scrollLeft))
+        .toBeGreaterThan(0);
+      await page.locator('#api-table-scroll-help').scrollIntoViewIfNeeded();
+      const screenshotPath = testInfo.outputPath('api-table-keyboard-scroll.png');
+      await page.screenshot({ path: screenshotPath });
+      await testInfo.attach('api-table-keyboard-scroll', {
+        path: screenshotPath,
+        contentType: 'image/png',
+      });
+    }
     await expect(category).toBeVisible();
     const categoryContrast = await category.evaluate((element) => {
       const rgba = (value: string) => {

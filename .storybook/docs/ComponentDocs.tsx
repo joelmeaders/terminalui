@@ -135,7 +135,13 @@ function ApiTable({
   if (!rows.length)
     return <p className="tk-docs-empty">No component-specific {title.toLowerCase()}.</p>;
   return (
-    <div className="tk-docs-table" role="region" aria-label={title} tabIndex={0}>
+    <div
+      className="tk-docs-table"
+      role="region"
+      aria-label={title}
+      aria-describedby="api-table-scroll-help"
+      tabIndex={0}
+    >
       <table>
         <caption>{title}</caption>
         <thead>
@@ -170,6 +176,9 @@ function ApiReference({ api }: { api: ComponentApi }) {
       <p>
         This reference is generated from the component source, including inherited form behavior.
         Attribute names and JavaScript properties can differ.
+      </p>
+      <p id="api-table-scroll-help" className="tk-docs-table-hint">
+        At narrow widths, focus a table and use the left and right arrow keys to read every column.
       </p>
       <ApiTable
         title="Properties and attributes"
