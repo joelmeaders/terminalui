@@ -1,6 +1,6 @@
 # Terminal Kit
 
-A browser component library built with Lit. All 55 components share six terminal-inspired palettes and work in plain HTML, React, Vue, and Angular. Storybook contains API notes, interactive controls, component states, and browser interaction tests. The package includes typed framework adapters, generated editor metadata, optional icon providers, and an installable local tarball.
+A browser component library built with Lit. All 56 components share six terminal-inspired palettes and work in plain HTML, React, Vue, and Angular. Storybook contains API notes, interactive controls, component states, and browser interaction tests. The package includes typed framework adapters, generated editor metadata, optional icon providers, and an installable local tarball.
 
 ## License
 
@@ -112,6 +112,7 @@ Use `.t-h1` through `.t-h6` for heading appearance, `.t-text` for standalone tex
 | `t-calendar`          | Inline date selection grid       | `value`, `month`, `min`, `max`, `locale`, `firstDayOfWeek`, `t-change`                      |
 | `t-date-picker`       | Form date picker                 | `value`, `name`, `min`, `max`, `required`, `show()`, `t-change`                             |
 | `t-date-range-picker` | Form date interval               | `value` as `START/END`, `start`, `end`, `min`, `max`, `show()`, `t-change`                  |
+| `t-time-picker`       | Form time picker                 | `value` as `HH:mm`, `name`, `min`, `max`, `required`, `show()`, `t-change`                  |
 | `t-command-palette`   | Modal command search             | `commands`, `query`, `heading`, `loading`, `show()`, `close()`, `t-select`                  |
 | `t-steps`             | Ordered step navigation          | `items`, `value`, `orientation`, `t-select`                                                 |
 | `t-timeline`          | Ordered event history            | `items`, `label`, `emptyText`                                                               |
@@ -124,7 +125,7 @@ Use `.t-h1` through `.t-h6` for heading appearance, `.t-text` for standalone tex
 
 Use `t-chip` for a standalone token or filter. `selectable` adds a pressed button and `removable` adds a separate named action. A `t-remove` event asks the application to remove the chip and move focus to a logical next control. Use `t-tags-input` when editable tokens must participate in FormData.
 
-The input supports text, numeric, and native date/time types with browser constraint validation. Native date/time interfaces follow the browser. `t-calendar` provides an inline date grid. Use `t-date-picker` for one date or `t-date-range-picker` for a start and end date in a form. The kit does not include a rich-text editor. File selection uses `t-file-input`; it does not upload files. Tables provide local filtering, sorting, paging, and selection without virtualization or editable cells. A table's selected keys persist across filters and pages; select all affects only the rows currently visible.
+The input supports text, numeric, and native date/time types with browser constraint validation. Native date/time interfaces follow the browser. `t-calendar` provides an inline date grid. Use `t-date-picker` for one date or `t-date-range-picker` for a start and end date in a form. Use `t-time-picker` for a themed 24-hour time field with typed or modal entry; its value has no date or timezone. The kit does not include a rich-text editor. File selection uses `t-file-input`; it does not upload files. Tables provide local filtering, sorting, paging, and selection without virtualization or editable cells. A table's selected keys persist across filters and pages; select all affects only the rows currently visible.
 
 ## Use in plain HTML
 
@@ -324,11 +325,11 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 50.6 KB for registration of all 55 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.2 KB gzip. The button and complete-catalog budgets are 8 KB and 51 KB. The catalog budget includes multi-select, local table filtering and paging, the inline calendar, both form date pickers, manual tab activation, and selectable chips. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
+The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 51.7 KB for registration of all 56 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.2 KB gzip. The button and complete-catalog budgets are 8 KB and 52 KB. The catalog budget includes multi-select, local table filtering and paging, the inline calendar, both form date pickers, the time picker, manual tab activation, and selectable chips. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
 
 ## Storybook and verification
 
-Storybook includes stories for all 55 components, introductions, appearance examples, and application patterns. Its toolbar changes palette, density, line weight, glow, screen scanlines, and motion. Appearance stories also demonstrate local overrides and the CRT preset. Docs describe slots, events, CSS parts, and form behavior. Stories include interaction checks, and the accessibility addon is configured to fail tests on detected violations.
+Storybook includes stories for all 56 components, introductions, appearance examples, and application patterns. Its toolbar changes palette, density, line weight, glow, screen scanlines, and motion. Appearance stories also demonstrate local overrides and the CRT preset. Docs describe slots, events, CSS parts, and form behavior. Stories include interaction checks, and the accessibility addon is configured to fail tests on detected violations.
 
 ```sh
 npm run build

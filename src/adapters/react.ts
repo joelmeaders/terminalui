@@ -51,6 +51,7 @@ import { TTable as TTableElement } from '../components/table';
 import { TTabs as TTabsElement } from '../components/tabs';
 import { TTagsInput as TTagsInputElement } from '../components/tags-input';
 import { TTextarea as TTextareaElement } from '../components/textarea';
+import { TTimePicker as TTimePickerElement } from '../components/time-picker';
 import { TTimeline as TTimelineElement } from '../components/timeline';
 import { TToast as TToastElement } from '../components/toast';
 import { TToolbar as TToolbarElement } from '../components/toolbar';
@@ -437,6 +438,17 @@ export const TTextarea = createComponent({
   tagName: 't-textarea',
   elementClass: TTextareaElement,
   events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
+});
+export const TTimePicker = createComponent({
+  react: React,
+  tagName: 't-time-picker',
+  elementClass: TTimePickerElement,
+  events: {
+    onInput: 'input' as EventName<Event>,
+    onChange: 'change' as EventName<Event>,
+    onTChange: 't-change' as EventName<CustomEvent<unknown>>,
+    onTClose: 't-close' as EventName<CustomEvent<unknown>>,
+  },
 });
 export const TTimeline = createComponent({
   react: React,

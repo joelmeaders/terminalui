@@ -41,7 +41,8 @@ export function submitOnEnter(event: KeyboardEvent, form: HTMLFormElement | null
       (['t-input', 't-password-input', 't-number-input'].includes(element.localName) &&
         blockingTypes.has((element as HTMLElement & { type: string }).type)) ||
       element.localName === 't-date-picker' ||
-      element.localName === 't-date-range-picker',
+      element.localName === 't-date-range-picker' ||
+      element.localName === 't-time-picker',
   );
   if (blockers.length === 1) {
     event.preventDefault();

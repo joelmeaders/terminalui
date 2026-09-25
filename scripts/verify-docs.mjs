@@ -360,6 +360,47 @@ try {
           '2026-09-25',
         ]);
       }
+      if (tag === 't-time-picker') {
+        const picker = page.locator(tag);
+        const field = picker.getByRole('textbox', { name: 'Launch time' });
+        assert.equal(await field.count(), 1, `${framework}/${tag}: the field needs its label.`);
+        assert.equal(await field.inputValue(), '09:30');
+        await picker.evaluate((element) => {
+          element.userEvents = [];
+          element.addEventListener('input', () => element.userEvents.push('input'));
+          element.addEventListener('t-change', (event) =>
+            element.userEvents.push(event.detail.value),
+          );
+        });
+        await picker.getByRole('button', { name: 'Change time, 09:30' }).click();
+        const hours = picker.getByRole('combobox', { name: 'Hours' });
+        const minutes = picker.getByRole('combobox', { name: 'Minutes' });
+        assert.equal(
+          await hours.evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        await hours.selectOption('10');
+        await minutes.selectOption('45');
+        const logged =
+          framework === 'html'
+            ? page.waitForEvent('console', {
+                predicate: (message) => message.text().includes('10:45'),
+              })
+            : null;
+        await picker.getByRole('button', { name: 'Use time' }).click();
+        if (logged) await logged;
+        assert.equal(await field.inputValue(), '10:45');
+        assert.deepEqual(await picker.evaluate((element) => element.userEvents), [
+          'input',
+          '10:45',
+        ]);
+        assert.equal(
+          await picker
+            .locator('.trigger')
+            .evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+      }
       if (tag === 't-date-range-picker') {
         const picker = page.locator(tag);
         const start = picker.getByRole('textbox', { name: 'Start date' });

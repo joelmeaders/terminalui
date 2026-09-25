@@ -297,6 +297,37 @@ export const guides: Record<string, ComponentGuide> = {
     },
     form: 'value',
   },
+  't-time-picker': {
+    purpose: 'Enter or choose a 24-hour time in a form-associated terminal field.',
+    usage: [
+      'Type HH:mm, such as 09:30, or open the modal and choose hours and minutes. The value has no date or timezone.',
+      'Use name for FormData and required, min, and max for validation. Bounds use HH:mm and do not span midnight.',
+      'Use time applies a draft. Cancel or Escape leaves the submitted value unchanged.',
+      'readonly keeps the submitted value without allowing edits. disabled omits it from FormData.',
+    ],
+    accessibility: [
+      'The native text field has a visible label, a 24-hour format instruction, and a changing error description.',
+      'The named trigger opens a modal with labeled native hour and minute selects. Unavailable choices are disabled.',
+      'Focus moves to hours when the modal opens and returns to the trigger when it closes. Test speech and touch with target devices.',
+    ],
+    example: {
+      props: {
+        name: 'launch',
+        label: 'Launch time',
+        value: '09:30',
+        min: '08:00',
+        max: '18:00',
+        required: true,
+      },
+    },
+    event: {
+      name: 'input',
+      read: 'target.value',
+      description:
+        'Read HH:mm from event.target.value after typing or applying a choice. Applying a changed choice also emits t-change with detail.value.',
+    },
+    form: 'value',
+  },
   't-checkbox': field(
     'Choose an independent boolean option.',
     { name: 'telemetry', label: 'Enable telemetry', checked: true },
