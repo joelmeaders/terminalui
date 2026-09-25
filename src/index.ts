@@ -5,6 +5,7 @@ export * from './components/multi-select';
 export * from './components/checkbox';
 export * from './components/card';
 export * from './components/badge';
+export * from './components/chip';
 export * from './components/alert';
 export * from './components/progress';
 export * from './components/accordion';

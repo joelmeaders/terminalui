@@ -152,6 +152,35 @@ export const guides: Record<string, ComponentGuide> = {
         'Listen for the native click event. A submit button also submits its associated form.',
     },
   },
+  't-chip': {
+    purpose: 'Show one compact filter or token, with optional selection and removal actions.',
+    usage: [
+      'Set label to the visible text. Variants are neutral, accent, success, warning, and danger; sizes are small, medium, and large.',
+      'Set selectable for a pressed button. User activation changes selected and emits t-toggle with detail.selected and detail.label.',
+      'Set removable for a separate named button. t-remove requests removal but keeps the element in place. Remove it in your application and move focus to a logical next control.',
+      'Start and end slots accept decorative icons. Use t-tags-input when editable tokens must submit through a form.',
+    ],
+    accessibility: [
+      'Selection uses a native button with aria-pressed. The removal button says Remove followed by the label. Both actions work with Enter and Space.',
+      'Keep labels meaningful and state visible beyond color. Preserve a focus destination when removing a focused chip.',
+      'Disabled actions cannot toggle or request removal. Static chips are text, not buttons.',
+    ],
+    example: {
+      props: {
+        label: 'Engineering',
+        variant: 'accent',
+        selectable: true,
+        removable: true,
+      },
+      children: [{ tag: 't-icon', attrs: { slot: 'start' }, props: { name: 'folder' } }],
+    },
+    event: {
+      name: 't-toggle',
+      read: 'detail.selected',
+      description:
+        'Read the pressed state from event.detail.selected. Removal sends t-remove with detail.label and leaves DOM removal and focus placement to your application.',
+    },
+  },
   't-card': {
     purpose: 'Group related content with a heading and optional footer.',
     usage: [

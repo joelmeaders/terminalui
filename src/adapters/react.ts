@@ -10,6 +10,7 @@ import { TButton as TButtonElement } from '../components/button';
 import { TCalendar as TCalendarElement } from '../components/calendar';
 import { TCard as TCardElement } from '../components/card';
 import { TCheckbox as TCheckboxElement } from '../components/checkbox';
+import { TChip as TChipElement } from '../components/chip';
 import { TColorPicker as TColorPickerElement } from '../components/color-picker';
 import { TCombobox as TComboboxElement } from '../components/combobox';
 import { TCommandPalette as TCommandPaletteElement } from '../components/command-palette';
@@ -121,6 +122,17 @@ export const TCheckbox = createComponent({
   tagName: 't-checkbox',
   elementClass: TCheckboxElement,
   events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
+});
+export const TChip = createComponent({
+  react: React,
+  tagName: 't-chip',
+  elementClass: TChipElement,
+  events: {
+    onInput: 'input' as EventName<Event>,
+    onChange: 'change' as EventName<Event>,
+    onTToggle: 't-toggle' as EventName<CustomEvent<unknown>>,
+    onTRemove: 't-remove' as EventName<CustomEvent<unknown>>,
+  },
 });
 export const TColorPicker = createComponent({
   react: React,

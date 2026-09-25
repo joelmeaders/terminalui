@@ -1,8 +1,14 @@
 # Accessibility evaluation
 
-Terminal Kit targets WCAG 2.2 Level AA for its 54 browser components and shipped themes. This is an engineering target, not a conformance claim. Component checks cannot establish conformance for an application that uses the library. Application content, labels, navigation, validation, timing, and workflows also require evaluation. Use the [WCAG 2.2 standard](https://www.w3.org/TR/WCAG22/) as the normative reference.
+Terminal Kit targets WCAG 2.2 Level AA for its 55 browser components and shipped themes. This is an engineering target, not a conformance claim. Component checks cannot establish conformance for an application that uses the library. Application content, labels, navigation, validation, timing, and workflows also require evaluation. Use the [WCAG 2.2 standard](https://www.w3.org/TR/WCAG22/) as the normative reference.
 
 ## Evidence and limits
+
+The 2026-09-25 complete check with the standalone chip passed 723 browser cases with nine browser-emulation skips, 292 Storybook tests, 81 built-site checks, all 224 generated framework examples, and an external package consumer. The focused accessibility suite passed 576 cases with nine skips. All 55 components measured 50,573 bytes gzip against the 51,000-byte catalog budget. These results cover the tested browser behavior and do not establish manual assistive-technology support or WCAG conformance.
+
+A Playwright Chromium visual review on Windows checked static, selected, removable, icon, and long-label chips in amber at 600 CSS pixels and paper at 320 CSS pixels. Labels, action buttons, and selection marks remained visible. Browser version, actual zoom, physical touch, and assistive-technology speech were not recorded.
+
+The standalone chip uses text for a static token and native buttons for selection and removal. A pressed state and visible check mark identify selection; the removal button has a label-specific name. Focused Chromium, Firefox, and WebKit tests passed 20 cases with one WebKit forced-colors emulation skip. They cover keyboard changes, event details, disabled actions, application removal and focus handoff, icon slots, all six palettes, axe results, 320 CSS pixel reflow with simulated enlarged text, and forced colors where the browser supports emulation. The 224 generated framework examples rendered and exercised selection and removal. Automated checks do not prove screen-reader speech, real zoom, or physical touch behavior. NVDA with Firefox or Chrome on Windows and VoiceOver with Safari on macOS remain **Pending** for selection, removal, and focus after an application removes a chip.
 
 The 2026-09-25 complete check after the visible range-error fix passed 703 browser cases with eight browser-emulation skips, 283 Storybook tests, 80 built-site checks, all 220 framework examples, and an external package consumer. The focused accessibility suite passed 556 cases with eight skips. All 54 components measured 49,707 bytes gzip against the 50,000-byte catalog budget. These automated checks do not establish manual assistive-technology support or WCAG conformance.
 
@@ -114,6 +120,7 @@ Use **Pass**, **Fail**, **Blocked**, or **Pending** for each result. A pass appl
 - Toggle local disabled state and a disabled fieldset. Confirm disabled controls cannot receive unintended actions. Re-enable them and verify input, focus, and submission.
 - Test reset, Enter submission, external form association, submit-button values, keyboard file selection, and range adjustment. Check that state changes remain understandable with speech enabled.
 - Check text buttons, icon buttons, pagination, breadcrumb links, and dismiss buttons. Verify accessible names, expected keyboard activation, visible focus, and no unexpected navigation.
+- Chip: read a static label, toggle selection, and remove a token. Confirm pressed state, separate action names, disabled behavior, and a logical focus destination after application removal.
 
 Use the applicable [APG widget patterns](https://www.w3.org/WAI/ARIA/apg/patterns/) to review keyboard conventions. ARIA alone does not provide keyboard behavior.
 

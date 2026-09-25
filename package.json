@@ -66,7 +66,7 @@
     "storybook": "npm run build && storybook dev -p 6006 --host 127.0.0.1 --no-open",
     "build:storybook": "npm run build && storybook build && node scripts/icon-credits.mjs",
     "test": "playwright test",
-    "test:a11y": "playwright test tests/accessibility-contrast.spec.ts tests/accessibility-layout.spec.ts tests/forms-accessibility.spec.ts tests/extended-forms.spec.ts tests/multi-select.spec.ts tests/table-filtering.spec.ts tests/calendar.spec.ts tests/date-picker.spec.ts tests/date-range-picker.spec.ts tests/extended-navigation.spec.ts tests/tabs-orientation.spec.ts tests/icons-motion.spec.ts tests/modal-scroll.spec.ts tests/overlay-lifecycle.spec.ts tests/toast-countdown.spec.ts tests/spinner-variants.spec.ts tests/meter-variants.spec.ts tests/slots.spec.ts tests/typography.spec.ts tests/appearance-cascade.spec.ts",
+    "test:a11y": "playwright test tests/accessibility-contrast.spec.ts tests/accessibility-layout.spec.ts tests/forms-accessibility.spec.ts tests/extended-forms.spec.ts tests/multi-select.spec.ts tests/table-filtering.spec.ts tests/calendar.spec.ts tests/date-picker.spec.ts tests/date-range-picker.spec.ts tests/chip.spec.ts tests/extended-navigation.spec.ts tests/tabs-orientation.spec.ts tests/icons-motion.spec.ts tests/modal-scroll.spec.ts tests/overlay-lifecycle.spec.ts tests/toast-countdown.spec.ts tests/spinner-variants.spec.ts tests/meter-variants.spec.ts tests/slots.spec.ts tests/typography.spec.ts tests/appearance-cascade.spec.ts",
     "test:stories": "vitest run --config vitest.config.ts",
     "test:docs": "node scripts/verify-docs.mjs",
     "size": "node scripts/size.mjs",

@@ -401,6 +401,36 @@ try {
           '2026-10-03/2026-10-05',
         ]);
       }
+      if (tag === 't-chip') {
+        const chip = page.locator(tag);
+        const action = chip.getByRole('button', { name: 'Engineering', exact: true });
+        const remove = chip.getByRole('button', { name: 'Remove Engineering' });
+        assert.equal(await action.count(), 1, `${framework}/${tag}: selection needs its label.`);
+        assert.equal(await remove.count(), 1, `${framework}/${tag}: removal needs its label.`);
+        await chip.evaluate((element) => {
+          element.userEvents = [];
+          element.addEventListener('t-toggle', (event) =>
+            element.userEvents.push(['toggle', event.detail.selected]),
+          );
+          element.addEventListener('t-remove', (event) =>
+            element.userEvents.push(['remove', event.detail.label]),
+          );
+        });
+        const logged =
+          framework === 'html'
+            ? page.waitForEvent('console', { predicate: (message) => message.text() === 'true' })
+            : null;
+        await action.click();
+        if (logged) await logged;
+        assert.equal(await chip.evaluate((element) => element.selected), true);
+        assert.equal(await action.getAttribute('aria-pressed'), 'true');
+        await remove.click();
+        assert.equal(await chip.count(), 1, `${framework}/${tag}: removal is an app request.`);
+        assert.deepEqual(await chip.evaluate((element) => element.userEvents), [
+          ['toggle', true],
+          ['remove', 'Engineering'],
+        ]);
+      }
       if (tag === 't-multi-select') {
         await page.getByRole('checkbox', { name: 'Engineering' }).check();
         assert.deepEqual(
