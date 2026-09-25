@@ -50,3 +50,4 @@ export * from './components/segmented-control';
 export * from './components/rating';
 export * from './components/tags-input';
 export * from './components/color-picker';
+export * from './components/calendar';

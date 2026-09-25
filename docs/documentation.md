@@ -1,6 +1,6 @@
 # Maintaining the Storybook manual
 
-Storybook is the component documentation entry point. Each of the 51 component pages has the same structure: setup, a working integration example, live controls, API reference, styling, accessibility, and states. The global framework selector changes setup and code for HTML/JS/CSS, Angular, Vue, and React. Its selection stays in Storybook globals and shareable URLs. The preview always renders the same Web Component.
+Storybook is the component documentation entry point. Each of the 52 component pages has the same structure: setup, a working integration example, live controls, API reference, styling, accessibility, and states. The global framework selector changes setup and code for HTML/JS/CSS, Angular, Vue, and React. Its selection stays in Storybook globals and shareable URLs. The preview always renders the same Web Component.
 
 ## Sources of truth
 

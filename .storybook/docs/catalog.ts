@@ -169,6 +169,37 @@ export const guides: Record<string, ComponentGuide> = {
       ],
     },
   },
+  't-calendar': {
+    purpose: 'Choose one date from an inline, terminal-styled calendar.',
+    usage: [
+      'Use a YYYY-MM-DD value and optional min/max bounds. month sets the displayed YYYY-MM month.',
+      'An invalid or out-of-range programmatic value stays unchanged and shows a status. Choosing an available date corrects it.',
+      'Set firstDayOfWeek from 0 (Sunday) through 6 (Saturday). locale controls month, weekday, and date names.',
+      'The calendar is a selection widget, not a form field. Pair it with a date input when you need native entry, validation, or FormData.',
+    ],
+    accessibility: [
+      'One day is in the Tab order. Arrow keys move by day or week; Home/End move within a week; Page Up/Down move by month and Shift moves by year.',
+      'Month navigation has named buttons, the month heading announces changes, and selected and unavailable days have grid states.',
+      'Check calendar speech and touch behavior with your target assistive technologies before release.',
+    ],
+    example: {
+      props: {
+        label: 'Mission date',
+        value: '2026-09-24',
+        month: '2026-09',
+        min: '2026-09-01',
+        max: '2026-10-31',
+        locale: 'en-US',
+        firstDayOfWeek: 1,
+      },
+    },
+    event: {
+      name: 't-change',
+      read: 'detail.value',
+      description:
+        'Read the selected ISO date from detail.value. Programmatic value changes do not emit an event.',
+    },
+  },
   't-checkbox': field(
     'Choose an independent boolean option.',
     { name: 'telemetry', label: 'Enable telemetry', checked: true },

@@ -7,6 +7,7 @@ import { TAvatar as TAvatarElement } from '../components/avatar';
 import { TBadge as TBadgeElement } from '../components/badge';
 import { TBreadcrumb as TBreadcrumbElement } from '../components/breadcrumb';
 import { TButton as TButtonElement } from '../components/button';
+import { TCalendar as TCalendarElement } from '../components/calendar';
 import { TCard as TCardElement } from '../components/card';
 import { TCheckbox as TCheckboxElement } from '../components/checkbox';
 import { TColorPicker as TColorPickerElement } from '../components/color-picker';
@@ -95,6 +96,17 @@ export const TButton = createComponent({
   tagName: 't-button',
   elementClass: TButtonElement,
   events: { onInput: 'input' as EventName<Event>, onChange: 'change' as EventName<Event> },
+});
+export const TCalendar = createComponent({
+  react: React,
+  tagName: 't-calendar',
+  elementClass: TCalendarElement,
+  events: {
+    onInput: 'input' as EventName<Event>,
+    onChange: 'change' as EventName<Event>,
+    onTChange: 't-change' as EventName<CustomEvent<unknown>>,
+    onTMonthChange: 't-month-change' as EventName<CustomEvent<unknown>>,
+  },
 });
 export const TCard = createComponent({
   react: React,

@@ -309,6 +309,25 @@ try {
         await page.getByRole('textbox', { name: 'Callsign', exact: false }).fill('DOCUMENTED');
         assert.equal(await page.locator(tag).evaluate((el) => el.value), 'DOCUMENTED');
       }
+      if (tag === 't-calendar') {
+        assert.equal(await page.getByRole('group', { name: 'Mission date' }).count(), 1);
+        const day = page.locator('t-calendar [data-date="2026-09-25"]');
+        await day.focus();
+        assert.equal(
+          await day.evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        const logged = page.waitForEvent('console', {
+          predicate: (message) => message.text().includes('2026-09-25'),
+        });
+        await day.click();
+        await logged;
+        assert.equal(
+          await page.locator(tag).evaluate((element) => element.value),
+          '2026-09-25',
+          `${framework}/${tag}: date selection must update the value and framework event handler.`,
+        );
+      }
       if (tag === 't-multi-select') {
         await page.getByRole('checkbox', { name: 'Engineering' }).check();
         assert.deepEqual(
