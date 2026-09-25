@@ -2,6 +2,8 @@
 
 Terminal Kit uses CSS transitions for control feedback and finite entry effects for overlays. Motion communicates a state change. It does not add flicker or decorative rotation. Repeating motion is limited to working-state indicators, including busy spinners and indeterminate progress stripes.
 
+Palette foregrounds, control backgrounds, and control borders change together without a color transition. This keeps controls readable while an application switches palettes. Other control feedback, such as shadow, filter, and transform effects, can still use the motion tokens.
+
 The default is `data-motion="auto"`. The browser's `prefers-reduced-motion: reduce` preference always takes precedence. Use `data-motion="off"` to disable library motion even when the device allows it.
 
 ```html

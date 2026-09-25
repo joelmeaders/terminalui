@@ -256,11 +256,6 @@ body:is([data-scanlines], [data-effects])::after {
   outline: 2px solid var(--t-focus);
   outline-offset: 3px;
 }
-.t-native {
-  transition:
-    border-color var(--_t-motion-duration, var(--t-motion-fast)) var(--t-motion-ease),
-    background-color var(--_t-motion-duration, var(--t-motion-fast)) var(--t-motion-ease);
-}
 @media (prefers-reduced-motion: reduce) {
   :root,
   [data-motion] {

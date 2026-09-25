@@ -49,11 +49,8 @@ export const baseStyles = css`
   [role='tab'],
   [role='option'],
   [role='treeitem'] {
-    transition:
-      background-color var(--_t-motion-duration, var(--t-motion-fast, 120ms))
-        var(--t-motion-ease, ease),
-      border-color var(--_t-motion-duration, var(--t-motion-fast, 120ms)) var(--t-motion-ease, ease),
-      box-shadow var(--_t-motion-duration, var(--t-motion-fast, 120ms)) var(--t-motion-ease, ease);
+    transition: box-shadow var(--_t-motion-duration, var(--t-motion-fast, 120ms))
+      var(--t-motion-ease, ease);
   }
   dialog[open],
   [popover]:popover-open {
