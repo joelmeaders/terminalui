@@ -1,6 +1,6 @@
 # Terminal Kit
 
-A browser component library built with Lit. All 52 components share six terminal-inspired palettes and work in plain HTML, React, Vue, and Angular. Storybook contains API notes, interactive controls, component states, and browser interaction tests. The package includes typed framework adapters, generated editor metadata, optional icon providers, and an installable local tarball.
+A browser component library built with Lit. All 53 components share six terminal-inspired palettes and work in plain HTML, React, Vue, and Angular. Storybook contains API notes, interactive controls, component states, and browser interaction tests. The package includes typed framework adapters, generated editor metadata, optional icon providers, and an installable local tarball.
 
 ## License
 
@@ -109,6 +109,7 @@ Use `.t-h1` through `.t-h6` for heading appearance, `.t-text` for standalone tex
 | `t-tags-input`        | Multiple text values             | `values`, JSON string `value`, `name`, `required`                                           |
 | `t-color-picker`      | Native color input and hex field | `value`, named `swatches`, `required`, `disabled`                                           |
 | `t-calendar`          | Inline date selection grid       | `value`, `month`, `min`, `max`, `locale`, `firstDayOfWeek`, `t-change`                      |
+| `t-date-picker`       | Form date picker                 | `value`, `name`, `min`, `max`, `required`, `show()`, `t-change`                             |
 | `t-command-palette`   | Modal command search             | `commands`, `query`, `heading`, `loading`, `show()`, `close()`, `t-select`                  |
 | `t-steps`             | Ordered step navigation          | `items`, `value`, `orientation`, `t-select`                                                 |
 | `t-timeline`          | Ordered event history            | `items`, `label`, `emptyText`                                                               |
@@ -119,7 +120,7 @@ Use `.t-h1` through `.t-h6` for heading appearance, `.t-text` for standalone tex
 | `t-split-pane`        | Resizable two-pane layout        | `size`, `min`, `max`, `step`, `orientation`, `stackAt`, named slots                         |
 | `t-copy-button`       | Clipboard action and status      | `value`, `label`, `disabled`, `t-copy`, `t-copy-error`                                      |
 
-The input supports text, numeric, and native date/time types with browser constraint validation. Native date/time interfaces follow the browser. `t-calendar` provides an inline terminal-styled date selection grid; pair it with a date input when a form needs native date entry and submission. The kit does not include a rich-text editor. File selection uses `t-file-input`; it does not upload files. Tables provide local filtering, sorting, paging, and selection without virtualization or editable cells. A table's selected keys persist across filters and pages; select all affects only the rows currently visible.
+The input supports text, numeric, and native date/time types with browser constraint validation. Native date/time interfaces follow the browser. `t-calendar` provides an inline terminal-styled date selection grid; use `t-date-picker` when a form needs a themed date field with entry, validation, and submission. The kit does not include a rich-text editor. File selection uses `t-file-input`; it does not upload files. Tables provide local filtering, sorting, paging, and selection without virtualization or editable cells. A table's selected keys persist across filters and pages; select all affects only the rows currently visible.
 
 ## Use in plain HTML
 
@@ -157,7 +158,7 @@ The build also creates TypeScript declarations, a Custom Elements Manifest, a co
 
 ## Forms and events
 
-All 16 form controls use `ElementInternals` to participate in HTML forms. They support FormData, browser validation, disabled fieldsets, and reset. Give each field a `name` for submission and a `label` for its internal native control. Reset restores the initial value or checked state and clears file selection. Set initial property values before the first render when using framework bindings. Tags and multi-select expose a `values` array and a JSON string `value`; FormData contains one entry per selected item under the same name. Multi-select uses labeled native checkboxes and can filter choices without clearing selection. Number and rating values are strings.
+All 17 form controls use `ElementInternals` to participate in HTML forms. They support FormData, browser validation, disabled fieldsets, and reset. Give each field a `name` for submission and a `label` for its internal native control. Reset restores the initial value or checked state and clears file selection. Set initial property values before the first render when using framework bindings. Tags and multi-select expose a `values` array and a JSON string `value`; FormData contains one entry per selected item under the same name. Multi-select uses labeled native checkboxes and can filter choices without clearing selection. Number and rating values are strings.
 
 Use Terminal Kit or native submit and reset buttons:
 
@@ -315,11 +316,11 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 46.2 KB for registration of all 52 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.2 KB gzip. The button and complete-catalog budgets are 8 KB and 47 KB. The catalog budget includes multi-select, local table filtering and paging, and the inline calendar. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
+The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 47.5 KB for registration of all 53 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.2 KB gzip. The button and complete-catalog budgets are 8 KB and 48 KB. The catalog budget includes multi-select, local table filtering and paging, the inline calendar, and the form-associated date picker. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
 
 ## Storybook and verification
 
-Storybook includes stories for all 52 components, introductions, appearance examples, and application patterns. Its toolbar changes palette, density, line weight, glow, screen scanlines, and motion. Appearance stories also demonstrate local overrides and the CRT preset. Docs describe slots, events, CSS parts, and form behavior. Stories include interaction checks, and the accessibility addon is configured to fail tests on detected violations.
+Storybook includes stories for all 53 components, introductions, appearance examples, and application patterns. Its toolbar changes palette, density, line weight, glow, screen scanlines, and motion. Appearance stories also demonstrate local overrides and the CRT preset. Docs describe slots, events, CSS parts, and form behavior. Stories include interaction checks, and the accessibility addon is configured to fail tests on detected violations.
 
 ```sh
 npm run build

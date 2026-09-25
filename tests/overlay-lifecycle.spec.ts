@@ -57,8 +57,17 @@ test('tooltip remains visible across the hover gap and works after reconnection'
   await trigger.hover();
   const tooltip = page.getByRole('tooltip');
   await expect(tooltip).toBeVisible();
+  const origin = (await trigger.boundingBox())!;
   const box = (await tooltip.boundingBox())!;
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 10 });
+  const start = { x: origin.x + origin.width / 2, y: origin.y + origin.height / 2 };
+  const finish = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  for (let step = 1; step <= 10; step++) {
+    await page.mouse.move(
+      start.x + ((finish.x - start.x) * step) / 10,
+      start.y + ((finish.y - start.y) * step) / 10,
+    );
+    await page.waitForTimeout(80);
+  }
   // Stay over the help longer than the close delay to prove it remains hoverable.
   await page.waitForTimeout(450);
   await expect(tooltip).toBeVisible();

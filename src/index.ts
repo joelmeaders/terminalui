@@ -51,3 +51,4 @@ export * from './components/rating';
 export * from './components/tags-input';
 export * from './components/color-picker';
 export * from './components/calendar';
+export * from './components/date-picker';

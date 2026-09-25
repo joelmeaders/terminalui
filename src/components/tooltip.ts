@@ -15,20 +15,39 @@ export class TTooltip extends TerminalElement {
   private cleanup?: () => void;
   private closeTimer?: ReturnType<typeof setTimeout>;
   private hovered = false;
-  private showTooltip() {
+  private clearCloseTimer() {
     clearTimeout(this.closeTimer);
+    this.closeTimer = undefined;
+  }
+  private showTooltip() {
+    this.clearCloseTimer();
     this.open = true;
   }
   private hideTooltip() {
-    clearTimeout(this.closeTimer);
+    this.clearCloseTimer();
     this.open = false;
   }
   private scheduleClose() {
-    clearTimeout(this.closeTimer);
+    this.clearCloseTimer();
     this.closeTimer = setTimeout(() => {
+      this.closeTimer = undefined;
       if (!this.hovered && this.shadowRoot?.activeElement?.tagName !== 'BUTTON') this.open = false;
     }, 300);
   }
+  private trackPointer = (event: PointerEvent) => {
+    if (!this.open || this.hovered || this.shadowRoot?.activeElement?.tagName === 'BUTTON') return;
+    const trigger = this.renderRoot.querySelector('button')?.getBoundingClientRect();
+    const panel = this.renderRoot.querySelector('#tip')?.getBoundingClientRect();
+    if (!trigger || !panel) return;
+    const margin = 8;
+    const inBridge =
+      event.clientX >= Math.min(trigger.left, panel.left) - margin &&
+      event.clientX <= Math.max(trigger.right, panel.right) + margin &&
+      event.clientY >= Math.min(trigger.top, panel.top) - margin &&
+      event.clientY <= Math.max(trigger.bottom, panel.bottom) + margin;
+    if (inBridge) this.clearCloseTimer();
+    else if (!this.closeTimer) this.scheduleClose();
+  };
   private escape = (event: KeyboardEvent) => {
     if (event.key === 'Escape') this.hideTooltip();
   };
@@ -73,6 +92,7 @@ export class TTooltip extends TerminalElement {
     this.cleanup?.();
     this.cleanup = undefined;
     document.removeEventListener('keydown', this.escape);
+    document.removeEventListener('pointermove', this.trackPointer, true);
     super.disconnectedCallback();
   }
   protected updated(changed: PropertyValues) {
@@ -87,10 +107,12 @@ export class TTooltip extends TerminalElement {
         this.placement,
       );
       document.addEventListener('keydown', this.escape);
+      document.addEventListener('pointermove', this.trackPointer, true);
     } else if (!this.open) {
       this.cleanup?.();
       this.cleanup = undefined;
       document.removeEventListener('keydown', this.escape);
+      document.removeEventListener('pointermove', this.trackPointer, true);
     }
   }
   render() {

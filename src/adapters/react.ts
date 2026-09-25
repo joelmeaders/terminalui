@@ -14,6 +14,7 @@ import { TColorPicker as TColorPickerElement } from '../components/color-picker'
 import { TCombobox as TComboboxElement } from '../components/combobox';
 import { TCommandPalette as TCommandPaletteElement } from '../components/command-palette';
 import { TCopyButton as TCopyButtonElement } from '../components/copy-button';
+import { TDatePicker as TDatePickerElement } from '../components/date-picker';
 import { TDescriptionList as TDescriptionListElement } from '../components/description-list';
 import { TDialog as TDialogElement } from '../components/dialog';
 import { TDivider as TDividerElement } from '../components/divider';
@@ -152,6 +153,17 @@ export const TCopyButton = createComponent({
     onChange: 'change' as EventName<Event>,
     onTCopy: 't-copy' as EventName<CustomEvent<unknown>>,
     onTCopyError: 't-copy-error' as EventName<CustomEvent<unknown>>,
+  },
+});
+export const TDatePicker = createComponent({
+  react: React,
+  tagName: 't-date-picker',
+  elementClass: TDatePickerElement,
+  events: {
+    onInput: 'input' as EventName<Event>,
+    onChange: 'change' as EventName<Event>,
+    onTChange: 't-change' as EventName<CustomEvent<unknown>>,
+    onTClose: 't-close' as EventName<CustomEvent<unknown>>,
   },
 });
 export const TDescriptionList = createComponent({

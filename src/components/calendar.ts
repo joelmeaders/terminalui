@@ -1,23 +1,6 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
-
-const datePattern = /^(\d{4})-(\d{2})-(\d{2})$/;
-function parseDate(value: string): Date | null {
-  const parts = datePattern.exec(value);
-  if (!parts) return null;
-  const year = Number(parts[1]);
-  const month = Number(parts[2]);
-  const day = Number(parts[3]);
-  const date = new Date(0);
-  date.setUTCHours(12, 0, 0, 0);
-  date.setUTCFullYear(year, month - 1, day);
-  return year > 0 &&
-    date.getUTCFullYear() === year &&
-    date.getUTCMonth() === month - 1 &&
-    date.getUTCDate() === day
-    ? date
-    : null;
-}
+import { parseDate } from '../internal/date';
 const isoDate = (date: Date) =>
   `${String(date.getUTCFullYear()).padStart(4, '0')}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
 const isoMonth = (date: Date) => isoDate(date).slice(0, 7);
@@ -140,16 +123,17 @@ export class TCalendar extends TerminalElement {
         margin: var(--t-space, 16px) 0 0;
       }
       table {
-        width: 100%;
-        min-width: 280px;
-        table-layout: fixed;
+        width: max-content;
+        min-width: max(100%, 280px);
+        table-layout: auto;
         border-collapse: collapse;
         text-align: center;
       }
       th {
         color: var(--t-muted);
         font-weight: 600;
-        padding: 4px 0;
+        padding: 4px 6px;
+        white-space: nowrap;
       }
       td {
         padding: 2px;
@@ -162,6 +146,7 @@ export class TCalendar extends TerminalElement {
         border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
         background: transparent;
         color: var(--t-text);
+        white-space: nowrap;
       }
       td[data-outside] button {
         color: var(--t-muted);
@@ -269,8 +254,20 @@ export class TCalendar extends TerminalElement {
   }
   private focusDay(value: string) {
     void this.updateComplete.then(() => {
-      this.renderRoot.querySelector<HTMLButtonElement>(`button[data-date="${value}"]`)?.focus();
+      const button = this.renderRoot.querySelector<HTMLButtonElement>(
+        `button[data-date="${value}"]`,
+      );
+      button?.focus();
+      button?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     });
+  }
+  /** Focus the current keyboard day when the calendar is opened from another control. */
+  focus(options?: FocusOptions) {
+    const button = this.renderRoot.querySelector<HTMLButtonElement>(
+      'button[data-date][tabindex="0"]',
+    );
+    button?.focus(options);
+    button?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
   private showMonth(value: string) {
     if (value === isoMonth(this.viewMonth())) return;

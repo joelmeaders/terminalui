@@ -1,6 +1,7 @@
 import { html, nothing, type PropertyValues } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControl, fieldStyles } from '../internal/form-control';
+import { submitOnEnter } from '../internal/implicit-submit';
 import { fieldSlotStyles, optionalSlotStyles, syncSlot } from '../internal/slots';
 
 /**
@@ -45,70 +46,8 @@ export class TInput extends FormControl {
     super.updated(changed);
   }
   private onKeydown(event: KeyboardEvent) {
-    if (
-      event.key !== 'Enter' ||
-      event.isComposing ||
-      event.defaultPrevented ||
-      !this.form ||
-      this.isDisabled
-    )
-      return;
-    if (
-      ![
-        'text',
-        'email',
-        'password',
-        'search',
-        'tel',
-        'url',
-        'number',
-        'date',
-        'datetime-local',
-        'month',
-        'time',
-        'week',
-      ].includes(this.type)
-    )
-      return;
-    const submitter = Array.from(this.form.elements).find(
-      (element) =>
-        ((element instanceof HTMLButtonElement || element instanceof HTMLInputElement) &&
-          element.type === 'submit') ||
-        (element.localName === 't-button' &&
-          (element as HTMLElement & { type: string }).type === 'submit'),
-    ) as HTMLElement | undefined;
-    if (submitter) {
-      event.preventDefault();
-      // The first disabled submit button blocks implicit submission, as in a native form.
-      if (
-        !submitter.matches(':disabled') &&
-        !(submitter as HTMLElement & { loading?: boolean }).loading
-      )
-        submitter.click();
-    } else {
-      const blockers = Array.from(this.form.elements).filter(
-        (element) =>
-          (element instanceof HTMLInputElement || element instanceof TInput) &&
-          [
-            'text',
-            'email',
-            'password',
-            'search',
-            'tel',
-            'url',
-            'number',
-            'date',
-            'datetime-local',
-            'month',
-            'time',
-            'week',
-          ].includes((element as HTMLInputElement).type),
-      );
-      if (blockers.length === 1) {
-        event.preventDefault();
-        this.form.requestSubmit();
-      }
-    }
+    if (this.isDisabled) return;
+    submitOnEnter(event, this.form, this.type);
   }
   render() {
     const type = [

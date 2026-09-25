@@ -20,7 +20,7 @@ It also tests optional adapter imports, compiles an Angular AOT consumer, and ch
 The test preserves its temporary consumer path in the output for inspection.
 
 The runtime package depends only on Lit. Framework peers are optional and remain outside the core and standalone bundles.
-The standalone bundle includes Lit. Its gzip budget is 47 KB for the 52-component catalog.
+The standalone bundle includes Lit. Its gzip budget is 48 KB for the 53-component catalog.
 The separate button and original three-control form scenarios retain 8 KB and 10 KB gzip budgets.
 These budgets exclude theme CSS and fonts. Run `npm run size` for current measurements.
 

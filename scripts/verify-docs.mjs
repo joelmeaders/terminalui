@@ -328,6 +328,38 @@ try {
           `${framework}/${tag}: date selection must update the value and framework event handler.`,
         );
       }
+      if (tag === 't-date-picker') {
+        const picker = page.locator(tag);
+        const field = picker.getByRole('textbox', { name: 'Mission date' });
+        assert.equal(await field.count(), 1, `${framework}/${tag}: the field needs its label.`);
+        await picker.evaluate((element) => {
+          element.userEvents = [];
+          element.addEventListener('input', () => element.userEvents.push('input'));
+          element.addEventListener('t-change', (event) =>
+            element.userEvents.push(event.detail.value),
+          );
+        });
+        await picker.getByRole('button', { name: 'Change date, 2026-09-24' }).click();
+        const day = picker.locator('t-calendar [data-date="2026-09-25"]');
+        await day.focus();
+        assert.equal(
+          await day.evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        const logged =
+          framework === 'html'
+            ? page.waitForEvent('console', {
+                predicate: (message) => message.text().includes('2026-09-25'),
+              })
+            : null;
+        await day.click();
+        if (logged) await logged;
+        assert.equal(await field.inputValue(), '2026-09-25');
+        assert.deepEqual(await picker.evaluate((element) => element.userEvents), [
+          'input',
+          '2026-09-25',
+        ]);
+      }
       if (tag === 't-multi-select') {
         await page.getByRole('checkbox', { name: 'Engineering' }).check();
         assert.deepEqual(

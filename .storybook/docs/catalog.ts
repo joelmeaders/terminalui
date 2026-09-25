@@ -175,7 +175,7 @@ export const guides: Record<string, ComponentGuide> = {
       'Use a YYYY-MM-DD value and optional min/max bounds. month sets the displayed YYYY-MM month.',
       'An invalid or out-of-range programmatic value stays unchanged and shows a status. Choosing an available date corrects it.',
       'Set firstDayOfWeek from 0 (Sunday) through 6 (Saturday). locale controls month, weekday, and date names.',
-      'The calendar is a selection widget, not a form field. Pair it with a date input when you need native entry, validation, or FormData.',
+      'The calendar is a selection widget, not a form field. Use t-date-picker for typed entry, validation, and FormData.',
     ],
     accessibility: [
       'One day is in the Tab order. Arrow keys move by day or week; Home/End move within a week; Page Up/Down move by month and Shift moves by year.',
@@ -199,6 +199,39 @@ export const guides: Record<string, ComponentGuide> = {
       description:
         'Read the selected ISO date from detail.value. Programmatic value changes do not emit an event.',
     },
+  },
+  't-date-picker': {
+    purpose: 'Enter or choose one date in a form-associated terminal field.',
+    usage: [
+      'Type a complete YYYY-MM-DD date, or open the modal calendar and select a day.',
+      'Use name for FormData and required, min, and max for validation. Empty optional fields submit an empty value.',
+      'The input keeps ISO order in every locale. locale and firstDayOfWeek control the calendar presentation.',
+      'Set readonly to keep the submitted value without allowing edits. disabled omits the value from FormData.',
+    ],
+    accessibility: [
+      'The native text field has a visible label, format instruction, and one changing error description.',
+      'The named calendar button opens a modal. Focus moves to the selected or current day. Escape cancels and returns focus to the button.',
+      'The date grid supports arrows, Home/End, Page Up/Down, and Shift+Page Up/Down. Test speech and touch with target devices before release.',
+    ],
+    example: {
+      props: {
+        name: 'mission',
+        label: 'Mission date',
+        value: '2026-09-24',
+        min: '2026-09-01',
+        max: '2026-10-31',
+        locale: 'en-US',
+        firstDayOfWeek: 1,
+        required: true,
+      },
+    },
+    event: {
+      name: 'input',
+      read: 'target.value',
+      description:
+        'Read the ISO date from event.target.value after typing or calendar selection. Calendar selection also emits t-change with detail.value.',
+    },
+    form: 'value',
   },
   't-checkbox': field(
     'Choose an independent boolean option.',

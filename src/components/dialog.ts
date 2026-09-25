@@ -7,6 +7,7 @@ import { ModalScrollController } from '../internal/modal-scroll';
  * @slot - Body.
  * @slot footer - Actions.
  * @csspart dialog - dialog element.
+ * @csspart body - Scrollable dialog content.
  * @fires t-close - The dialog closed. No detail payload.
  */
 export class TDialog extends TerminalElement {
@@ -123,7 +124,7 @@ export class TDialog extends TerminalElement {
         <h2 id="title">${this.heading}</h2>
         <button aria-label="Close dialog" @click=${this.close}>×</button>
       </header>
-      <div class="body"><slot></slot></div>
+      <div class="body" part="body"><slot></slot></div>
       <footer><slot name="footer"></slot></footer>
     </dialog>`;
   }
