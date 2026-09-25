@@ -4,6 +4,8 @@ Terminal Kit targets WCAG 2.2 Level AA for its 56 browser components and shipped
 
 ## Evidence and limits
 
+The 2026-09-25 built Storybook check opened all 56 component manuals at a 320 CSS pixel viewport. Every page fit without page-level horizontal overflow. Wide Controls and API tables remain independently scrollable. The complete check passed 768 browser cases with 12 browser-emulation skips, 299 Storybook tests, 84 built-site checks, all 228 framework examples, and the external package consumer. This is a viewport reflow check, not actual browser zoom, a review of every table cell, or a manual screen-reader test. The existing axe `color-contrast` incomplete findings for clipped and overlapping documentation content remain review items.
+
 The 2026-09-25 tooltip review measured its open text against its opaque panel in all six palettes. Chromium, Firefox, and WebKit each passed a nested palette change while the tooltip stayed open at 320 CSS pixels. The lowest computed contrast ratio was 10.59:1 in paper. The panel stayed within the viewport in each sampled state. A Playwright Chromium screenshot on Windows shows the paper tooltip after one animation frame.
 
 The browser version was not recorded, and no assistive technology was used. Axe still marks this overlapping panel as a `color-contrast` incomplete item. The measured panel does not resolve every tooltip state or prove screen-reader speech.

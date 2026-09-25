@@ -108,6 +108,7 @@ test('typography documentation stays usable at 320 CSS pixels', async ({ page },
 
 for (const { tag, id } of entries) {
   test(`${tag} has a complete built documentation page`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 900 });
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
     await page.goto(`/storybook/iframe.html?id=${id}&viewMode=docs`);
@@ -133,6 +134,9 @@ for (const { tag, id } of entries) {
           ),
         ),
     ).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
+      true,
+    );
     expect(errors).toEqual([]);
   });
 }

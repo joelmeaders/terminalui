@@ -1,6 +1,6 @@
 # Maintaining the Storybook manual
 
-Storybook is the component documentation entry point. Each of the 55 component pages has the same structure: setup, a working integration example, live controls, API reference, styling, accessibility, and states. The global framework selector changes setup and code for HTML/JS/CSS, Angular, Vue, and React. Its selection stays in Storybook globals and shareable URLs. The preview always renders the same Web Component.
+Storybook is the component documentation entry point. Each of the 56 component pages has the same structure: setup, a working integration example, live controls, API reference, styling, accessibility, and states. The global framework selector changes setup and code for HTML/JS/CSS, Angular, Vue, and React. Its selection stays in Storybook globals and shareable URLs. The preview always renders the same Web Component.
 
 ## Sources of truth
 
@@ -20,7 +20,7 @@ Run `npm run build`, then `npm run test:docs`. The check requires a guide and an
 
 Boolean controls use true/false radio groups with a programmatic group name. The group name stays visible at narrow widths. Arrow keys change the choice and update the live preview. This avoids an unlabeled switch in Storybook's built-in boolean control.
 
-Run `npm run test:production` to check the built site. This covers every component documentation page, icon registration instructions, global framework selection across navigation and reload, keyboard access, and representative 320 CSS pixel reflow and axe scans. Review attached axe `incomplete` results; do not count them as passes. `npm run check` includes these checks and the existing component, story, package, and size gates.
+Run `npm run test:production` to check the built site. This covers every component documentation page and its page-level reflow at 320 CSS pixels, icon registration instructions, global framework selection across navigation and reload, keyboard access, and representative axe scans. Wide Controls and API tables scroll inside their own keyboard-reachable regions. Review attached axe `incomplete` results; do not count them as passes. `npm run check` includes these checks and the existing component, story, package, and size gates.
 
 After changing component metadata, rebuild before starting Storybook. Restart an already running Storybook development server if it retains an old manifest. Do not regenerate watched source or build metadata while development-server browser tests run.
 
