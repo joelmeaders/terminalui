@@ -419,6 +419,9 @@ export function ComponentDocs() {
           example above remains a complete integration recipe.
         </p>
         <Primary />
+        <p className="tk-docs-controls-hint">
+          Scroll the controls table sideways to reach every column.
+        </p>
         <div
           className="tk-docs-controls"
           role="region"

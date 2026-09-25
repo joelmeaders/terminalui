@@ -16,6 +16,9 @@
   overflow-x: auto;
   padding: 4px;
 }
+.tk-docs-controls-hint {
+  display: none;
+}
 .tk-docs-controls label[aria-disabled='false'] > span[aria-hidden='true'] {
   color: var(--docs-muted);
 }
@@ -162,6 +165,17 @@
 @media (max-width: 600px) {
   .sbdocs.sbdocs-wrapper {
     padding: 24px 16px;
+  }
+  .tk-docs-controls table {
+    min-width: 680px;
+  }
+  .tk-docs-controls-hint {
+    display: block;
+    color: var(--docs-muted);
+    font-size: 12px;
+  }
+  .tk-docs-controls tr[title] > td:first-child > span {
+    white-space: nowrap;
   }
   .tk-docs .tk-docs-lead {
     font-size: 18px;

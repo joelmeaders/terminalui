@@ -90,6 +90,13 @@ test('typography documentation stays usable at 320 CSS pixels', async ({ page },
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
     true,
   );
+  await expect(page.locator('.tk-docs-controls-hint')).toBeVisible();
+  const typographyControls = page.getByRole('region', { name: 'Typography controls' });
+  await typographyControls.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect
+    .poll(() => typographyControls.evaluate((element) => element.scrollLeft))
+    .toBeGreaterThan(0);
   const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
   await writeFile(
     testInfo.outputPath('typography-documentation-axe-review.json'),
@@ -246,6 +253,21 @@ for (const id of ['components-icon--docs', 'components-input--docs', 'components
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
       true,
     );
+    const controls = page.getByRole('region', { name: 'Live preview controls' });
+    await expect(page.locator('.tk-docs-controls-hint')).toBeVisible();
+    const tableWidth = await controls
+      .locator('table')
+      .first()
+      .evaluate((table) => table.getBoundingClientRect().width);
+    expect(tableWidth).toBeGreaterThanOrEqual(680);
+    const category = controls.locator('tr[title] td:first-child > span').first();
+    expect((await category.boundingBox())!.height).toBeLessThanOrEqual(24);
+    await controls.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect.poll(() => controls.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+    await controls.evaluate((element) => {
+      element.scrollLeft = 0;
+    });
     const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
     const reportPath = testInfo.outputPath('documentation-axe-review.json');
     await writeFile(

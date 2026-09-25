@@ -67,7 +67,15 @@ export function TypographyDocs() {
           effects.
         </p>
         <Primary />
-        <div className="tk-docs-controls" role="region" aria-label="Typography controls">
+        <p className="tk-docs-controls-hint">
+          Scroll the controls table sideways to reach every column.
+        </p>
+        <div
+          className="tk-docs-controls"
+          role="region"
+          aria-label="Typography controls"
+          tabIndex={0}
+        >
           <Controls />
         </div>
       </section>
