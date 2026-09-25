@@ -51,6 +51,7 @@ Include accessibility in implementation, stories, tests, documentation, and revi
 - Review visual differences before updating screenshot references. Preserve historical references when adding an intentional accessibility baseline.
 - Report axe `incomplete` findings as review items. Do not count them as verified passes.
 - Distinguish 320 CSS pixel reflow and simulated text enlargement from actual browser zoom testing.
+- Keep actual 400% Chromium browser-zoom checks for the catalog and built documentation. Record browser zoom separately from manual visual review.
 - Distinguish automated browser/ARIA checks from manual screen-reader testing. Never claim one proves the other.
 - Record manual test results and remaining gaps in `docs/accessibility.md`. Include browser, OS, assistive technology, scenario, and outcome.
 - Require manual NVDA and VoiceOver validation of forms, composite widgets, modals, errors, and live regions before claiming assistive-technology support.

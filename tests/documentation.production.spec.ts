@@ -3,6 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readdirSync, readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { guides } from '../.storybook/docs/catalog';
+import { launchBrowserZoom } from './helpers/browser-zoom';
 
 const stories = readdirSync('stories')
   .filter((file) => file.endsWith('.stories.ts'))
@@ -281,3 +282,67 @@ for (const id of ['components-icon--docs', 'components-input--docs', 'components
     expect(report.violations).toEqual([]);
   });
 }
+
+test('Input documentation stays usable at actual 400% Chromium browser zoom', async ({}, testInfo) => {
+  const zoomBrowser = await launchBrowserZoom(testInfo, 'http://127.0.0.1:4173', {
+    width: 1280,
+    height: 900,
+  });
+  const { context, page } = zoomBrowser;
+  try {
+    await page.goto('/storybook/iframe.html?id=components-input--docs&viewMode=docs');
+    const select = page.getByRole('combobox', { name: 'Documentation framework' });
+    await expect(select).toBeVisible();
+    const zoom = await zoomBrowser.setZoom(4);
+    expect(zoom).toBeCloseTo(4, 3);
+    await expect
+      .poll(() =>
+        page.evaluate(() => ({ width: innerWidth, dpr: Number(devicePixelRatio.toFixed(2)) })),
+      )
+      .toEqual({ width: 320, dpr: 4 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
+      true,
+    );
+    await select.focus();
+    await expect(select).toBeFocused();
+    await select.press('ArrowDown');
+    await select.press('Enter');
+    await expect(select).toHaveValue('angular');
+    await page.evaluate(() => scrollTo(0, 0));
+    const screenshotPath = testInfo.outputPath('storybook-input-400-percent-browser-zoom.png');
+    await page.screenshot({ path: screenshotPath });
+    await testInfo.attach('storybook-input-400-percent-browser-zoom', {
+      path: screenshotPath,
+      contentType: 'image/png',
+    });
+    const controls = page.getByRole('region', { name: 'Live preview controls' });
+    await expect(page.locator('.tk-docs-controls-hint')).toBeVisible();
+    await controls.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect.poll(() => controls.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+    await controls.scrollIntoViewIfNeeded();
+    await expect(controls).toBeInViewport();
+    const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
+    const reportPath = testInfo.outputPath('documentation-browser-zoom-axe-review.json');
+    await writeFile(
+      reportPath,
+      JSON.stringify(
+        {
+          browser: context.browser()?.version(),
+          zoom,
+          violations: report.violations,
+          incomplete: report.incomplete,
+        },
+        null,
+        2,
+      ),
+    );
+    await testInfo.attach('documentation-browser-zoom-axe-review', {
+      path: reportPath,
+      contentType: 'application/json',
+    });
+    expect(report.violations).toEqual([]);
+  } finally {
+    await context.close();
+  }
+});

@@ -349,7 +349,7 @@ The package check installs the tarball into an external temporary consumer. It c
 
 Production tests compare saved screenshots for all six palettes, a mobile layout, a modal dialog, and selected display styles. Component-area references include the accessibility contrast corrections; the original `base-components` images remain as historical references. Browser tests cover nested overrides, texture boundaries, persistence, forced colors, and accessibility with effects enabled. The committed reference images use Playwright Chromium on Windows. Review intentional visual changes before regenerating references with `npx playwright test --config playwright.production.config.ts --update-snapshots`. Other operating systems need their own reviewed reference images.
 
-Accessibility requirements are part of [AGENTS.md](AGENTS.md). The [accessibility evidence and manual test guide](docs/accessibility.md) separates automated coverage from pending NVDA, VoiceOver, real zoom, and physical-device checks. A narrow viewport and injected font sizes do not establish real browser zoom or screen-reader support.
+Accessibility requirements are part of [AGENTS.md](AGENTS.md). The [accessibility evidence and manual test guide](docs/accessibility.md) separates automated coverage from pending NVDA, VoiceOver, manual browser-zoom, and physical-device checks. The suite includes an isolated actual 400% Chromium zoom test for the catalog and Input docs. A narrow viewport and injected font sizes alone do not establish real browser zoom or screen-reader support.
 
 `npm run build:site` creates a combined static demo and Storybook in `demo-dist/`. `npm run preview` serves it locally. The core package output remains separate in `dist/`; consumers do not download Storybook.
 

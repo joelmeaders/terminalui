@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { writeFile } from 'node:fs/promises';
 import { readdirSync } from 'node:fs';
+import { launchBrowserZoom } from './helpers/browser-zoom';
 
 const tags = readdirSync(new URL('../src/components/', import.meta.url))
   .filter((file) => file.endsWith('.ts'))
@@ -296,6 +297,97 @@ for (const scenario of [
     await page.keyboard.press('Escape');
   });
 }
+
+test('all catalog components reflow under actual 400% Chromium browser zoom', async ({}, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'The zoom extension uses Chromium tabs API');
+  const zoomBrowser = await launchBrowserZoom(testInfo, 'http://127.0.0.1:5173', {
+    width: 1280,
+    height: 900,
+  });
+  const { context, page } = zoomBrowser;
+  try {
+    await catalog(page);
+    const zoom = await zoomBrowser.setZoom(4);
+    expect(zoom).toBeCloseTo(4, 3);
+    await expect
+      .poll(() =>
+        page.evaluate(() => ({ width: innerWidth, dpr: Number(devicePixelRatio.toFixed(2)) })),
+      )
+      .toEqual({ width: 320, dpr: 4 });
+    const problems = await layoutProblems(page);
+    expect.soft(problems.clipped).toEqual([]);
+    expect.soft(problems.scrollWidth).toBeLessThanOrEqual(322);
+    const axe = await new AxeBuilder({ page })
+      .include('#fixture')
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+      .analyze();
+    const viewport = await page.evaluate(() => ({
+      width: innerWidth,
+      height: innerHeight,
+      dpr: devicePixelRatio,
+    }));
+    const evidencePath = testInfo.outputPath('axe-browser-zoom-review-needed.json');
+    await writeFile(
+      evidencePath,
+      JSON.stringify(
+        {
+          browser: context.browser()?.version(),
+          zoom,
+          viewport,
+          violations: axe.violations.length,
+          incomplete: axe.incomplete.map((result) => ({
+            id: result.id,
+            nodes: result.nodes.map((node) => ({
+              target: node.target,
+              summary: node.failureSummary,
+            })),
+          })),
+        },
+        null,
+        2,
+      ),
+    );
+    await testInfo.attach('axe-browser-zoom-review-needed', {
+      path: evidencePath,
+      contentType: 'application/json',
+    });
+    expect(axe.violations).toEqual([]);
+    await page
+      .getByRole('textbox', { name: 'Workspace name', exact: true })
+      .fill('Zoomed workspace');
+    await page
+      .getByRole('textbox', { name: 'Workspace name', exact: true })
+      .evaluate((element) => element.scrollIntoView({ block: 'center' }));
+    const screenshotPath = testInfo.outputPath('catalog-400-percent-browser-zoom.png');
+    await page.screenshot({ path: screenshotPath });
+    await testInfo.attach('catalog-400-percent-browser-zoom', {
+      path: screenshotPath,
+      contentType: 'image/png',
+    });
+    await page.getByRole('button', { name: 'Next page' }).click();
+    await expect(page.locator('t-pagination [role=status]')).toHaveText('Page 7 of 13');
+    await page.getByRole('button', { name: 'Record actions' }).click();
+    const menu = page.getByRole('menu', { name: 'Record actions' });
+    await expect(menu).toBeVisible();
+    const box = (await menu.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(320);
+    await page.keyboard.press('Escape');
+    const dialogHost = page.locator('t-dialog[heading="Review workspace settings"]');
+    await dialogHost.evaluate((element: import('../src').TDialog) => element.show());
+    const dialog = dialogHost.locator('dialog');
+    await expect(dialog).toBeVisible();
+    const close = dialog.getByRole('button', { name: 'Close dialog' });
+    await close.focus();
+    const closeBox = (await close.boundingBox())!;
+    expect(closeBox.x).toBeGreaterThanOrEqual(0);
+    expect(closeBox.x + closeBox.width).toBeLessThanOrEqual(320);
+    await page.keyboard.press('Escape');
+    await expect(dialog).not.toBeVisible();
+  } finally {
+    await context.close();
+  }
+});
 
 test('catalog interactive targets meet 24px size or the spacing exception', async ({ page }) => {
   await catalog(page);

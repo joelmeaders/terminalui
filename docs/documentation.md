@@ -22,4 +22,4 @@ Run `npm run test:production` to check the built site. This covers every compone
 
 After changing component metadata, rebuild before starting Storybook. Restart an already running Storybook development server if it retains an old manifest. Do not regenerate watched source or build metadata while development-server browser tests run.
 
-These checks establish executable examples and representative browser behavior. They do not establish manual screen-reader support, real browser zoom coverage, or complete WCAG conformance. Track those checks in [accessibility evidence](accessibility.md).
+These checks establish executable examples and representative browser behavior. A built Input documentation test also sets actual Chromium page zoom to 400% and checks reflow, framework selection, and keyboard scrolling. Manual screen-reader review, visual review of the Controls table at real zoom, and complete WCAG conformance remain unproven. Track those checks in [accessibility evidence](accessibility.md).
