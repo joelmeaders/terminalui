@@ -137,6 +137,12 @@ export class TToast extends TerminalElement {
         border-radius: 50%;
         animation: var(--_t-motion-name, countdown-spin) 900ms linear infinite;
       }
+      [part='countdown-value'] {
+        position: relative;
+        z-index: 1;
+        padding: 2px;
+        background: var(--t-raised);
+      }
       .countdown-unit {
         display: block;
         font-size: 0.8em;

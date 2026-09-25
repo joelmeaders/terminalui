@@ -282,6 +282,29 @@ test('countdowns retain labels, contrast and readable layout in all palettes at 
         `${theme} toast axe review items: ${report.incomplete.map((item) => item.id).join(', ')}`,
       );
     expect(report.violations, theme).toEqual([]);
+    expect(report.incomplete, `${theme} countdown review items`).toEqual([]);
+    const colors = await page.locator('[part=countdown-value]').evaluate((element) => {
+      const style = getComputedStyle(element);
+      return { text: style.color, background: style.backgroundColor };
+    });
+    const luminance = (color: string) =>
+      color
+        .match(/[\d.]+/g)!
+        .slice(0, 3)
+        .map(Number)
+        .map((value) => {
+          const channel = value / 255;
+          return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+        })
+        .reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+    const [light, dark] = [luminance(colors.text), luminance(colors.background)].sort(
+      (a, b) => b - a,
+    );
+    expect(colors.background, `${theme} opaque countdown background`).toMatch(/^rgb\(/);
+    expect(
+      (light + 0.05) / (dark + 0.05),
+      `${theme} countdown text contrast`,
+    ).toBeGreaterThanOrEqual(4.5);
     const value = page.locator('[part=countdown-value]');
     const bounds = await value.boundingBox();
     const ring = await page.locator('.countdown-spinner').boundingBox();
