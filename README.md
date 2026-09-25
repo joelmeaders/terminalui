@@ -176,6 +176,8 @@ Fields emit bubbling, composed `input` and `change` events. Read `event.target.v
 
 Set arrays such as `options`, `tabs`, `items`, `columns`, and `rows` as JavaScript properties. Pass new arrays when changing their contents. Slot names must match unique tab IDs.
 
+Tabs default to a horizontal list. Set `orientation="vertical"` for a side list that moves above its panel on narrow screens. Horizontal arrow keys follow text direction; vertical tabs use Up and Down.
+
 ```js
 select.options = [{ value: 'web', label: 'Website' }];
 select.value = 'web';

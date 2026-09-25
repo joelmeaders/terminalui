@@ -807,9 +807,11 @@ export const guides: Record<string, ComponentGuide> = {
     usage: [
       'Supply tabs with unique id, label, and optional disabled. Each ID names the corresponding content slot.',
       'active controls the selected ID. Keyboard navigation activates the next enabled tab automatically.',
+      'Use orientation="vertical" for a side list. The vertical list moves above its panel on narrow screens.',
     ],
     accessibility: [
-      'Give the tablist a label. ArrowLeft/Right, Home, and End move between enabled tabs.',
+      'Give the tablist a label. Horizontal tabs use Left/Right (reversed in RTL); vertical tabs use Up/Down. Home and End reach the first and last enabled tabs.',
+      'Only the selected panel is visible. Keep the panel content ready when selection changes automatically.',
       'Use links for navigation to different pages.',
     ],
     example: {
