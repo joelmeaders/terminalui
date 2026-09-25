@@ -1,10 +1,13 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
+import { repeat } from 'lit/directives/repeat.js';
 import { FormControl, fieldStyles } from '../internal/form-control';
+import { activeElement } from '../internal/floating';
 import type { SelectOption } from './select';
 
 /**
  * Choose several options with native checkboxes. Each choice submits a FormData entry under name.
  * The values property is a string array; value is its JSON string form for attribute and state restoration.
+ * Replacing options preserves focus by choice value. An empty required list focuses its named group on validation.
  *
  * @fires input - A user changed the values array.
  * @fires change - A user committed a checkbox change.
@@ -22,7 +25,7 @@ export class TMultiSelect extends FormControl {
     query: { state: true },
   };
 
-  /** Available choices. Values must be unique. Replace the array to update the list. */
+  /** Available choices. Values must be unique. Replace the array to update the list. Focus follows a surviving value. */
   options: SelectOption[] = [];
   /** Selected option values. Replace the array to change selection. */
   values: string[] = [];
@@ -33,6 +36,8 @@ export class TMultiSelect extends FormControl {
   private query = '';
   private serialized = '';
   private entryError = '';
+  private focusedChoice?: { element: HTMLInputElement; value: string; index: number };
+  private groupHadFocus = false;
 
   static styles = [
     fieldStyles,
@@ -42,6 +47,10 @@ export class TMultiSelect extends FormControl {
         margin: 0;
         padding: 0;
         border: 0;
+      }
+      fieldset:focus {
+        outline: 2px solid var(--t-focus);
+        outline-offset: 4px;
       }
       legend {
         padding: 0;
@@ -113,6 +122,9 @@ export class TMultiSelect extends FormControl {
         color: var(--t-muted);
       }
       @media (forced-colors: active) {
+        fieldset:focus {
+          outline-color: Highlight;
+        }
         .list {
           border-color: ButtonText;
         }
@@ -133,6 +145,20 @@ export class TMultiSelect extends FormControl {
   }
 
   protected willUpdate(changed: PropertyValues) {
+    if (changed.has('options')) {
+      const active = this.shadowRoot?.activeElement;
+      const choice =
+        active instanceof HTMLInputElement && active.type === 'checkbox' ? active : undefined;
+      const enabled = [
+        ...this.renderRoot.querySelectorAll<HTMLInputElement>(
+          'input[type=checkbox]:not(:disabled)',
+        ),
+      ];
+      this.focusedChoice = choice
+        ? { element: choice, value: choice.value, index: enabled.indexOf(choice) }
+        : undefined;
+      this.groupHadFocus = active === this.renderRoot.querySelector('fieldset');
+    }
     if (changed.has('value') && this.value !== this.serialized) {
       try {
         const parsed: unknown = this.value ? JSON.parse(this.value) : [];
@@ -153,6 +179,37 @@ export class TMultiSelect extends FormControl {
     this.value = this.serialized = JSON.stringify(this.values);
   }
 
+  protected updated(changed: PropertyValues) {
+    super.updated(changed);
+    if (!changed.has('options')) return;
+    const focused = this.focusedChoice;
+    const groupHadFocus = this.groupHadFocus;
+    this.focusedChoice = undefined;
+    this.groupHadFocus = false;
+    if ((!focused && !groupHadFocus) || this.isDisabled) return;
+    const group = this.renderRoot.querySelector<HTMLElement>('fieldset');
+    const current = activeElement();
+    if (
+      current &&
+      current !== focused?.element &&
+      current !== group &&
+      current !== this &&
+      current !== document.body
+    )
+      return;
+    const enabled = [
+      ...this.renderRoot.querySelectorAll<HTMLInputElement>('input[type=checkbox]:not(:disabled)'),
+    ];
+    const match = enabled.find((choice) => choice.value === focused?.value);
+    const fallback = enabled[Math.min(focused?.index ?? 0, enabled.length - 1)];
+    (
+      match ??
+      fallback ??
+      this.renderRoot.querySelector<HTMLElement>('input[type=search]') ??
+      group
+    )?.focus();
+  }
+
   protected syncForm() {
     const choices = new Set(
       this.options.filter((option) => !option.disabled).map((option) => option.value),
@@ -169,7 +226,8 @@ export class TMultiSelect extends FormControl {
         (this.required && !selected.length ? 'Choose at least one option.' : '');
     const anchor =
       this.renderRoot.querySelector<HTMLInputElement>('input[type="checkbox"]:not(:disabled)') ??
-      this.control;
+      this.control ??
+      this.renderRoot.querySelector<HTMLElement>('fieldset');
     this.internals.setValidity(
       message
         ? this.required &&
@@ -222,7 +280,10 @@ export class TMultiSelect extends FormControl {
     const selector = this.searchable
       ? 'input[type="search"]'
       : 'input[type="checkbox"]:not(:disabled)';
-    this.renderRoot.querySelector<HTMLInputElement>(selector)?.focus(options);
+    (
+      this.renderRoot.querySelector<HTMLInputElement>(selector) ??
+      this.renderRoot.querySelector<HTMLElement>('fieldset')
+    )?.focus(options);
   }
 
   render() {
@@ -230,7 +291,7 @@ export class TMultiSelect extends FormControl {
     const options = this.options.filter((option) =>
       option.label.toLocaleLowerCase().includes(query),
     );
-    return html`<fieldset ?disabled=${this.isDisabled}>
+    return html`<fieldset tabindex="-1" aria-describedby="help" ?disabled=${this.isDisabled}>
         <legend>
           ${this.label}${this.required ? html` <abbr title="required" aria-hidden="true">*</abbr><span class="visually-hidden"> required</span>` : nothing}
         </legend>
@@ -255,7 +316,9 @@ export class TMultiSelect extends FormControl {
         <div class="list" part="list">
           ${
             options.length
-              ? options.map(
+              ? repeat(
+                  options,
+                  (option) => option.value,
                   (option) =>
                     html`<label class="option" part="option"
                       ><input

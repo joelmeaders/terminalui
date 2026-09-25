@@ -65,6 +65,62 @@ test('native choices support keyboard, filtering, events, FormData and reset', a
   ]);
 });
 
+test('live options keep focus on the same choice or move it within the named group', async ({
+  page,
+}) => {
+  await fixture(
+    page,
+    '<form><t-multi-select name="teams" label="Teams"></t-multi-select></form><button id="after">After</button>',
+  );
+  const host = page.locator('t-multi-select');
+  await host.evaluate((element: import('../src').TMultiSelect) => {
+    element.options = [
+      { value: 'a', label: 'Alpha' },
+      { value: 'b', label: 'Beta' },
+      { value: 'c', label: 'Gamma' },
+    ];
+    element.values = ['b'];
+  });
+  await page.getByRole('checkbox', { name: 'Beta' }).focus();
+  await host.evaluate((element: import('../src').TMultiSelect) => {
+    element.options = [
+      { value: 'b', label: 'Beta' },
+      { value: 'c', label: 'Gamma' },
+      { value: 'a', label: 'Alpha' },
+    ];
+  });
+  await expect(page.getByRole('checkbox', { name: 'Beta' })).toBeFocused();
+  await expect(page.getByRole('checkbox', { name: 'Beta' })).toBeChecked();
+  await host.evaluate((element: import('../src').TMultiSelect) => {
+    element.options = [
+      { value: 'b', label: 'Beta', disabled: true },
+      { value: 'c', label: 'Gamma' },
+      { value: 'a', label: 'Alpha' },
+    ];
+  });
+  await expect(page.getByRole('checkbox', { name: 'Gamma' })).toBeFocused();
+  await host.evaluate((element: import('../src').TMultiSelect) => {
+    element.options = [];
+  });
+  await expect(page.getByRole('group', { name: 'Teams' })).toBeFocused();
+  await host.evaluate((element: import('../src').TMultiSelect) => {
+    element.options = [{ value: 'd', label: 'Delta' }];
+  });
+  await expect(page.getByRole('checkbox', { name: 'Delta' })).toBeFocused();
+  await page.locator('#after').focus();
+  await host.evaluate((element: import('../src').TMultiSelect) => {
+    element.options = [{ value: 'e', label: 'Echo' }];
+  });
+  await expect(page.locator('#after')).toBeFocused();
+  expect(
+    await page
+      .locator('form')
+      .evaluate((form: HTMLFormElement) => new FormData(form).getAll('teams')),
+  ).toEqual([]);
+  const axe = await new AxeBuilder({ page }).include('t-multi-select').analyze();
+  expect(axe.violations, JSON.stringify(axe.violations)).toEqual([]);
+});
+
 test('required and custom errors target the actual choices and clear on correction', async ({
   page,
 }) => {
@@ -102,6 +158,20 @@ test('required and custom errors target the actual choices and clear on correcti
       .locator('form')
       .evaluate((form: HTMLFormElement) => new FormData(form).getAll('teams')),
   ).toEqual(['b']);
+});
+
+test('an empty required choice group remains a focusable validation target', async ({ page }) => {
+  await fixture(
+    page,
+    '<form><t-multi-select name="teams" label="Teams" required></t-multi-select><button type="submit">Save</button></form>',
+  );
+  await page.getByRole('button', { name: 'Save' }).click();
+  const group = page.getByRole('group', { name: 'Teams required' });
+  await expect(group).toBeFocused();
+  await expect(group).toHaveAccessibleDescription('Choose at least one option.');
+  await expect(group).toHaveCSS('outline-width', '2px');
+  const axe = await new AxeBuilder({ page }).include('t-multi-select').analyze();
+  expect(axe.violations, JSON.stringify(axe.violations)).toEqual([]);
 });
 
 test('disabled and unavailable options do not submit; palettes have no axe violations', async ({

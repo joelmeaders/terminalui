@@ -743,6 +743,7 @@ export const guides: Record<string, ComponentGuide> = {
       'Supply unique option values through the options property. Each option has value, label, and optional disabled.',
       'Read and set the values array. The value string is its JSON form. Each selection produces one FormData entry under name.',
       'Use searchable to filter the visible choices. Filtering keeps the current selection.',
+      'Replace options to update the list. Keep values stable so focus stays with the same choice.',
     ],
     {
       form: 'values',
@@ -755,6 +756,7 @@ export const guides: Record<string, ComponentGuide> = {
       accessibility: [
         'The fieldset names the group. Every choice is a native checkbox with its own label.',
         'The optional filter only changes the visible choices. Selected choices remain selected when the filter changes.',
+        'If a focused choice disappears or becomes disabled, focus moves to an available choice or the named group. An empty required group can receive focus and describe its error.',
       ],
     },
   ),

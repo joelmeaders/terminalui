@@ -25,7 +25,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Labeled native checkboxes with optional filtering. Set the `options` array and read `values`. Each selected value submits a separate FormData entry under `name`. The `value` string is a JSON array for attributes and form state restoration.',
+          'Labeled native checkboxes with optional filtering. Set the `options` array and read `values`. Each selected value submits a separate FormData entry under `name`. The `value` string is a JSON array for attributes and form state restoration. Replace the options array for live updates; focus follows a surviving value or moves to an available choice. An empty required list focuses its named group when submitted.',
       },
     },
   },
@@ -63,6 +63,18 @@ export const Empty: Story = {
       empty-message="No departments available."
     ></t-multi-select>`,
 };
+export const EmptyRequired: Story = {
+  render: () =>
+    html`<form>
+      <t-multi-select name="departments" label="Departments" required></t-multi-select
+      ><button type="submit">Save</button>
+    </form>`,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-multi-select')!;
+    await userEvent.click(canvasElement.querySelector('button')!);
+    await expect(host.shadowRoot!.activeElement).toBe(host.shadowRoot!.querySelector('fieldset'));
+  },
+};
 export const Filtered: Story = {
   play: async ({ canvasElement }) => {
     const host = canvasElement.querySelector('t-multi-select')!;
@@ -87,5 +99,23 @@ export const ReactiveOptions: Story = {
     await host.updateComplete;
     await expect(host.shadowRoot!.querySelectorAll('.option')).toHaveLength(1);
     await expect(host.shadowRoot!.querySelector('input[type="checkbox"]')).toBeChecked();
+  },
+};
+export const LiveOptionsFocus: Story = {
+  render: () =>
+    html`<t-multi-select label="Live departments" .options=${options}></t-multi-select>`,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-multi-select')!;
+    host.shadowRoot!.querySelector<HTMLInputElement>('input[value="engineering"]')!.focus();
+    host.options = [options[1], options[0], options[2]];
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toBe(
+      host.shadowRoot!.querySelector('input[value="engineering"]'),
+    );
+    host.options = [options[0], options[2]];
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toBe(
+      host.shadowRoot!.querySelector('input[value="archive"]'),
+    );
   },
 };
