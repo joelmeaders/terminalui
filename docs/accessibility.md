@@ -4,6 +4,10 @@ Terminal Kit targets WCAG 2.2 Level AA for its 56 browser components and shipped
 
 ## Evidence and limits
 
+The 2026-09-25 tooltip review measured its open text against its opaque panel in all six palettes. Chromium, Firefox, and WebKit each passed a nested palette change while the tooltip stayed open at 320 CSS pixels. The lowest computed contrast ratio was 10.59:1 in paper. The panel stayed within the viewport in each sampled state. A Playwright Chromium screenshot on Windows shows the paper tooltip after one animation frame.
+
+The browser version was not recorded, and no assistive technology was used. Axe still marks this overlapping panel as a `color-contrast` incomplete item. The measured panel does not resolve every tooltip state or prove screen-reader speech.
+
 The 2026-09-25 Storybook Controls review found low contrast on the visible category label and chevron. Storybook drew them at 40% opacity over a dark cell. The docs now use `--docs-muted` for that visible label. A Playwright Chromium check at 320 CSS pixels measured 9.79:1 against the cell background on the Icon, Input, and Dialog manuals. A visual review of the Input manual on Windows confirmed the brighter label and chevron.
 
 The browser version was not recorded, and no assistive technology was used. Axe still marks the category as incomplete because a transparent text button overlaps the visible label. That incomplete finding remains a review item, not a verified pass.
@@ -216,7 +220,7 @@ The three Storybook documentation scans return `color-contrast` incomplete findi
 
 The expanded slot-guide scans on the Button, Input, and Toast documentation pages return no violations. After the boolean-control update, they retain only `color-contrast` review items for clipped or overlapping table/control content and Toast countdown digits and units. Reports are saved as `<story-id>-slots-axe-review.json` in the production output. These checks establish no horizontal page overflow at 320 CSS pixels. Scrollable API tables still need the manual review above.
 
-The catalog layout scans returned no axe violations. Their JSON attachments are named `axe-layout-review-needed.json` in the Playwright output directories. The remaining `color-contrast` incomplete findings concern non-text symbols, partially clipped table cells, and an overlapping tooltip. The semantic contrast suite covers theme colors and scanline composites. The rendered-symbol check above covers representative symbols and text during palette switches. Partially clipped cells, overlapping content, and other rendered states remain open for review.
+The catalog layout scans returned no axe violations. Their JSON attachments are named `axe-layout-review-needed.json` in the Playwright output directories. The remaining `color-contrast` incomplete findings concern non-text symbols, partially clipped table cells, and an overlapping tooltip. The semantic contrast suite covers theme colors and scanline composites. The rendered-symbol check above covers representative symbols and text during palette switches. The tooltip check above covers its sampled opaque panel. Partially clipped cells, overlapping content, and other rendered states remain open for review.
 
 The menu trigger uses `aria-haspopup="menu"` and a live `aria-expanded` state. The optional `aria-controls` value could not be resolved by axe for the shadow-root popover, even while it was open. Removing that unresolved reference cleared `aria-valid-attr-value` incomplete findings in closed and open menu checks across Chromium, Firefox, and WebKit. The [W3C menu-button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/) permits omitting `aria-controls`. Manual NVDA and VoiceOver checks of the menu remain pending.
 
