@@ -323,6 +323,21 @@ try {
           `${framework}/${tag}: filtering must keep selected values.`,
         );
       }
+      if (tag === 't-table') {
+        await page.getByRole('button', { name: 'Next page for Mission records' }).click();
+        assert.equal(
+          await page.locator(tag).evaluate((el) => el.page),
+          2,
+          `${framework}/${tag}: local paging must update the page property.`,
+        );
+        await page.getByRole('searchbox', { name: 'Filter Mission records' }).fill('crew');
+        assert.deepEqual(
+          await page.locator(tag).evaluate((el) => ({ query: el.query, page: el.page })),
+          { query: 'crew', page: 1 },
+          `${framework}/${tag}: filtering must reset the page without losing the query.`,
+        );
+        assert.equal(await page.locator('t-table tbody tr').count(), 1);
+      }
       if (tag === 't-toast') {
         assert.equal(
           (await page.locator('t-toast [role=status]').innerText()).trim(),

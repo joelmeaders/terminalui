@@ -88,7 +88,7 @@ Use `.t-h1` through `.t-h6` for heading appearance, `.t-text` for standalone tex
 | `t-menu`              | Action menu                      | `label`, `options`, `open`, `disabled`, `t-select`                                          |
 | `t-breadcrumb`        | Navigation path                  | `items`, `label`                                                                            |
 | `t-pagination`        | Page navigation                  | `page`, `total`, `pageSize`, `label`, `disabled`, `t-change`                                |
-| `t-table`             | Sortable native table            | `columns`, `rows`, `caption`, `sortKey`, `sortDirection`, `selectedKeys`, `loading`         |
+| `t-table`             | Searchable, pageable table       | `columns`, `rows`, `query`, `filterable`, `page`, `pageSize`, `selectedKeys`, `loading`     |
 | `t-drawer`            | Modal side panel                 | `heading`, `open`, `placement`, `show(opener?)`, `close()`                                  |
 | `t-tree`              | Hierarchical navigation          | `items`, `value`, `expandedIds`, `label`                                                    |
 | `t-icon`              | Built-in or registered SVG icon  | `name`, `label`, `size`                                                                     |
@@ -118,7 +118,7 @@ Use `.t-h1` through `.t-h6` for heading appearance, `.t-text` for standalone tex
 | `t-split-pane`        | Resizable two-pane layout        | `size`, `min`, `max`, `step`, `orientation`, `stackAt`, named slots                         |
 | `t-copy-button`       | Clipboard action and status      | `value`, `label`, `disabled`, `t-copy`, `t-copy-error`                                      |
 
-The input supports text, numeric, and native date/time types with browser constraint validation. Date/time interfaces follow the browser. The kit does not include a custom calendar or rich-text editor. File selection uses `t-file-input`; it does not upload files. Tables provide local sorting and selection without virtualization or editable cells.
+The input supports text, numeric, and native date/time types with browser constraint validation. Date/time interfaces follow the browser. The kit does not include a custom calendar or rich-text editor. File selection uses `t-file-input`; it does not upload files. Tables provide local filtering, sorting, paging, and selection without virtualization or editable cells. A table's selected keys persist across filters and pages; select all affects only the rows currently visible.
 
 ## Use in plain HTML
 
@@ -314,7 +314,7 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 42.6 KB for registration of all 51 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.2 KB gzip. The button and complete-catalog budgets are 8 KB and 43 KB. The catalog budget increased by 1 KB for multi-select. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
+The local size check measures about 8.0 KB gzip for one button, 9.9 KB for the original three form controls, and 43.7 KB for registration of all 51 components. One selected Ionicons example, its registry, and `t-icon` measure about 10.7 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS is about 2.2 KB gzip. The button and complete-catalog budgets are 8 KB and 44 KB. The catalog budget increased for multi-select, then for local table filtering and paging. The form budget is 10 KB to allow about 0.5 KB for field slots and disabled-action handling. Importing and using more exported APIs adds their code.
 
 ## Storybook and verification
 

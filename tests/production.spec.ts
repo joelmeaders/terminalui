@@ -220,7 +220,7 @@ test('built spinner styles work in the demo selector and Storybook gallery', asy
     await expect(item).toHaveCSS('animation-name', 'none');
 });
 
-// Earlier page references remain available alongside the reviewed spinner-selector layout.
+// Earlier page references remain available alongside the reviewed table target-size layout.
 for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {
   test(`visual reference: ${theme}`, async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
@@ -228,7 +228,7 @@ for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {
     await page
       .getByRole('button', { name: theme[0].toUpperCase() + theme.slice(1), exact: true })
       .click();
-    await expect(page).toHaveScreenshot(`spinner-${theme}-desktop.png`, {
+    await expect(page).toHaveScreenshot(`table-target-${theme}-desktop.png`, {
       fullPage: true,
       animations: 'disabled',
       maxDiffPixelRatio: 0.002,
@@ -240,7 +240,7 @@ test('visual reference: mobile and dialog', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await expect(page.getByRole('button', { name: 'Save configuration', exact: true })).toBeVisible();
-  await expect(page).toHaveScreenshot('spinner-amber-mobile.png', {
+  await expect(page).toHaveScreenshot('table-target-amber-mobile.png', {
     fullPage: true,
     animations: 'disabled',
     maxDiffPixelRatio: 0.002,
@@ -285,7 +285,7 @@ for (const profile of [
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
-    await expect(page).toHaveScreenshot(`spinner-${profile.name}.png`, {
+    await expect(page).toHaveScreenshot(`table-target-${profile.name}.png`, {
       fullPage: true,
       animations: 'disabled',
       maxDiffPixelRatio: 0.002,

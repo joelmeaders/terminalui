@@ -362,7 +362,9 @@ export const TTable = createComponent({
   events: {
     onInput: 'input' as EventName<Event>,
     onChange: 'change' as EventName<Event>,
+    onTFilter: 't-filter' as EventName<CustomEvent<unknown>>,
     onTSort: 't-sort' as EventName<CustomEvent<unknown>>,
+    onTPageChange: 't-page-change' as EventName<CustomEvent<unknown>>,
     onTSelectionChange: 't-selection-change' as EventName<CustomEvent<unknown>>,
   },
 });

@@ -52,6 +52,10 @@ export class TMeter extends TerminalElement {
   private phase: 'pending' | 'entering' | 'complete' = 'complete';
   private entered = false;
   private observer?: IntersectionObserver;
+  private motionQuery?: MediaQueryList;
+  private onMotionChange = (event: MediaQueryListEvent) => {
+    if (event.matches && this.animated) this.completeEntrance();
+  };
   static styles = [
     baseStyles,
     css`
@@ -184,9 +188,15 @@ export class TMeter extends TerminalElement {
   connectedCallback() {
     super.connectedCallback();
     this.entered = false;
+    if (typeof matchMedia === 'function') {
+      this.motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+      this.motionQuery.addEventListener('change', this.onMotionChange);
+    }
     this.prepareEntrance();
   }
   disconnectedCallback() {
+    this.motionQuery?.removeEventListener('change', this.onMotionChange);
+    this.motionQuery = undefined;
     this.observer?.disconnect();
     this.observer = undefined;
     super.disconnectedCallback();
@@ -201,12 +211,15 @@ export class TMeter extends TerminalElement {
       this.phase = 'complete';
       return;
     }
+    if (this.motionQuery?.matches) {
+      this.completeEntrance();
+      return;
+    }
     this.phase = 'pending';
     void this.updateComplete.then(() => {
       if (!this.isConnected || this.phase !== 'pending' || this.observer) return;
       if (typeof IntersectionObserver === 'undefined') {
-        this.entered = true;
-        this.phase = 'complete';
+        this.completeEntrance();
         return;
       }
       this.observer = new IntersectionObserver((entries) => {
@@ -232,6 +245,12 @@ export class TMeter extends TerminalElement {
       });
       this.observer.observe(this);
     });
+  }
+  private completeEntrance() {
+    this.observer?.disconnect();
+    this.observer = undefined;
+    this.entered = true;
+    this.phase = 'complete';
   }
   private finishEntrance() {
     if (this.phase === 'entering') this.phase = 'complete';

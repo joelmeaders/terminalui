@@ -700,15 +700,18 @@ export const guides: Record<string, ComponentGuide> = {
     { form: 'checked', event: checkedEvent },
   ),
   't-table': {
-    purpose: 'Read structured records with optional local sorting and selection.',
+    purpose:
+      'Read structured records with optional local filtering, sorting, paging, and selection.',
     usage: [
       'Provide columns with key, label, and optional sortable. Each key reads a plain-text row value.',
       'Give rows stable unique identifiers through rowKey. Replace arrays when data changes.',
-      'Sorting is local. The table does not fetch data, virtualize rows, or edit cells. Set loading or emptyText for those states.',
+      'Set filterable to show a search field. Query searches the displayed columns. PageSize enables local paging; page is one-based.',
+      'Sorting, filtering, and paging are local. The table does not fetch data, virtualize rows, or edit cells. Set loading, emptyText, or noResultsText for those states.',
     ],
     accessibility: [
       'Use a useful caption. Native table semantics and named sorting buttons preserve relationships.',
       'Wide tables scroll horizontally instead of hiding columns. Row selection uses native checkboxes.',
+      'Select all applies to the current page after filtering and sorting. Selected keys on other pages remain selected.',
     ],
     example: {
       props: {
@@ -720,16 +723,19 @@ export const guides: Record<string, ComponentGuide> = {
         rows: [
           { id: 'survey', name: 'Atmospheric survey', status: 'Ready' },
           { id: 'crew', name: 'Crew manifest', status: 'In review' },
+          { id: 'nav', name: 'Navigation log', status: 'Ready' },
         ],
         rowKey: 'id',
         selectable: true,
+        filterable: true,
+        pageSize: 2,
       },
     },
     event: {
       name: 't-selection-change',
       read: 'detail.selectedKeys',
       description:
-        'detail.selectedKeys contains selected identifiers. t-sort reports key and direction after a local sort.',
+        'detail.selectedKeys contains selected identifiers. t-filter reports query, t-sort reports key and direction, and t-page-change reports page and pageSize.',
     },
   },
   't-tabs': {

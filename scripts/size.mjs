@@ -22,7 +22,8 @@ for (const [name, contents] of Object.entries(scenarios)) {
   });
   const bytes = result.outputFiles[0].contents;
   const gzipBytes = gzipSync(bytes).length;
-  // The complete catalog includes collection, overlay, and form behaviors. Keep small imports strict.
+  // The complete catalog includes collection, overlay, form, and table data behaviors.
+  // Allow the complete catalog to include local table filtering and paging.
   // Optional field slots and disabled-action handling add about 0.5 kB to the form bundle.
   const budget =
     name === 'One button'
@@ -31,7 +32,7 @@ for (const [name, contents] of Object.entries(scenarios)) {
         ? 10000
         : name === 'One Ionicons icon'
           ? 12000
-          : 43000;
+          : 44000;
   if (bytes.length === 0 || gzipBytes > budget)
     throw new Error(
       `${name}: ${gzipBytes} B exceeds its ${budget} B gzip budget or has no output.`,
