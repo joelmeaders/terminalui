@@ -38,11 +38,11 @@ export class TSplitPane extends TerminalElement {
     disabled: { type: Boolean, reflect: true },
     narrow: { state: true },
   };
-  /** Primary pane percentage. */
+  /** Primary pane percentage. Zero hides the primary pane; 100 hides the secondary pane. */
   size = 50;
-  /** Minimum primary pane percentage. */
+  /** Minimum primary pane percentage. Set to zero to allow full primary collapse. */
   min = 10;
-  /** Maximum primary pane percentage. */
+  /** Maximum primary pane percentage. Set to 100 to allow full secondary collapse. */
   max = 90;
   /** Arrow key percentage increment. Shift multiplies it by ten. */
   step = 1;
@@ -60,6 +60,7 @@ export class TSplitPane extends TerminalElement {
   disabled = false;
   private narrow = false;
   private restoreSize?: number;
+  private hiddenSlotted = new Map<Element, string | null>();
   private resize = new ResizeObserver((entries) => {
     this.narrow = this.stackAt > 0 && entries[0].contentRect.width < this.stackAt;
   });
@@ -90,6 +91,9 @@ export class TSplitPane extends TerminalElement {
         overflow: auto;
         padding: var(--t-space, 16px);
         overflow-wrap: anywhere;
+      }
+      .pane[hidden] {
+        display: none;
       }
       .pane:focus-visible {
         outline-offset: -3px;
@@ -134,10 +138,18 @@ export class TSplitPane extends TerminalElement {
   connectedCallback() {
     super.connectedCallback();
     this.resize.observe(this);
+    void this.updateComplete.then(() => {
+      if (this.isConnected) this.syncSlottedVisibility();
+    });
   }
   disconnectedCallback() {
     this.resize.disconnect();
     this.drag = undefined;
+    for (const [element, original] of this.hiddenSlotted) {
+      if (original === null) element.removeAttribute('aria-hidden');
+      else element.setAttribute('aria-hidden', original);
+    }
+    this.hiddenSlotted.clear();
     super.disconnectedCallback();
   }
   protected willUpdate(changed: PropertyValues) {
@@ -147,8 +159,51 @@ export class TSplitPane extends TerminalElement {
       : Math.max(this.min, 90);
     this.step = Number.isFinite(this.step) && this.step > 0 ? this.step : 1;
     this.size = this.clamp(this.size);
+    this.moveFocusFromCollapsedPane();
     if (changed.has('stackAt'))
       this.narrow = this.stackAt > 0 && this.getBoundingClientRect().width < this.stackAt;
+  }
+  private moveFocusFromCollapsedPane() {
+    const active = this.ownerDocument.activeElement,
+      pane =
+        this.shadowRoot?.activeElement?.closest('.pane') ?? active?.assignedSlot?.closest('.pane');
+    if (
+      (this.size === 0 && pane?.getAttribute('part') === 'primary') ||
+      (this.size === 100 && pane?.getAttribute('part') === 'secondary')
+    ) {
+      const destination = this.disabled
+        ? this.renderRoot.querySelector<HTMLElement>(
+            this.size === 0 ? '[part="secondary"]' : '[part="primary"]',
+          )
+        : this.renderRoot.querySelector<HTMLElement>('[role="separator"]');
+      destination?.focus();
+    }
+  }
+  private syncSlottedVisibility() {
+    if (!this.isConnected) return;
+    const hidden = new Set<Element>();
+    for (const [name, collapsed] of [
+      ['primary', this.size === 0],
+      ['secondary', this.size === 100],
+    ] as const) {
+      if (!collapsed) continue;
+      const slot = this.renderRoot.querySelector<HTMLSlotElement>(`slot[name="${name}"]`);
+      for (const element of slot?.assignedElements() ?? []) hidden.add(element);
+    }
+    for (const [element, original] of this.hiddenSlotted) {
+      if (hidden.has(element)) continue;
+      if (original === null) element.removeAttribute('aria-hidden');
+      else element.setAttribute('aria-hidden', original);
+      this.hiddenSlotted.delete(element);
+    }
+    for (const element of hidden) {
+      if (this.hiddenSlotted.has(element)) continue;
+      this.hiddenSlotted.set(element, element.getAttribute('aria-hidden'));
+      element.setAttribute('aria-hidden', 'true');
+    }
+  }
+  protected updated() {
+    this.syncSlottedVisibility();
   }
   private clamp(size: number) {
     return Math.max(this.min, Math.min(this.max, Number.isFinite(size) ? size : 50));
@@ -167,8 +222,8 @@ export class TSplitPane extends TerminalElement {
       if (this.size > this.min) {
         this.restoreSize = this.size;
         value = this.min;
-      } else if (this.restoreSize !== undefined) {
-        value = this.restoreSize;
+      } else {
+        value = this.restoreSize ?? (this.min + this.max) / 2;
         this.restoreSize = undefined;
       }
     } else if (event.key === increase) value += this.step * (event.shiftKey ? 10 : 1);
@@ -229,11 +284,21 @@ export class TSplitPane extends TerminalElement {
       class="layout"
       style=${styleMap({ gridTemplateColumns: horizontal ? tracks : 'minmax(0,1fr)', gridTemplateRows: horizontal ? 'minmax(0,1fr)' : tracks })}
     >
-      <section class="pane" id="primary" part="primary" tabindex="0" aria-label=${primaryLabel}>
-        <slot name="primary"></slot>
+      <section
+        class="pane"
+        id="primary"
+        part="primary"
+        style="grid-area: 1 / 1"
+        tabindex="0"
+        aria-label=${primaryLabel}
+        ?hidden=${this.size === 0}
+        ?inert=${this.size === 0}
+      >
+        <slot name="primary" @slotchange=${this.syncSlottedVisibility}></slot>
       </section>
       <div
         part="separator"
+        style=${horizontal ? 'grid-area: 1 / 2' : 'grid-area: 2 / 1'}
         role="separator"
         tabindex=${this.disabled ? -1 : 0}
         aria-label=${this.label?.trim() || primaryLabel}
@@ -251,8 +316,16 @@ export class TSplitPane extends TerminalElement {
         @pointercancel=${this.pointerEnd}
         @lostpointercapture=${this.pointerEnd}
       ></div>
-      <section class="pane" part="secondary" tabindex="0" aria-label=${this.secondaryLabel}>
-        <slot name="secondary"></slot>
+      <section
+        class="pane"
+        part="secondary"
+        style=${horizontal ? 'grid-area: 1 / 3' : 'grid-area: 3 / 1'}
+        tabindex="0"
+        aria-label=${this.secondaryLabel}
+        ?hidden=${this.size === 100}
+        ?inert=${this.size === 100}
+      >
+        <slot name="secondary" @slotchange=${this.syncSlottedVisibility}></slot>
       </section>
     </div>`;
   }

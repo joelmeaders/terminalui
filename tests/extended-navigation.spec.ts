@@ -365,6 +365,120 @@ test('split pane keeps its separator name with the primary pane and honors expli
   expect(axe.incomplete, JSON.stringify(axe.incomplete)).toEqual([]);
 });
 
+test('split pane removes zero-size panes from focus order and restores them', async ({ page }) => {
+  await fixture(
+    page,
+    '<t-split-pane min="0" max="100" primary-label="Files" secondary-label="Preview"><button slot="primary" style="color:#000;background:#fff">Open file</button><button slot="secondary" style="color:#000;background:#fff">Show preview</button></t-split-pane>',
+  );
+  const split = page.locator('t-split-pane');
+  const separator = page.getByRole('separator', { name: 'Files' });
+  const primary = split.locator('[part="primary"]');
+  const secondary = split.locator('[part="secondary"]');
+  await separator.focus();
+  await page.keyboard.press('Enter');
+  await expect(separator).toHaveAttribute('aria-valuenow', '0');
+  await expect(primary).toHaveAttribute('hidden', '');
+  await expect(page.getByRole('button', { name: 'Open file' })).toHaveCount(0);
+  await page.keyboard.press('Tab');
+  await expect(secondary).toBeFocused();
+  await separator.focus();
+  await page.keyboard.press('Enter');
+  await expect(separator).toHaveAttribute('aria-valuenow', '50');
+  await expect(primary).not.toHaveAttribute('hidden');
+  await expect(page.getByRole('button', { name: 'Open file' })).toBeVisible();
+  await separator.focus();
+  await page.keyboard.press('End');
+  await expect(secondary).toHaveAttribute('hidden', '');
+  await expect(page.getByRole('button', { name: 'Show preview' })).toHaveCount(0);
+  await split.evaluate((element: import('../src/components/split-pane').TSplitPane) => {
+    element.size = 50;
+  });
+  await expect(secondary).not.toHaveAttribute('hidden');
+  await page.getByRole('button', { name: 'Show preview' }).focus();
+  await split.evaluate((element: import('../src/components/split-pane').TSplitPane) => {
+    element.size = 100;
+  });
+  await expect(separator).toBeFocused();
+  await expect(secondary).toHaveAttribute('hidden', '');
+  await split.evaluate((element: import('../src/components/split-pane').TSplitPane) => {
+    element.size = 50;
+  });
+  await page.getByRole('button', { name: 'Open file' }).focus();
+  await split.evaluate((element: import('../src/components/split-pane').TSplitPane) => {
+    element.size = 0;
+  });
+  await expect(separator).toBeFocused();
+  await expect(separator).toHaveAttribute('aria-valuenow', '0');
+  await expect(primary).toHaveAttribute('hidden', '');
+  await expect(page.getByRole('button', { name: 'Open file' })).toHaveCount(0);
+  const layoutWidth = await split.evaluate(
+    (element) => element.shadowRoot!.querySelector('.layout')!.getBoundingClientRect().width,
+  );
+  expect((await secondary.boundingBox())!.width).toBeGreaterThan(layoutWidth - 50);
+  await page.setViewportSize({ width: 320, height: 800 });
+  await expect(separator).toHaveAttribute('aria-orientation', 'horizontal');
+  const layoutHeight = await split.evaluate(
+    (element) => element.shadowRoot!.querySelector('.layout')!.getBoundingClientRect().height,
+  );
+  expect((await secondary.boundingBox())!.height).toBeGreaterThan(layoutHeight - 50);
+  const axe = await new AxeBuilder({ page }).include('t-split-pane').analyze();
+  expect(axe.violations, JSON.stringify(axe.violations)).toEqual([]);
+  expect(axe.incomplete, JSON.stringify(axe.incomplete)).toEqual([]);
+  await page.keyboard.press('Enter');
+  await expect(separator).toHaveAttribute('aria-valuenow', '50');
+  await expect(page.getByRole('button', { name: 'Open file' })).toBeVisible();
+});
+
+test('split pane restores consumer ARIA state when slots change or the host disconnects', async ({
+  page,
+}) => {
+  await fixture(
+    page,
+    '<t-split-pane min="0" size="0"><span slot="primary" aria-hidden="false">Marker</span></t-split-pane>',
+  );
+  const split = page.locator('t-split-pane');
+  const marker = split.locator('[slot="primary"]');
+  await expect(marker).toHaveAttribute('aria-hidden', 'true');
+  await split.evaluate((element: import('../src/components/split-pane').TSplitPane) => {
+    element.size = 50;
+  });
+  await expect(marker).toHaveAttribute('aria-hidden', 'false');
+  await split.evaluate((element: import('../src/components/split-pane').TSplitPane) => {
+    element.size = 0;
+  });
+  await expect(marker).toHaveAttribute('aria-hidden', 'true');
+  const states = await split.evaluate(
+    async (element: import('../src/components/split-pane').TSplitPane) => {
+      const marker = element.querySelector('[slot="primary"]')!;
+      element.remove();
+      const afterDisconnect = marker.getAttribute('aria-hidden');
+      document.querySelector('#fixture')!.append(element);
+      await element.updateComplete;
+      const afterReconnect = marker.getAttribute('aria-hidden');
+      const added = document.createElement('span');
+      added.slot = 'primary';
+      added.textContent = 'Added while collapsed';
+      element.append(added);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const afterSlotChange = added.getAttribute('aria-hidden');
+      added.remove();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      return {
+        afterDisconnect,
+        afterReconnect,
+        afterSlotChange,
+        afterRemoval: added.getAttribute('aria-hidden'),
+      };
+    },
+  );
+  expect(states).toEqual({
+    afterDisconnect: 'false',
+    afterReconnect: 'true',
+    afterSlotChange: 'true',
+    afterRemoval: null,
+  });
+});
+
 for (const [mode, scenario] of [
   ['narrow', '320 CSS pixel reflow (not browser zoom)'],
   ['text-200', 'simulated 200% text enlargement (not browser zoom)'],

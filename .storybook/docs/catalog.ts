@@ -788,9 +788,10 @@ export const guides: Record<string, ComponentGuide> = {
     usage: [
       'Supply primary and secondary slots. size is the primary pane percentage, bounded by min and max.',
       'Horizontal panes stack below stackAt CSS pixels. Set stackAt=0 to disable that behavior.',
+      'Set min=0 to allow the primary pane to collapse fully. Set max=100 to allow the secondary pane to collapse fully.',
     ],
     accessibility: [
-      'The separator supports arrows, Home/End, and Shift for a larger step. Enter moves the primary pane to its minimum size or restores its previous size.',
+      'The separator supports arrows, Home/End, and Shift for a larger step. Enter moves the primary pane to its minimum size or restores its previous size. If it starts at the minimum, Enter opens it at the midpoint.',
       'Name both panes. The separator uses the primary pane name unless you set label; keep an explicit label aligned with that pane.',
     ],
     example: {
