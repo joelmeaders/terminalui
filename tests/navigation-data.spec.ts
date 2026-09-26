@@ -1,5 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { writeFile } from 'node:fs/promises';
+import type { TTree, TreeItem } from '../src/components/tree';
 
 async function fixture(page: Page, markup: string) {
   await page.goto('/tests/fixture.html');
@@ -12,6 +14,146 @@ async function fixture(page: Page, markup: string) {
     element.innerHTML = html;
   }, markup);
 }
+
+const longTreeLabel = `report-${'A'.repeat(72)}.json`;
+async function narrowTree(page: Page, direction: 'ltr' | 'rtl', preference = 'normal') {
+  await page.setViewportSize({ width: 320, height: 900 });
+  await fixture(
+    page,
+    '<div style="display:flex"><t-tree label="Archive files" style="flex:1"></t-tree></div>',
+  );
+  await page.locator('t-tree').evaluate(
+    async (tree: TTree, { direction, preference, label }) => {
+      document.documentElement.dir = direction;
+      document.body.style.padding = '8px';
+      document.body.style.margin = '0';
+      let children: TreeItem[] = [{ id: 'leaf', label }];
+      for (let depth = 14; depth >= 1; depth--)
+        children = [{ id: `directory-${depth}`, label: `Directory ${depth}`, children }];
+      tree.items = [...children, { id: 'unavailable', label: 'Unavailable file', disabled: true }];
+      tree.expandedIds = Array.from({ length: 14 }, (_, index) => `directory-${index + 1}`);
+      tree.dataset.selections = '0';
+      tree.addEventListener('t-select', () => {
+        tree.dataset.selections = String(Number(tree.dataset.selections) + 1);
+      });
+      if (preference !== 'normal') tree.setAttribute('data-density', 'compact');
+      if (preference === 'enlarged') tree.style.setProperty('--t-font-size', '28px');
+      await tree.updateComplete;
+      if (preference === 'spaced') {
+        const style = document.createElement('style');
+        style.textContent =
+          '[part=row] span {line-height:1.5 !important;letter-spacing:.12em !important;word-spacing:.16em !important}';
+        tree.shadowRoot!.append(style);
+      }
+    },
+    { direction, preference, label: longTreeLabel },
+  );
+}
+
+async function treeGeometry(page: Page) {
+  return page.locator('t-tree').evaluate((tree) => {
+    const boundary = tree.getBoundingClientRect();
+    const rows = [...tree.shadowRoot!.querySelectorAll<HTMLElement>('[part=row]')];
+    return {
+      pageWidth: document.documentElement.scrollWidth,
+      viewport: innerWidth,
+      clipped: rows.flatMap((row) => {
+        const label = row.lastElementChild!;
+        const range = document.createRange();
+        range.selectNodeContents(label);
+        return [...range.getClientRects()]
+          .filter(
+            (rect) =>
+              rect.width > 0 && (rect.left < boundary.left - 1 || rect.right > boundary.right + 1),
+          )
+          .map((rect) => ({ text: label.textContent, left: rect.left, right: rect.right }));
+      }),
+      indentation: rows
+        .slice(0, 15)
+        .map((row) => Number.parseFloat(getComputedStyle(row).paddingInlineStart)),
+      rowWidths: rows.map((row) => ({ width: row.scrollWidth, available: row.clientWidth })),
+      leafText: tree.shadowRoot!.querySelector('[data-id=leaf] > [part=row] > span:last-child')!
+        .textContent,
+    };
+  });
+}
+
+for (const direction of ['ltr', 'rtl'] as const)
+  for (const preference of ['normal', 'enlarged', 'spaced']) {
+    test(`tree labels and deep hierarchy reflow at 320 pixels: ${direction}, ${preference}`, async ({
+      page,
+    }, testInfo) => {
+      await narrowTree(page, direction, preference);
+      const tree = page.locator('t-tree');
+      expect(await tree.evaluate((element) => element.shadowRoot!.activeElement)).toBeNull();
+      await tree.getByRole('treeitem', { name: 'Directory 1', exact: true }).focus();
+      await page.keyboard.press('End');
+      const leaf = tree.getByRole('treeitem', { name: longTreeLabel, exact: true });
+      await expect(leaf).toBeFocused();
+      await expect(leaf).toHaveAttribute('aria-level', '15');
+      await expect(leaf.locator(':scope > [part=row]')).toBeInViewport({ ratio: 1 });
+      await expect(leaf.locator(':scope > [part=row]')).toHaveCSS('outline-width', '2px');
+      const geometry = await treeGeometry(page);
+      expect(geometry.pageWidth).toBeLessThanOrEqual(geometry.viewport + 1);
+      expect(geometry.clipped).toEqual([]);
+      expect(geometry.rowWidths.filter(({ width, available }) => width > available + 1)).toEqual(
+        [],
+      );
+      expect(geometry.leafText).toBe(longTreeLabel);
+      // Keep visible nesting meaningful instead of flattening rows after an indent cap.
+      for (let index = 1; index < geometry.indentation.length; index++)
+        expect(geometry.indentation[index]).toBeGreaterThan(geometry.indentation[index - 1]);
+      await page.keyboard.press('Enter');
+      await expect(tree).toHaveJSProperty('value', 'leaf');
+      await expect(tree).toHaveAttribute('data-selections', '1');
+      await page.keyboard.press('ArrowLeft');
+      const parent = tree.getByRole('treeitem', { name: 'Directory 14', exact: true });
+      await expect(parent).toBeFocused();
+      await page.keyboard.press('ArrowLeft');
+      await expect(leaf).toHaveCount(0);
+      await expect(tree).toHaveJSProperty('value', 'leaf');
+      await page.keyboard.press('ArrowRight');
+      await page.keyboard.press('ArrowRight');
+      await expect(leaf).toBeFocused();
+      await expect(tree).toHaveAttribute('data-selections', '1');
+      if (preference === 'enlarged')
+        await page.screenshot({ path: testInfo.outputPath(`tree-${direction}-320-enlarged.png`) });
+      await page.keyboard.press('Home');
+      const root = tree.getByRole('treeitem', { name: 'Directory 1', exact: true });
+      await expect(root).toBeFocused();
+      await expect(root.locator(':scope > [part=row]')).toBeInViewport({ ratio: 1 });
+      await expect(tree).toHaveJSProperty('value', 'leaf');
+      await expect(tree).toHaveAttribute('data-selections', '1');
+    });
+  }
+
+test('narrow tree labels and focused rows remain accessible in all palettes', async ({
+  page,
+}, testInfo) => {
+  await narrowTree(page, 'ltr');
+  for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {
+    await page
+      .locator('html')
+      .evaluate((element, theme) => element.setAttribute('data-theme', theme), theme);
+    const tree = page.locator('t-tree');
+    await tree.getByRole('treeitem', { name: 'Directory 1', exact: true }).focus();
+    await page.keyboard.press('End');
+    const report = await new AxeBuilder({ page }).include('t-tree').analyze();
+    const path = testInfo.outputPath(`tree-narrow-${theme}-axe-review.json`);
+    await writeFile(
+      path,
+      JSON.stringify({ violations: report.violations, incomplete: report.incomplete }, null, 2),
+    );
+    await testInfo.attach(`tree-narrow-${theme}-axe-review`, {
+      path,
+      contentType: 'application/json',
+    });
+    expect(report.violations).toEqual([]);
+    const geometry = await treeGeometry(page);
+    expect(geometry.pageWidth).toBeLessThanOrEqual(geometry.viewport + 1);
+    expect(geometry.clipped).toEqual([]);
+  }
+});
 
 test('menu skips disabled actions, supports typeahead, returns focus, and dismisses outside', async ({
   page,

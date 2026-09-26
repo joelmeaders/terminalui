@@ -1060,6 +1060,7 @@ export const guides: Record<string, ComponentGuide> = {
     usage: [
       'Items use id, label, and optional children/disabled. Use unique IDs throughout the tree.',
       'value selects one item; expandedIds controls open branches. Replace arrays to update the hierarchy.',
+      'Long labels wrap. Deep hierarchies share a smaller indent step when space is limited. Set --t-tree-indent for the preferred step (20px by default).',
     ],
     accessibility: [
       'Arrows, Home/End, typeahead, and sibling expansion support keyboard browsing.',
@@ -1079,6 +1080,7 @@ export const guides: Record<string, ComponentGuide> = {
         ],
         expandedIds: ['archive'],
       },
+      attrs: { style: '--t-tree-indent: 12px' },
     },
     event: selectEvent,
   },

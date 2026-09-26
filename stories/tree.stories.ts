@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 import { expect, userEvent } from 'storybook/test';
 import '../src/components/tree';
+import type { TreeItem } from '../src/components/tree';
 const items = [
   {
     id: 'src',
@@ -99,5 +100,49 @@ export const LiveBranchCollapse: Story = {
     await expect(tree.shadowRoot!.activeElement?.getAttribute('data-id')).toBe('components');
     await expect(tree.value).toBe('button');
     await expect(tree.shadowRoot!.querySelector('[data-id="src"] > [role="group"]')).not.toBeNull();
+  },
+};
+
+const archiveFolders = [
+  'Archive',
+  'Operations',
+  'Sector 17',
+  'Atmosphere',
+  'Telemetry',
+  'Sensor packages',
+  'Laboratory',
+  'Validated samples',
+];
+let archiveItems: TreeItem[] = [
+  {
+    id: 'sample',
+    label: 'environmental_readings_2026_09_26_sector17_revision3.json',
+  },
+];
+for (let index = archiveFolders.length - 1; index >= 0; index--)
+  archiveItems = [{ id: `folder-${index}`, label: archiveFolders[index], children: archiveItems }];
+export const LongLabels: Story = {
+  render: () =>
+    html`<section style="max-width:320px;--t-tree-indent:16px">
+      <p>Use the arrow keys to browse. Long filenames wrap within this narrow archive.</p>
+      <t-tree
+        label="Sample archive"
+        .items=${archiveItems}
+        .expandedIds=${archiveFolders.map((_, index) => `folder-${index}`)}
+      ></t-tree>
+    </section>`,
+  play: async ({ canvasElement }) => {
+    const tree = canvasElement.querySelector('t-tree')!;
+    await tree.updateComplete;
+    tree.shadowRoot!.querySelector<HTMLElement>('[data-id=folder-0]')!.focus();
+    await userEvent.keyboard('{End}{Enter}');
+    await expect(tree.value).toBe('sample');
+    await expect(tree.shadowRoot!.activeElement?.getAttribute('data-id')).toBe('sample');
+    await expect(tree.scrollWidth).toBeLessThanOrEqual(tree.clientWidth + 1);
+    const indentation = [...tree.shadowRoot!.querySelectorAll('[part=row]')].map((row) =>
+      Number.parseFloat(getComputedStyle(row).paddingInlineStart),
+    );
+    for (let index = 1; index < indentation.length; index++)
+      await expect(indentation[index]).toBeGreaterThan(indentation[index - 1]);
   },
 };

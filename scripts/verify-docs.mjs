@@ -373,6 +373,13 @@ try {
       }
       if (tag === 't-tree') {
         const host = page.locator(tag);
+        assert.equal(
+          await host
+            .locator('[data-id=survey] > [part=row]')
+            .evaluate((element) => getComputedStyle(element).paddingInlineStart),
+          '12px',
+          `${framework}/${tag}: documented indentation must reach the shadow row.`,
+        );
         assert.equal(await page.evaluate(() => document.activeElement === document.body), true);
         assert.equal(
           await host.getByRole('tree', { name: expected.label, exact: true }).count(),

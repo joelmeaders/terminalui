@@ -30,6 +30,7 @@ interface VisibleItem {
  * @csspart row - Visible label, toggle, selection, and focus surface.
  *
  * @csspart group - Expanded child group owned by its parent item.
+ * @cssprop --t-tree-indent - Preferred indentation per depth level. Defaults to 20px. The shared step shrinks when nesting would use more than 40% of the row width.
  */
 export class TTree extends TerminalElement {
   static properties = {
@@ -52,11 +53,13 @@ export class TTree extends TerminalElement {
   private searchTime = 0;
   private restoreFocus = false;
   private previousVisible: VisibleItem[] = [];
+  private maxLevel = 1;
   static styles = [
     baseStyles,
     css`
       :host {
         display: block;
+        min-width: 0;
       }
       [part='tree'] {
         border: var(--t-line-width, 1px) solid var(--t-border);
@@ -69,8 +72,16 @@ export class TTree extends TerminalElement {
         gap: 8px;
         min-height: 36px;
         padding-block: 6px;
+        padding-inline-start: calc(
+          var(--_t-tree-level) *
+            min(var(--t-tree-indent, 20px), calc(40% / var(--_t-tree-max-level)))
+        );
         padding-inline-end: 12px;
         cursor: pointer;
+      }
+      .label {
+        min-width: 0;
+        overflow-wrap: anywhere;
       }
       [role='treeitem']:focus-visible {
         outline: none;
@@ -92,7 +103,9 @@ export class TTree extends TerminalElement {
         align-items: center;
         justify-content: center;
         width: 24px;
-        align-self: stretch;
+        height: 1.5em;
+        min-height: 24px;
+        align-self: flex-start;
         flex: none;
       }
     `,
@@ -131,22 +144,34 @@ export class TTree extends TerminalElement {
           '');
     }
     this.previousVisible = rows;
+    this.maxLevel = rows.reduce((maximum, row) => Math.max(maximum, row.level - 1), 1);
   }
   protected updated() {
     if (!this.restoreFocus) return;
     this.restoreFocus = false;
-    (
+    this.focusRow(
       this.renderRoot.querySelector<HTMLElement>('[role=treeitem][tabindex="0"]') ??
-      this.renderRoot.querySelector<HTMLElement>('[part=tree]')
-    )?.focus();
+        this.renderRoot.querySelector<HTMLElement>('[part=tree]'),
+    );
+  }
+  private focusRow(element: HTMLElement | null | undefined) {
+    if (!element) return;
+    element.focus({ preventScroll: true });
+    (element.querySelector<HTMLElement>(':scope > [part=row]') ?? element).scrollIntoView({
+      block: 'nearest',
+      inline: 'nearest',
+      behavior: 'instant',
+    });
   }
   private async focusItem(id?: string) {
     if (!id) return;
     this.focusedId = id;
     await this.updateComplete;
-    [...this.renderRoot.querySelectorAll<HTMLElement>('[role=treeitem]')]
-      .find((element) => element.dataset.id === id)
-      ?.focus();
+    this.focusRow(
+      [...this.renderRoot.querySelectorAll<HTMLElement>('[role=treeitem]')].find(
+        (element) => element.dataset.id === id,
+      ),
+    );
   }
   private toggle(item: TreeItem, expanded = !this.expandedIds.includes(item.id)) {
     if (item.disabled || !item.children?.length) return;
@@ -230,7 +255,7 @@ export class TTree extends TerminalElement {
                 this.select(item);
             }}
           >
-            <div class="row" part="row" style=${`padding-inline-start: ${(level - 1) * 20}px`}>
+            <div class="row" part="row" style=${`--_t-tree-level:${level - 1}`}>
               <span
                 class="toggle"
                 aria-hidden="true"
@@ -244,7 +269,7 @@ export class TTree extends TerminalElement {
                   }
                 }}
                 >${entry.item.children?.length ? (this.expandedIds.includes(entry.item.id) ? '▾' : '▸') : '·'}</span
-              ><span>${entry.item.label}</span>
+              ><span class="label">${entry.item.label}</span>
             </div>
             ${
               item.children?.length && this.expandedIds.includes(item.id)
@@ -264,6 +289,7 @@ export class TTree extends TerminalElement {
       role=${this.items.length ? 'tree' : 'group'}
       aria-label=${this.label}
       tabindex=${this.focusedId ? -1 : 0}
+      style=${`--_t-tree-max-level:${this.maxLevel}`}
     >
       ${this.renderItems(this.items, 1)}
     </div>`;
