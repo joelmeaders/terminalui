@@ -1002,6 +1002,7 @@ export const guides: Record<string, ComponentGuide> = {
     purpose: 'Announce a brief result without moving keyboard focus.',
     usage: [
       'Set message, then call show(). Notifications remain open by default. close() dismisses them programmatically.',
+      'show() restarts on the next component update even when the message is unchanged. Await updateComplete before reading the rendered indicator.',
       'For optional auto-dismiss, set duration in milliseconds. countdown can be none, bar, or spinner; countdownUnit can be seconds or milliseconds.',
       'Hover, focus, and hidden pages pause the timer. Keep critical information persistent or available elsewhere.',
     ],

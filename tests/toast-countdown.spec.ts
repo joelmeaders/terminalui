@@ -45,6 +45,90 @@ const progress = (page: Page) =>
 const number = (page: Page) =>
   page.locator('[part=countdown-value]').evaluate((element) => parseInt(element.textContent!, 10));
 
+test('countdown configuration is rendered in its first update without a follow-up render warning', async ({
+  page,
+}) => {
+  const warnings: string[] = [];
+  page.on('console', (message) => {
+    if (message.text().includes('Element t-toast scheduled an update'))
+      warnings.push(message.text());
+  });
+  await fixture(page, 'spinner', 'milliseconds');
+  const toast = page.locator('t-toast');
+  expect(
+    await toast.evaluate(async (element: TToast) => {
+      element.show('First message.', document.querySelector<HTMLButtonElement>('#opener')!);
+      return element.updateComplete;
+    }),
+  ).toBe(true);
+  expect(await number(page)).toBe(5000);
+  await page.clock.runFor(1250);
+  expect(
+    await toast.evaluate(async (element: TToast) => {
+      element.message = 'Replacement message.';
+      element.duration = 2000;
+      return element.updateComplete;
+    }),
+  ).toBe(true);
+  expect(await number(page)).toBe(2000);
+  expect(
+    await toast.evaluate(async (element: TToast) => {
+      element.countdownUnit = 'seconds';
+      return element.updateComplete;
+    }),
+  ).toBe(true);
+  expect(await number(page)).toBe(2);
+  await page.getByRole('button', { name: 'Dismiss notification' }).focus();
+  expect(
+    await toast.evaluate(async (element: TToast) => {
+      element.close();
+      return element.updateComplete;
+    }),
+  ).toBe(true);
+  await expect(page.locator('#opener')).toBeFocused();
+  expect(warnings).toEqual([]);
+});
+
+test('initial connection and each show call schedule one dismissal timer per update', async ({
+  page,
+}) => {
+  await fixture(page);
+  const schedules = await page.locator('#fixture').evaluate(async (fixture) => {
+    const timerWindow: Window = window;
+    const schedule = timerWindow.setTimeout.bind(timerWindow);
+    const delays: number[] = [];
+    timerWindow.setTimeout = (handler, delay, ...args) => {
+      if (delay === 5000 || delay === 6000) delays.push(delay);
+      return schedule(handler, delay, ...args);
+    };
+    const toast = document.createElement('t-toast');
+    toast.duration = 5000;
+    toast.countdown = 'spinner';
+    toast.open = true;
+    const result: number[][] = [];
+    try {
+      fixture.append(toast);
+      await toast.updateComplete;
+      result.push(delays.splice(0));
+      toast.show('Replacement message.');
+      await toast.updateComplete;
+      result.push(delays.splice(0));
+      toast.show();
+      await toast.updateComplete;
+      result.push(delays.splice(0));
+      toast.duration = 6000;
+      toast.show('New duration.');
+      await toast.updateComplete;
+      result.push(delays.splice(0));
+    } finally {
+      timerWindow.setTimeout = schedule;
+      toast.remove();
+    }
+    return result;
+  });
+  expect(schedules).toEqual([[5000], [5000], [5000], [6000]]);
+});
+
 test('bar shrinks with the real remaining duration and reaches zero when it closes', async ({
   page,
 }) => {

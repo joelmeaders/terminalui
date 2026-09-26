@@ -66,16 +66,37 @@ const timedRender: Story['render'] = (args) =>
       >Show notification</t-button
     >${meta.render(args)}
   </t-stack>`;
+const timedPlay: Story['play'] = async ({ canvasElement }) => {
+  const trigger = canvasElement.querySelector('t-button')!;
+  const toast = canvasElement.querySelector('t-toast')!;
+  await userEvent.click(trigger.shadowRoot!.querySelector('button')!);
+  await expect(await toast.updateComplete).toBe(true);
+  await expect(toast.open).toBe(true);
+  await expect(toast.shadowRoot!.querySelector('[role=status]')).toHaveTextContent(
+    'Your configuration was saved.',
+  );
+  await expect(toast.shadowRoot!.querySelector('[part=countdown]')).toHaveAttribute(
+    'aria-hidden',
+    'true',
+  );
+  const close = toast.shadowRoot!.querySelector<HTMLButtonElement>('button')!;
+  close.focus();
+  await toast.updateComplete;
+  await expect(toast.shadowRoot!.activeElement).toBe(close);
+};
 export const CountdownBar: Story = {
   render: timedRender,
+  play: timedPlay,
   args: { duration: 8000, countdown: 'bar' },
 };
 export const CountdownSeconds: Story = {
   render: timedRender,
+  play: timedPlay,
   args: { duration: 8000, countdown: 'spinner' },
 };
 export const CountdownMilliseconds: Story = {
   render: timedRender,
+  play: timedPlay,
   args: { duration: 8000, countdown: 'spinner', countdownUnit: 'milliseconds' },
 };
 export const Triggered: Story = {

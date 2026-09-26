@@ -59,6 +59,8 @@ export class TToast extends TerminalElement {
   private restoreFocus = false;
   private opener?: HTMLElement;
   private reason: 'dismiss' | 'timeout' | 'programmatic' = 'programmatic';
+  // show() must restart even when no public property changes.
+  private restartRequested = false;
   static styles = [
     baseStyles,
     optionalSlotStyles,
@@ -183,7 +185,10 @@ export class TToast extends TerminalElement {
       attributeFilter: ['slot'],
     });
     document.addEventListener('visibilitychange', this.visibility);
-    if (this.open) this.restart();
+    if (this.open) {
+      this.restartRequested = true;
+      this.requestUpdate();
+    }
   }
   disconnectedCallback() {
     this.contentObserver.disconnect();
@@ -202,12 +207,13 @@ export class TToast extends TerminalElement {
         : node.nodeType === Node.TEXT_NODE && !!node.textContent?.trim(),
     );
   }
-  /** Pass an opener for reliable focus return after pointer activation in Safari. */
+  /** Restart on the next component update. Pass an opener for reliable focus return after pointer activation in Safari. */
   show(message?: string, opener?: HTMLElement) {
     if (message !== undefined) this.message = message;
     this.opener = opener ?? activeElement();
     this.open = true;
-    this.restart();
+    this.restartRequested = true;
+    this.requestUpdate();
   }
   close(reason: 'dismiss' | 'timeout' | 'programmatic' = 'programmatic') {
     this.reason = reason;
@@ -215,23 +221,30 @@ export class TToast extends TerminalElement {
   }
   protected willUpdate(changed: PropertyValues) {
     // Hiding the notice can fire blur before updated() runs, notably in WebKit.
-    if (changed.has('open') && !this.open) this.restoreFocus = this.focused;
+    if (changed.has('open') && !this.open) {
+      this.restoreFocus = this.focused;
+      clearTimeout(this.timer);
+      this.timer = undefined;
+      this.stopDisplay();
+      this.paused = false;
+    } else if (
+      this.restartRequested ||
+      changed.has('open') ||
+      changed.has('duration') ||
+      changed.has('message')
+    )
+      this.restart();
+    else if (changed.has('countdown') || changed.has('countdownUnit')) this.startDisplay();
+    this.restartRequested = false;
   }
   protected updated(changed: PropertyValues) {
-    if (changed.has('open')) {
-      if (this.open) this.restart();
-      else {
-        clearTimeout(this.timer);
-        this.timer = undefined;
-        this.stopDisplay();
-        if (this.restoreFocus && this.opener?.isConnected) this.opener.focus();
-        this.restoreFocus = false;
-        this.hovered = this.focused = false;
-        if (changed.get('open') === true) this.emit('t-close', { reason: this.reason });
-        this.reason = 'programmatic';
-      }
-    } else if (changed.has('duration') || changed.has('message')) this.restart();
-    else if (changed.has('countdown') || changed.has('countdownUnit')) this.startDisplay();
+    if (changed.has('open') && !this.open) {
+      if (this.restoreFocus && this.opener?.isConnected) this.opener.focus();
+      this.restoreFocus = false;
+      this.hovered = this.focused = false;
+      if (changed.get('open') === true) this.emit('t-close', { reason: this.reason });
+      this.reason = 'programmatic';
+    }
   }
   private get timeoutDuration() {
     // Browsers overflow larger setTimeout delays. Zero and invalid values stay persistent.

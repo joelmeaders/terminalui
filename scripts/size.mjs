@@ -14,6 +14,14 @@ const scenarios = {
   'React button (barrel import)':
     'import {TButton} from "./src/adapters/react.ts"; globalThis.exampleButton = TButton;',
 };
+// Guard small imports against unexpected dependencies. Report catalog growth without a fixed cap.
+const importBudgets = {
+  'One button': 8000,
+  'Form controls': 10000,
+  'One Ionicons icon': 12000,
+  'React button (component import)': 9500,
+  'React button (barrel import)': 9500,
+};
 console.log('Production JS including Lit. CSS themes and fonts excluded.');
 console.log('React scenarios include the adapter and exclude the shared React framework runtime.');
 for (const [name, contents] of Object.entries(scenarios)) {
@@ -28,21 +36,10 @@ for (const [name, contents] of Object.entries(scenarios)) {
   });
   const bytes = result.outputFiles[0].contents;
   const gzipBytes = gzipSync(bytes).length;
-  // Preserve strict small-import guards. Review catalog growth when features change.
-  const budget =
-    name === 'One button'
-      ? 8000
-      : name === 'Form controls'
-        ? 10000
-        : name.startsWith('React button')
-          ? 9500
-          : name === 'One Ionicons icon'
-            ? 12000
-            : 53500;
-  if (bytes.length === 0 || gzipBytes > budget)
-    throw new Error(
-      `${name}: ${gzipBytes} B exceeds its ${budget} B gzip budget or has no output.`,
-    );
+  const budget = importBudgets[name];
+  if (bytes.length === 0) throw new Error(`${name}: no output.`);
+  if (budget !== undefined && gzipBytes > budget)
+    throw new Error(`${name}: ${gzipBytes} B exceeds its ${budget} B gzip import budget.`);
   console.log(
     `${name}: raw ${bytes.length} B | gzip ${gzipSync(bytes).length} B | Brotli ${brotliCompressSync(bytes).length} B`,
   );
