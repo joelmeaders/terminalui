@@ -2,9 +2,27 @@ import { css, html } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { activeElement } from '../internal/floating';
 
+const actionChanges: MutationObserverInit = {
+  subtree: true,
+  childList: true,
+  attributes: true,
+  attributeFilter: [
+    'disabled',
+    'aria-disabled',
+    'hidden',
+    'inert',
+    'open',
+    'slot',
+    'name',
+    'style',
+    'class',
+  ],
+};
+
 /**
- * Roving toolbar for native buttons/links and buttons in open shadow roots.
- * Focus moves to an available action when the focused action leaves or becomes disabled.
+ * Roving toolbar for native buttons/links, rendered slots, and open shadow roots.
+ * Disabled, hidden, inert, and collapsed actions are skipped.
+ * Focus moves to an available action when the focused action becomes unavailable.
  * Text fields and other composite widgets must remain outside this toolbar.
  *
  * @slot - Action buttons or links. Native separators may separate action groups.
@@ -22,6 +40,8 @@ export class TToolbar extends TerminalElement {
   private current?: HTMLElement;
   private focusedAction?: HTMLElement;
   private originals = new Map<HTMLElement, string | null>();
+  private slots = new Set<HTMLSlotElement>();
+  private onSlotChange = () => this.syncActions();
   private observer = new MutationObserver(() => this.syncActions());
   private resize = new ResizeObserver(() => this.syncActions());
   static styles = [
@@ -70,6 +90,8 @@ export class TToolbar extends TerminalElement {
   disconnectedCallback() {
     this.observer.disconnect();
     this.resize.disconnect();
+    for (const slot of this.slots) slot.removeEventListener('slotchange', this.onSlotChange);
+    this.slots.clear();
     this.restore();
     this.focusedAction = undefined;
     this.current = undefined;
@@ -89,29 +111,31 @@ export class TToolbar extends TerminalElement {
     this.originals.clear();
   }
   private syncActions() {
+    if (!this.isConnected) return;
     this.observer.disconnect();
     const previousIndex = this.actions.indexOf(this.focusedAction!);
     const found: HTMLElement[] = [];
+    const slots = new Set<HTMLSlotElement>();
     const visit = (element: Element) => {
       if (!(element instanceof HTMLElement)) return;
+      if (element instanceof HTMLSlotElement) {
+        slots.add(element);
+        for (const child of element.assignedElements({ flatten: true })) visit(child);
+        return;
+      }
       if (element.matches('button,a[href]')) found.push(element);
       if (element.shadowRoot) {
-        this.observer.observe(element.shadowRoot, {
-          subtree: true,
-          childList: true,
-          attributes: true,
-          attributeFilter: ['disabled', 'aria-disabled', 'hidden', 'style', 'class'],
-        });
+        this.observer.observe(element.shadowRoot, actionChanges);
         for (const child of element.shadowRoot.children) visit(child);
       } else for (const child of element.children) visit(child);
     };
     for (const child of this.children) visit(child);
-    this.observer.observe(this, {
-      subtree: true,
-      childList: true,
-      attributes: true,
-      attributeFilter: ['disabled', 'aria-disabled', 'hidden', 'style', 'class'],
-    });
+    this.observer.observe(this, actionChanges);
+    for (const slot of this.slots)
+      if (!slots.has(slot)) slot.removeEventListener('slotchange', this.onSlotChange);
+    for (const slot of slots)
+      if (!this.slots.has(slot)) slot.addEventListener('slotchange', this.onSlotChange);
+    this.slots = slots;
     for (const [element, value] of this.originals)
       if (!found.includes(element)) {
         if (value === null) element.removeAttribute('tabindex');
@@ -121,13 +145,7 @@ export class TToolbar extends TerminalElement {
     for (const element of found)
       if (!this.originals.has(element))
         this.originals.set(element, element.getAttribute('tabindex'));
-    this.actions = found.filter(
-      (element) =>
-        !element.matches(':disabled,[aria-disabled=true]') &&
-        !element.closest('[hidden],[inert]') &&
-        getComputedStyle(element).visibility !== 'hidden' &&
-        Boolean(element.getClientRects().length),
-    );
+    this.actions = found.filter((element) => this.isAvailable(element));
     const active = activeElement(),
       toolbar = this.renderRoot.querySelector<HTMLElement>('[role=toolbar]'),
       lostAction = previousIndex >= 0 && !this.actions.includes(this.focusedAction!);
@@ -137,6 +155,31 @@ export class TToolbar extends TerminalElement {
     for (const element of found) element.tabIndex = element === this.current ? 0 : -1;
     this.empty = this.actions.length === 0;
     if (lostAction || active === toolbar) (this.current ?? toolbar)?.focus();
+  }
+  private isAvailable(element: HTMLElement) {
+    if (
+      !element.isConnected ||
+      element.matches(':disabled,[aria-disabled=true]') ||
+      getComputedStyle(element).visibility !== 'visible' ||
+      !element.getClientRects().length
+    )
+      return false;
+    let child: Element = element;
+    while (child) {
+      if (child.matches('[hidden],[inert]')) return false;
+      const root = child.getRootNode();
+      const parent: Element | null =
+        child.assignedSlot ??
+        child.parentElement ??
+        (root instanceof ShadowRoot ? root.host : null);
+      if (parent instanceof HTMLDetailsElement && !parent.open) {
+        const summary = Array.from(parent.children).find((item) => item.tagName === 'SUMMARY');
+        if (child !== summary) return false;
+      }
+      if (!parent) break;
+      child = parent;
+    }
+    return true;
   }
   private focusAction(element: HTMLElement) {
     this.current = element;
@@ -153,10 +196,10 @@ export class TToolbar extends TerminalElement {
   }
   private onFocusOut() {
     queueMicrotask(() => {
+      const active = activeElement();
       if (
-        this.focusedAction?.isConnected &&
-        !this.focusedAction.matches(':disabled,[aria-disabled=true]') &&
-        !this.actions.includes(activeElement()!)
+        !this.actions.includes(active!) &&
+        (active !== document.body || (this.focusedAction && this.isAvailable(this.focusedAction)))
       )
         this.focusedAction = undefined;
     });

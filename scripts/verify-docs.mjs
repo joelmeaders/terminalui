@@ -372,6 +372,51 @@ try {
         await page.getByRole('textbox', { name: 'Callsign', exact: false }).fill('DOCUMENTED');
         assert.equal(await page.locator(tag).evaluate((el) => el.value), 'DOCUMENTED');
       }
+      if (tag === 't-toolbar') {
+        const host = page.locator(tag);
+        assert.equal(
+          await host.getByRole('toolbar', { name: expected.label, exact: true }).count(),
+          1,
+        );
+        assert.equal(await page.evaluate(() => document.activeElement === document.body), true);
+        const focused = async (name) =>
+          host
+            .getByRole('button', { name, exact: true })
+            .evaluate((element) => element === element.getRootNode().activeElement);
+        await host.getByRole('button', { name: 'Refresh', exact: true }).focus();
+        await page.keyboard.press('ArrowRight');
+        assert.equal(
+          await focused('Export'),
+          true,
+          `${framework}/${tag}: wrapped action must receive focus.`,
+        );
+        await page.keyboard.press('ArrowRight');
+        assert.equal(
+          await focused('Help'),
+          true,
+          `${framework}/${tag}: inert wrapper must be skipped.`,
+        );
+        const unavailableGroup = host.locator(':scope > span').last();
+        await unavailableGroup.evaluate((element) => (element.inert = false));
+        await page.keyboard.press('ArrowLeft');
+        assert.equal(
+          await focused('Unavailable action'),
+          true,
+          `${framework}/${tag}: live inert changes must restore navigation.`,
+        );
+        await unavailableGroup.evaluate((element) => (element.inert = true));
+        await page.waitForFunction(() => {
+          const root = document
+            .querySelector('t-toolbar')
+            .querySelectorAll('t-button')[3].shadowRoot;
+          return root.activeElement === root.querySelector('button');
+        });
+        assert.equal(
+          await focused('Help'),
+          true,
+          `${framework}/${tag}: live inert changes must recover focus.`,
+        );
+      }
       if (tag === 't-split-pane') {
         const host = page.locator(tag);
         assert.equal(

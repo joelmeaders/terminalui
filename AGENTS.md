@@ -19,6 +19,7 @@ Include accessibility in implementation, stories, tests, documentation, and revi
 - Give every interactive control a useful accessible name. Associate labels, instructions, required state, and errors with the actual control.
 - Preserve keyboard operation, visible focus, logical focus order, and disabled behavior. Never use positive `tabindex` in library markup.
 - Follow the relevant WAI-ARIA Authoring Practices pattern for composite widgets. Test navigation, selection, and disabled options.
+- Composite navigation must follow rendered slot order across open shadow roots. Test live inert, hidden, and collapsed actions. Preserve focus outside the widget during live changes.
 - Choice controls must leave focus unchanged on initial render. Recover focus after live option changes only when the control already had focus.
 - Modals must contain keyboard focus and restore it on close. Account for slots, shadow roots, radio groups, and collapsed disclosures.
 - Modals must prevent background wheel, touch, and keyboard scrolling while keeping their content scrollable. Preserve page position and styles. Test stacked modals and removal cleanup.

@@ -1042,17 +1042,29 @@ export const guides: Record<string, ComponentGuide> = {
     purpose: 'Group related actions with a single keyboard entry point.',
     usage: [
       'Put buttons and links in the default slot. Use native separators for action groups.',
+      'Actions can be inside wrappers, open shadow roots, or nested slots. Rendered slot order sets keyboard order.',
+      'Handle each action with its own click handler or form behavior. The toolbar manages keyboard focus.',
       'Use orientation="vertical" for vertical navigation. Keep text fields and other composite controls outside this toolbar.',
     ],
     accessibility: [
       'A roving tab stop supports arrows and Home/End. Give each toolbar a distinct label.',
-      'If a focused action disappears or becomes disabled, focus moves to an available action. An empty toolbar keeps a focusable named container.',
+      'Disabled, hidden, inert, and collapsed actions are skipped. If the focused action becomes unavailable, focus moves to an available action.',
+      'An empty toolbar keeps a focusable named container. Live changes preserve focus outside the toolbar. Original tabindex values return when actions leave.',
     ],
     example: {
       props: { label: 'Archive actions' },
       children: [
         { tag: 't-button', children: ['Refresh'] },
-        { tag: 't-button', props: { variant: 'secondary' }, children: ['Export'] },
+        {
+          tag: 'span',
+          children: [{ tag: 't-button', props: { variant: 'secondary' }, children: ['Export'] }],
+        },
+        {
+          tag: 'span',
+          props: { inert: true },
+          children: [{ tag: 't-button', children: ['Unavailable action'] }],
+        },
+        { tag: 't-button', props: { variant: 'secondary' }, children: ['Help'] },
       ],
     },
   },
