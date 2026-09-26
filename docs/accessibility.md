@@ -329,6 +329,37 @@ Use current NVDA with Firefox or Chrome on Windows. Record which browser you cho
 
 Use **Pass**, **Fail**, **Blocked**, or **Pending** for each result. A pass applies only to the recorded scenario and environment. For failures, include reproduction steps, expected behavior, actual speech or behavior, an issue reference, and any workaround. Preserve screenshots for visual findings and transcripts for speech findings. Attach a reason and evidence to any criterion exception.
 
+### First manual session
+
+Start with these tasks on Windows with NVDA. Repeat them on macOS with VoiceOver. Use the detailed scenarios below for expected behavior.
+
+1. Read and submit a required form. Correct an error. Check the label, value, error announcement, and focus destination.
+2. Operate a combobox, menu, and calendar with the keyboard. Check selection, unavailable options, and expanded state.
+3. Open a dialog and drawer. Check focus containment, background scrolling, Escape, and focus restoration.
+4. Edit the dock. Reorder with settings buttons, snap to each edge, and resize both dimensions. Check reading order and retained input values.
+5. Trigger routine status and a timed notification. Check announcement count, countdown silence, pause behavior, and dismissal.
+
+This first session does not replace the complete scenario list. Continue with the remaining forms, collections, typography, visual preferences, enlargement, and physical touch tasks.
+
+Use this record for each scenario. Add the result to the manual evidence register after the test.
+
+```text
+Test date:
+Source revision or archive digest:
+Build commands and test URL:
+OS and version:
+Browser and version:
+Assistive technology and version:
+Navigation mode and verbosity:
+Component, story, framework, palette, and density:
+Scenario and steps:
+Expected speech and behavior:
+Actual speech and behavior:
+Result: Pending / Pass / Fail / Blocked
+Evidence path or issue reference:
+Remaining coverage or exception:
+```
+
 ## Manual scenarios
 
 ### Forms and actions
@@ -398,6 +429,8 @@ The library disables glow and texture under `prefers-contrast: more` and forced 
 Use a physical touch device to operate compact controls, menus, tabs, pagination, and dismiss actions. Check target size and spacing against the 24 by 24 CSS pixel requirement or an applicable exception. Confirm scrolling does not trigger an unintended action. See [Target Size Minimum](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html).
 
 ## Manual evidence register
+
+The 2026-09-26 Start here manual guide passed keyboard disclosure, evidence-table scrolling, and page reflow checks at 320 CSS pixels and actual 400% Chromium zoom. The guide reads this document directly. Its two scans returned no axe violations and retained `color-contrast` incomplete findings for partially clipped evidence-table cells. Reports are `welcome-manual-axe-review.json`. These remain review items. A separate visual review checked the collapsed guide at 320 CSS pixels without browser zoom. The automated zoom check does not establish visual review or screen-reader speech.
 
 ### Automated review items from 2026-09-23
 

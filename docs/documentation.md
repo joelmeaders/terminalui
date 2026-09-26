@@ -1,6 +1,6 @@
 # Maintaining the Storybook manual
 
-Storybook is the component documentation entry point. Each of the 56 component pages has the same structure: setup, a working integration example, live controls, API reference, styling, accessibility, and states. The global framework selector changes setup and code for HTML/JS/CSS, Angular, Vue, and React. Its selection stays in Storybook globals and shareable URLs. The preview always renders the same Web Component.
+Storybook is the component documentation entry point. Each of the 57 component pages has the same structure: setup, a working integration example, live controls, API reference, styling, accessibility, and states. The global framework selector changes setup and code for HTML/JS/CSS, Angular, Vue, and React. Its selection stays in Storybook globals and shareable URLs. The preview always renders the same Web Component.
 
 ## Sources of truth
 
@@ -14,9 +14,11 @@ Storybook is the component documentation entry point. Each of the 56 component p
 
 The framework example is a complete starting recipe. Storybook Controls change the live preview, not that recipe. The page explains this distinction. React examples import each required wrapper from its component subpath and include a companion CSS block. The documentation check requires those selective imports. Angular setup explains the global theme import. Plain HTML examples use the standalone bundle and need no browser import map.
 
-React examples read inferred custom event details directly. The installed-package check compiles `tests/types/react-events.tsx` against the packaged declarations. It checks all 33 custom event contracts, native event types, compatibility with broad existing handlers, and agreement between the barrel and per-component wrappers. Browser integration checks cover actual React delivery, controlled selection, names, and keyboard focus.
+React examples read inferred custom event details directly. The installed-package check compiles `tests/types/react-events.tsx` against the packaged declarations. It checks public custom event contracts, native event types, compatibility with broad existing handlers, and agreement between the barrel and per-component wrappers. Browser integration checks cover actual React delivery, controlled selection, names, and keyboard focus.
 
 The Typography foundation page uses `docs/typography.md` and `.storybook/docs/typography.ts`. Its one native HTML recipe supplies the preview and all four framework examples. `TypographyDocs.tsx` reuses the component manual's global framework selector. Typography has no custom element or fake catalog entry.
+
+The Start here page derives its component count from the generated catalog. Its manual accessibility section displays setup, scenarios, a session record template, and unresolved review items from `docs/accessibility.md`. Edit that shared source to update both locations. Automated checks and manual results remain separate. The evidence table uses a named, keyboard-scrollable region at narrow widths.
 
 ## Validation
 
@@ -28,4 +30,4 @@ Run `npm run test:production` to check the built site. This covers every compone
 
 After changing component metadata, rebuild before starting Storybook. Restart an already running Storybook development server if it retains an old manifest. Do not regenerate watched source or build metadata while development-server browser tests run.
 
-These checks establish executable examples and representative browser behavior. A built-site test sets actual Chromium page zoom to 400% and checks page reflow across all 56 component manuals in each framework mode, including expanded Angular setup. It also checks ArrowRight scrolling in wide API and Controls table regions. A separate Input manual test checks framework selection at this zoom. Manual screen-reader review, visual review of the Controls table at real zoom, and complete WCAG conformance remain unproven. Track those checks in [accessibility evidence](accessibility.md).
+These checks establish executable examples and representative browser behavior. A built-site test sets actual Chromium page zoom to 400% and checks page reflow across all 57 component manuals in each framework mode, including expanded Angular setup. It also checks ArrowRight scrolling in wide API and Controls table regions. A separate Input manual test checks framework selection at this zoom. Manual screen-reader review, visual review of the Controls table at real zoom, and complete WCAG conformance remain unproven. Track those checks in [accessibility evidence](accessibility.md).

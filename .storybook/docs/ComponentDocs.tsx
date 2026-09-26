@@ -25,11 +25,15 @@ import iconGuide from '../../docs/icons.md?raw';
 import spinnerGuide from '../../docs/spinners.md?raw';
 import slotGuide from '../../docs/slots.md?raw';
 import appearanceGuide from '../../docs/appearance.md?raw';
+import accessibilityGuide from '../../docs/accessibility.md?raw';
 import { icons } from '../../src/components/icon';
 import './docs.css';
 
 const frameworkValue = (value: unknown): Framework =>
   typeof value === 'string' && Object.hasOwn(frameworks, value) ? (value as Framework) : 'html';
+const manualEvidence = accessibilityGuide
+  .slice(accessibilityGuide.indexOf('## Manual evidence register'))
+  .split(/(^\|[^\r\n]*(?:\r?\n\|[^\r\n]*)+)/m);
 export function useFramework() {
   const context = useContext(DocsContext);
   const story = context.componentStories()[0];
@@ -301,6 +305,7 @@ export function ComponentDocs() {
   const tag = typeof primary?.component === 'string' ? primary.component : '';
   const api = apiFor(tag);
   const isAppearance = primary?.title === 'Introduction/Appearance';
+  const isIntroduction = primary?.title === 'Introduction/Start here';
   const guide = guides[tag];
   const [framework, updateFramework] = useFramework();
   const example = guide ? exampleFor(tag, framework) : undefined;
@@ -326,6 +331,11 @@ export function ComponentDocs() {
         {isAppearance && (
           <a href="#appearance-guide" target="_self">
             Inheritance
+          </a>
+        )}
+        {isIntroduction && (
+          <a href="#manual-accessibility" target="_self">
+            Manual accessibility review
           </a>
         )}
         {api && (
@@ -394,6 +404,37 @@ export function ComponentDocs() {
         <section id="appearance-guide">
           <h2>Cascading appearance</h2>
           <Markdown>{appearanceGuide.replace(/^# .+\n/, '')}</Markdown>
+        </section>
+      )}
+      {isIntroduction && (
+        <section id="manual-accessibility">
+          <h2>Manual accessibility review</h2>
+          <p>
+            Automated checks cover browser behavior. Manual NVDA, VoiceOver, physical touch, and
+            real OS preference checks remain pending. The library does not claim WCAG conformance.
+          </p>
+          <details>
+            <summary>Manual test setup and scenarios</summary>
+            <Markdown>
+              {accessibilityGuide.slice(
+                accessibilityGuide.indexOf('## Test setup and records'),
+                accessibilityGuide.indexOf('## Manual evidence register'),
+              )}
+            </Markdown>
+          </details>
+          <details>
+            <summary>Results and unresolved review items</summary>
+            <Markdown>{manualEvidence[0]}</Markdown>
+            <div
+              className="tk-docs-table"
+              role="region"
+              aria-label="Manual accessibility evidence and review items"
+              tabIndex={0}
+            >
+              <Markdown>{manualEvidence[1]}</Markdown>
+            </div>
+            <Markdown>{manualEvidence[2]}</Markdown>
+          </details>
         </section>
       )}
       {guide?.guide === 'icons' && (

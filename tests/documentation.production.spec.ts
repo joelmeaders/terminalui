@@ -17,6 +17,90 @@ const sharedCssProperties = [
   ...readFileSync('docs/appearance.md', 'utf8').matchAll(/^\| `(--t-[\w-]+)`\s*\|/gm),
 ].map((match) => match[1]);
 
+for (const realZoom of [false, true]) {
+  test(`welcome manual accessibility guide is reachable ${realZoom ? 'at actual 400% zoom' : 'at 320 CSS pixels'}`, async ({
+    page: defaultPage,
+    baseURL,
+  }, testInfo) => {
+    const zoom = realZoom
+      ? await launchBrowserZoom(testInfo, baseURL!, { width: 1280, height: 1000 })
+      : undefined;
+    const page = zoom?.page ?? defaultPage;
+    try {
+      if (!realZoom) await page.setViewportSize({ width: 320, height: 900 });
+      await page.goto('/storybook/iframe.html?id=introduction-start-here--docs&viewMode=docs');
+      const zoomFactor = zoom ? await zoom.setZoom(4) : 1;
+      if (realZoom) {
+        expect(zoomFactor).toBeCloseTo(4, 4);
+        await expect.poll(() => page.evaluate(() => innerWidth)).toBe(320);
+      }
+      await expect(page.locator('.tk-docs-hero')).toContainText(
+        `${entries.length} components and six themes`,
+      );
+      await page.getByRole('link', { name: 'Manual accessibility review', exact: true }).click();
+      const manual = page.locator('#manual-accessibility');
+      await expect(
+        manual.getByRole('heading', { name: 'Manual accessibility review' }),
+      ).toBeInViewport();
+      await expect(manual).toContainText('remain pending');
+      await expect(manual).toContainText('does not claim WCAG conformance');
+      const setup = manual.locator('summary', { hasText: 'Manual test setup and scenarios' });
+      await setup.focus();
+      await page.keyboard.press('Enter');
+      await expect(setup.locator('..')).toHaveAttribute('open', '');
+      await expect(manual.getByRole('heading', { name: 'First manual session' })).toBeVisible();
+      await expect(manual).toContainText('Source revision or archive digest:');
+      await expect(manual).toContainText('Navigation mode and verbosity:');
+      await expect(manual).toContainText('Actual speech and behavior:');
+      await expect(manual).toContainText('Dock: identify the named group');
+      await expect(manual).toContainText('Timed notifications:');
+      await expect(manual).toContainText('VoiceOver with Safari on macOS');
+      const results = manual.locator('summary', { hasText: 'Results and unresolved review items' });
+      await results.focus();
+      await page.keyboard.press('Space');
+      await expect(results.locator('..')).toHaveAttribute('open', '');
+      const evidence = manual.getByRole('region', {
+        name: 'Manual accessibility evidence and review items',
+      });
+      await expect(results.locator('..')).toContainText(
+        'No row below records a completed manual run',
+      );
+      await expect(evidence.getByRole('table')).toContainText('Pending');
+      await expect(evidence.getByRole('table')).toContainText('Dock editing');
+      await evidence.focus();
+      await expect(evidence).toBeFocused();
+      await expect(evidence.getByRole('heading')).toHaveCount(0);
+      const initialScroll = await evidence.evaluate((element) => element.scrollLeft);
+      await page.keyboard.press('ArrowRight');
+      await expect
+        .poll(() => evidence.evaluate((element) => element.scrollLeft))
+        .toBeGreaterThan(initialScroll);
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
+      ).toBe(true);
+      const report = await new AxeBuilder({ page }).include('#manual-accessibility').analyze();
+      await writeFile(
+        testInfo.outputPath('welcome-manual-axe-review.json'),
+        JSON.stringify(
+          { zoomFactor, violations: report.violations, incomplete: report.incomplete },
+          null,
+          2,
+        ),
+      );
+      expect(report.violations).toEqual([]);
+      await setup.focus();
+      await page.keyboard.press('Enter');
+      await results.focus();
+      await page.keyboard.press('Space');
+      await manual.scrollIntoViewIfNeeded();
+      if (!realZoom)
+        await page.screenshot({ path: testInfo.outputPath('welcome-manual-evidence.png') });
+    } finally {
+      await zoom?.context.close();
+    }
+  });
+}
+
 test('appearance inheritance guide is available in introductions and component styling at narrow widths', async ({
   page,
 }, testInfo) => {
