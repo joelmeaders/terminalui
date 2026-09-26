@@ -66,7 +66,40 @@ export const LiveOptions: Story = {
   },
 };
 export const Empty: Story = {
-  render: () => html`<t-menu label="No available actions" disabled></t-menu>`,
+  render: () =>
+    html`<t-menu label="File actions" empty-message="No file actions are available."></t-menu>`,
+  play: async ({ canvasElement }) => {
+    const menu = canvasElement.querySelector('t-menu')!;
+    const trigger = menu.shadowRoot!.querySelector<HTMLButtonElement>('.trigger')!;
+    await userEvent.click(trigger);
+    await expect(trigger).not.toHaveAttribute('aria-haspopup');
+    await expect(menu.shadowRoot!.activeElement).toBe(
+      menu.shadowRoot!.querySelector('[role=group]'),
+    );
+    await expect(menu.shadowRoot!.querySelector('[role=status]')).toHaveTextContent(
+      'No file actions are available.',
+    );
+    menu.options = [{ value: 'open', label: 'Open' }];
+    await menu.updateComplete;
+    await expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+    await expect(menu.shadowRoot!.activeElement?.textContent).toBe('Open');
+    await userEvent.keyboard('{Escape}');
+    await expect(menu.shadowRoot!.activeElement).toBe(trigger);
+  },
+};
+export const SeparatorsOnly: Story = {
+  render: () =>
+    html`<t-menu
+      label="File actions"
+      .options=${[{ value: 'line', label: '', separator: true }]}
+    ></t-menu>`,
+};
+export const UnavailableActions: Story = {
+  render: () =>
+    html`<t-menu
+      label="File actions"
+      .options=${[{ value: 'open', label: 'Open', disabled: true }]}
+    ></t-menu>`,
 };
 
 export const WithSlots: Story = {

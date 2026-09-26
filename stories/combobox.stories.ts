@@ -50,7 +50,20 @@ export const Default: Story = {
     await expect(host.value).toBe('charlie');
   },
 };
-export const Empty: Story = { args: { options: [] } };
+export const Empty: Story = {
+  args: { options: [] },
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-combobox')!;
+    const input = host.shadowRoot!.querySelector('input')!;
+    await userEvent.click(input);
+    await expect(input).toHaveAttribute('aria-expanded', 'false');
+    await expect(input).not.toHaveAttribute('aria-controls');
+    await expect(host.shadowRoot!.querySelector('[role=status]')).toHaveTextContent(
+      'No options found.',
+    );
+    await expect(host.shadowRoot!.activeElement).toBe(input);
+  },
+};
 export const Loading: Story = { args: { options: [], loading: true } };
 export const Disabled: Story = { args: { disabled: true, value: 'alpha' } };
 export const Invalid: Story = { args: { required: true, error: 'Choose a destination.' } };

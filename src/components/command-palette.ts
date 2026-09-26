@@ -14,6 +14,7 @@ export interface CommandItem {
 }
 /**
  * Searchable modal command list. No global shortcut is registered.
+ * Empty results remain a status notice without an expanded listbox. Loading lists are busy.
  *
  * @fires t-select - Command chosen: `{ value, command }`.
  *
@@ -219,6 +220,7 @@ export class TCommandPalette extends TerminalElement {
   }
   render() {
     const commands = this.filtered(),
+      hasList = commands.length > 0 || this.loading,
       activeIndex = commands.findIndex((command) => command.value === this.activeValue);
     return html`<dialog
       part="dialog"
@@ -243,8 +245,8 @@ export class TCommandPalette extends TerminalElement {
           type="search"
           role="combobox"
           aria-autocomplete="list"
-          aria-expanded="true"
-          aria-controls="commands"
+          aria-expanded=${this.open && hasList}
+          aria-controls=${hasList ? 'commands' : nothing}
           aria-activedescendant=${activeIndex >= 0 ? `command-${activeIndex}` : nothing}
           aria-describedby="instructions"
           placeholder=${this.placeholder}
@@ -260,7 +262,7 @@ export class TCommandPalette extends TerminalElement {
       </div>
       <div
         class="results"
-        role="listbox"
+        role=${hasList ? 'listbox' : 'group'}
         id="commands"
         aria-label="Commands"
         aria-busy=${this.loading}

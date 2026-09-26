@@ -17,12 +17,13 @@ interface VisibleItem {
 }
 /**
  * Single-select tree with roving focus, arrows, Home/End, typeahead, and sibling expansion.
+ * Empty hierarchies use a named group. Restored items retain focus without changing selection.
  *
  * @fires t-select - Selection changed: `{ value, item }`.
  *
  * @fires t-toggle - Branch changed: `{ id, expanded, expandedIds }`.
  *
- * @csspart tree - Tree container.
+ * @csspart tree - Hierarchy container, including the empty group.
  *
  * @csspart item - Tree item with its optional expanded child group.
  *
@@ -57,7 +58,7 @@ export class TTree extends TerminalElement {
       :host {
         display: block;
       }
-      [role='tree'] {
+      [part='tree'] {
         border: var(--t-line-width, 1px) solid var(--t-border);
         padding: var(--t-space-2, 8px);
         box-shadow: var(--_t-edge-glow);
@@ -136,7 +137,7 @@ export class TTree extends TerminalElement {
     this.restoreFocus = false;
     (
       this.renderRoot.querySelector<HTMLElement>('[role=treeitem][tabindex="0"]') ??
-      this.renderRoot.querySelector<HTMLElement>('[role=tree]')
+      this.renderRoot.querySelector<HTMLElement>('[part=tree]')
     )?.focus();
   }
   private async focusItem(id?: string) {
@@ -260,7 +261,7 @@ export class TTree extends TerminalElement {
   render() {
     return html`<div
       part="tree"
-      role="tree"
+      role=${this.items.length ? 'tree' : 'group'}
       aria-label=${this.label}
       tabindex=${this.focusedId ? -1 : 0}
     >

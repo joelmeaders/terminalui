@@ -364,6 +364,7 @@ export const guides: Record<string, ComponentGuide> = {
       accessibility: [
         ...fieldAccess,
         'Arrow keys move through options; Enter selects; Escape dismisses the list.',
+        'Empty results keep field focus and show emptyMessage as a status notice. No selection list is expanded until options return. Loading lists expose aria-busy.',
       ],
     },
   ),
@@ -376,6 +377,7 @@ export const guides: Record<string, ComponentGuide> = {
     accessibility: [
       'Focus moves into the modal. Escape closes it and focus returns to the opener. The background cannot scroll.',
       'Keep command labels specific. Communicate loading and empty results.',
+      'Empty or unmatched results keep search focus and show a status notice. No selection list is expanded until matches return. Loading lists expose aria-busy.',
     ],
     example: {
       props: {
@@ -575,10 +577,11 @@ export const guides: Record<string, ComponentGuide> = {
       'Options use { value, label, disabled? }. Handle t-select to run the chosen action.',
       'This is a single-level action menu. Use links or a tree for deeper navigation.',
       'Replace options to update an open menu. Keep values stable so focus stays with the same action.',
+      'Use emptyMessage to customize the notice when no actions are available. Separators alone do not count as actions.',
     ],
     accessibility: [
       'Arrow keys, Home/End, and typeahead move through enabled actions. Escape dismisses and restores focus.',
-      'If the focused action disappears or becomes disabled, focus moves to an available action. An empty open menu keeps focus on its named panel.',
+      'If the focused action disappears or becomes disabled, focus moves to an available action. An empty popup keeps focus on its named group and announces emptyMessage. Escape and Tab still dismiss it. Menu semantics return when actions are available.',
     ],
     example: {
       props: {
@@ -1058,6 +1061,7 @@ export const guides: Record<string, ComponentGuide> = {
     accessibility: [
       'Arrows, Home/End, typeahead, and sibling expansion support keyboard browsing.',
       'Expanded children belong to nested groups. A live branch collapse returns focus to a visible ancestor without changing selection. Items moved between branches retain focus by ID.',
+      'An empty hierarchy uses a named group and retains focus when items disappear. Returning items restore row focus without changing selection. Updates leave outside focus unchanged.',
       'Provide an accessible tree label. Use simpler navigation when a hierarchy is unnecessary.',
     ],
     example: {

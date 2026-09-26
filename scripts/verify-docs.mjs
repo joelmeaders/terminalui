@@ -320,6 +320,139 @@ try {
         await page.getByRole('textbox', { name: 'Callsign', exact: false }).fill('DOCUMENTED');
         assert.equal(await page.locator(tag).evaluate((el) => el.value), 'DOCUMENTED');
       }
+      if (tag === 't-tree') {
+        const host = page.locator(tag);
+        assert.equal(await page.evaluate(() => document.activeElement === document.body), true);
+        assert.equal(
+          await host.getByRole('tree', { name: expected.label, exact: true }).count(),
+          1,
+        );
+        await host.getByRole('treeitem', { name: 'Atmospheric survey', exact: true }).focus();
+        const logged = page.waitForEvent('console', {
+          predicate: (message) => message.text() === 'survey',
+        });
+        await page.keyboard.press('Enter');
+        await logged;
+        await host.evaluate(async (element) => {
+          element.documentationItems = element.items;
+          element.items = [];
+          await element.updateComplete;
+        });
+        assert.equal(
+          await host
+            .getByRole('group', { name: expected.label, exact: true })
+            .evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        await host.evaluate(async (element) => {
+          element.items = element.documentationItems;
+          await element.updateComplete;
+        });
+        assert.equal(
+          await host
+            .getByRole('treeitem')
+            .first()
+            .evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        assert.equal(await host.evaluate((element) => element.value), 'survey');
+      }
+      if (tag === 't-menu') {
+        const host = page.locator(tag);
+        const trigger = host.getByRole('button', { name: expected.label, exact: true });
+        await trigger.click();
+        await host.evaluate(async (element) => {
+          element.documentationOptions = element.options;
+          element.options = [];
+          await element.updateComplete;
+        });
+        assert.equal(await trigger.getAttribute('aria-haspopup'), null);
+        assert.equal(
+          await host
+            .getByRole('group', { name: expected.label, exact: true })
+            .evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        assert.equal(
+          await host
+            .getByRole('status')
+            .textContent()
+            .then((text) => text.trim()),
+          'No actions available.',
+        );
+        await host.evaluate(async (element) => {
+          element.options = element.documentationOptions;
+          await element.updateComplete;
+        });
+        const logged = page.waitForEvent('console', {
+          predicate: (message) => message.text() === 'rename',
+        });
+        await page.keyboard.press('Enter');
+        await logged;
+        assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
+        assert.equal(
+          await trigger.evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+      }
+      if (tag === 't-combobox') {
+        const host = page.locator(tag);
+        const search = host.getByRole('combobox', { name: expected.label, exact: true });
+        await search.focus();
+        await host.evaluate(async (element) => {
+          element.documentationOptions = element.options;
+          element.userEvents = [];
+          for (const type of ['input', 'change'])
+            element.addEventListener(type, () => element.userEvents.push(type));
+          element.options = [];
+          await element.updateComplete;
+        });
+        assert.equal(await search.getAttribute('aria-expanded'), 'false');
+        assert.equal(await search.getAttribute('aria-controls'), null);
+        assert.equal(
+          await search.evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        await host.evaluate(async (element) => {
+          element.options = element.documentationOptions;
+          await element.updateComplete;
+        });
+        assert.equal(await search.getAttribute('aria-expanded'), 'true');
+        assert.deepEqual(await host.evaluate((element) => element.userEvents), []);
+        await page.keyboard.press('ArrowDown');
+        await page.keyboard.press('ArrowDown');
+        await page.keyboard.press('Enter');
+        assert.equal(await host.evaluate((element) => element.value), 'engineering');
+        assert.deepEqual(await host.evaluate((element) => element.userEvents), ['input', 'change']);
+      }
+      if (tag === 't-command-palette') {
+        const host = page.locator(tag);
+        const search = host.getByRole('combobox');
+        await host.evaluate(async (element) => {
+          element.documentationCommands = element.commands;
+          element.commands = [];
+          await element.updateComplete;
+        });
+        assert.equal(await search.getAttribute('aria-expanded'), 'false');
+        assert.equal(await search.getAttribute('aria-controls'), null);
+        assert.equal(
+          await search.evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        await host.evaluate(async (element) => {
+          element.commands = element.documentationCommands;
+          await element.updateComplete;
+        });
+        assert.equal(await search.getAttribute('aria-expanded'), 'true');
+        const logged = page.waitForEvent('console', {
+          predicate: (message) => message.text() === 'settings',
+        });
+        await page.keyboard.press('End');
+        await page.keyboard.press('Enter');
+        await logged;
+        await host.evaluate(async (element) => element.updateComplete);
+        assert.equal(await host.evaluate((element) => element.open), false);
+      }
       if (tag === 't-tabs') {
         const host = page.locator(tag);
         assert.equal(

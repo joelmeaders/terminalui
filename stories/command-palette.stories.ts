@@ -60,4 +60,22 @@ export const Empty: Story = {
       >
         Open empty palette</button
       ><t-command-palette></t-command-palette>`,
+  play: async ({ canvasElement }) => {
+    const trigger = canvasElement.querySelector('button')!;
+    await userEvent.click(trigger);
+    const palette = canvasElement.querySelector('t-command-palette')!;
+    const input = palette.shadowRoot!.querySelector('input')!;
+    await expect(input).toHaveAttribute('aria-expanded', 'false');
+    await expect(input).not.toHaveAttribute('aria-controls');
+    await expect(palette.shadowRoot!.querySelector('[role=status]')).toHaveTextContent(
+      'No matching commands.',
+    );
+    await expect(palette.shadowRoot!.activeElement).toBe(input);
+    palette.commands = commands;
+    await palette.updateComplete;
+    await expect(input).toHaveAttribute('aria-expanded', 'true');
+    await expect(input).toHaveAttribute('aria-controls', 'commands');
+    await userEvent.keyboard('{Escape}');
+    await expect(document.activeElement).toBe(trigger);
+  },
 };

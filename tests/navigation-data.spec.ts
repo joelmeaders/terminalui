@@ -123,7 +123,7 @@ test('menu preserves a focused action through live option changes and recovers w
   await menu.evaluate((element: import('../src').TMenu) => {
     element.options = [];
   });
-  await expect(page.getByRole('menu')).toBeFocused();
+  await expect(page.getByRole('group', { name: 'Actions', exact: true })).toBeFocused();
   await menu.evaluate((element: import('../src').TMenu) => {
     element.options = [{ value: 'retry', label: 'Retry' }];
   });
@@ -443,7 +443,7 @@ test('tree keeps focus near a live collapsed or removed branch without changing 
   });
   await expect(survey).toBeFocused();
   await tree.evaluate((element: any) => (element.items = []));
-  await expect(page.getByRole('tree', { name: 'Files' })).toBeFocused();
+  await expect(page.getByRole('group', { name: 'Files', exact: true })).toBeFocused();
   await tree.evaluate((element: any) => (element.items = [{ id: 'restored', label: 'Restored' }]));
   await expect(page.getByRole('treeitem', { name: 'Restored' })).toBeFocused();
   await expect(tree).toHaveJSProperty('value', 'survey');

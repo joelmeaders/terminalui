@@ -1,4 +1,4 @@
-import { css, html, type PropertyValues } from 'lit';
+import { css, html, nothing, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { observeFloating } from '../internal/floating';
 import { inlineSlotStyles } from '../internal/slots';
@@ -12,6 +12,7 @@ export interface MenuOption {
 
 /**
  * Single-level action menu with arrow navigation, typeahead, and focus return.
+ * With no actions, the popup is a named group with an empty-state status notice.
  * @slot start - Non-interactive icon before the trigger label.
  * @slot end - Non-interactive icon or content after the trigger label, before the arrow.
  *
@@ -19,7 +20,7 @@ export interface MenuOption {
  *
  * @csspart trigger - Native trigger button.
  *
- * @csspart menu - Menu surface.
+ * @csspart menu - Popup surface for actions or an empty-state notice.
  *
  * @csspart item - Action button.
  */
@@ -29,6 +30,7 @@ export class TMenu extends TerminalElement {
     options: { attribute: false },
     disabled: { type: Boolean, reflect: true },
     open: { type: Boolean, reflect: true },
+    emptyMessage: { attribute: 'empty-message' },
   };
   /** Accessible trigger text. */
   label = 'Actions';
@@ -38,6 +40,8 @@ export class TMenu extends TerminalElement {
   disabled = false;
   /** Whether the menu is visible. */
   open = false;
+  /** Status notice when the options contain no actions. Separators are not actions. */
+  emptyMessage = 'No actions available.';
   private search = '';
   private searchTime = 0;
   private cleanup?: () => void;
@@ -60,7 +64,7 @@ export class TMenu extends TerminalElement {
         border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
         box-shadow: var(--_t-edge-glow);
       }
-      [role='menu'] {
+      [part='menu'] {
         position: fixed;
         inset: auto;
         margin: 0;
@@ -91,6 +95,12 @@ export class TMenu extends TerminalElement {
         border-top: var(--t-divider-width, 1px) solid var(--t-control-border, var(--t-border));
         margin: 4px;
       }
+      .empty {
+        margin: 0;
+        padding: 8px 12px;
+        color: var(--t-muted);
+        overflow-wrap: anywhere;
+      }
     `,
   ];
   private outside = (event: Event) => {
@@ -113,7 +123,7 @@ export class TMenu extends TerminalElement {
   protected willUpdate(changed: PropertyValues) {
     if (!changed.has('options') || !this.open) return;
     const active = this.shadowRoot?.activeElement;
-    const panel = this.renderRoot.querySelector<HTMLElement>('[role=menu]');
+    const panel = this.renderRoot.querySelector<HTMLElement>('#menu');
     this.menuHadFocus = active === panel || active?.getAttribute('role') === 'menuitem';
     const item = active?.getAttribute('role') === 'menuitem' ? (active as HTMLButtonElement) : null;
     this.focusedOption = item
@@ -125,7 +135,7 @@ export class TMenu extends TerminalElement {
       this.open = false;
       return;
     }
-    const panel = this.renderRoot.querySelector<HTMLElement>('[role=menu]')!;
+    const panel = this.renderRoot.querySelector<HTMLElement>('#menu')!;
     if (this.open && !panel.matches(':popover-open')) panel.showPopover();
     if (!this.open && panel.matches(':popover-open')) panel.hidePopover();
     if (this.open && !this.cleanup)
@@ -168,8 +178,7 @@ export class TMenu extends TerminalElement {
     await this.updateComplete;
     const buttons = this.buttons();
     (
-      buttons[last ? buttons.length - 1 : 0] ??
-      this.renderRoot.querySelector<HTMLElement>('[role=menu]')
+      buttons[last ? buttons.length - 1 : 0] ?? this.renderRoot.querySelector<HTMLElement>('#menu')
     )?.focus();
   }
   private choose(option: MenuOption) {
@@ -222,12 +231,13 @@ export class TMenu extends TerminalElement {
     buttons[next]?.focus();
   }
   render() {
+    const hasActions = this.options.some((option) => !option.separator);
     return html` <button
         class="trigger"
         part="trigger"
         type="button"
         ?disabled=${this.disabled}
-        aria-haspopup="menu"
+        aria-haspopup=${hasActions ? 'menu' : nothing}
         aria-expanded=${this.open}
         @click=${() => (this.open ? this.dismiss() : this.show())}
         @keydown=${(event: KeyboardEvent) => {
@@ -243,13 +253,14 @@ export class TMenu extends TerminalElement {
       <div
         id="menu"
         part="menu"
-        role="menu"
+        role=${hasActions ? 'menu' : 'group'}
         tabindex="-1"
         popover="manual"
         aria-label=${this.label}
         @keydown=${this.onKey}
       >
         ${this.options.map((option) => (option.separator ? html`<div role="separator"></div>` : html`<button part="item" type="button" role="menuitem" data-value=${option.value} tabindex="-1" ?disabled=${option.disabled} @click=${() => this.choose(option)}>${option.label}</button>`))}
+        ${hasActions ? nothing : html`<p class="empty" role="status">${this.emptyMessage}</p>`}
       </div>`;
   }
 }

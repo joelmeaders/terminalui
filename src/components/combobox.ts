@@ -7,11 +7,12 @@ import { fieldSlotStyles, optionalSlotStyles, syncSlot } from '../internal/slots
 
 /**
  * Searchable single select. Only enabled options can supply the submitted value.
+ * Empty results remain a status notice without an expanded listbox. Loading lists are busy.
  * @slot start - Leading icon, short prefix, or named action. Inert while disabled.
  * @slot end - Trailing icon, short suffix, or named action. Inert while disabled.
  * @csspart control - Frame around the native combobox and optional affixes.
  * @csspart input - input element.
- * @csspart listbox - listbox element.
+ * @csspart listbox - Popup surface for options, loading, and empty-state notices.
  * @csspart option - option element.
  */
 export class TCombobox extends FormControl {
@@ -246,6 +247,7 @@ export class TCombobox extends FormControl {
   }
   render() {
     const options = this.filtered;
+    const hasList = options.length > 0 || this.loading;
     return html`<div class="control">
         <label for="control"
           ><span class="label"
@@ -264,10 +266,10 @@ export class TCombobox extends FormControl {
             placeholder=${this.placeholder}
             ?disabled=${this.isDisabled}
             aria-required=${this.required ? 'true' : 'false'}
-            aria-expanded=${this.open ? 'true' : 'false'}
-            aria-controls="options"
+            aria-expanded=${this.open && hasList ? 'true' : 'false'}
+            aria-controls=${hasList ? 'options' : nothing}
             aria-autocomplete="list"
-            aria-activedescendant=${ifDefined(this.open && this.active >= 0 ? `option-${this.active}` : undefined)}
+            aria-activedescendant=${ifDefined(this.open && hasList && this.active >= 0 ? `option-${this.active}` : undefined)}
             aria-describedby="help"
             aria-invalid=${this.hasVisibleError ? 'true' : 'false'}
             @input=${this.handleInput}
@@ -298,7 +300,7 @@ export class TCombobox extends FormControl {
           <div class="scroll">
             <div
               id="options"
-              role="listbox"
+              role=${hasList ? 'listbox' : 'group'}
               aria-label=${this.label}
               aria-busy=${this.loading ? 'true' : 'false'}
             >

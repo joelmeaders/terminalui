@@ -34,6 +34,8 @@ type Story = StoryObj;
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const tree = canvasElement.querySelector('t-tree')!;
+    await tree.updateComplete;
+    await expect(tree.shadowRoot!.activeElement).toBeNull();
     await userEvent.click(tree.shadowRoot!.querySelector('[data-id="src"]')!);
     await userEvent.keyboard('{End}{Enter}');
     await expect(tree.value).toBe('readme');
@@ -54,7 +56,32 @@ export const Selected: Story = {
       value="button"
     ></t-tree>`,
 };
-export const Empty: Story = { render: () => html`<t-tree label="No files"></t-tree>` };
+export const Empty: Story = {
+  render: () =>
+    html`<p>No project files are available.</p>
+      <t-tree label="Project files"></t-tree>`,
+  play: async ({ canvasElement }) => {
+    const tree = canvasElement.querySelector('t-tree')!;
+    await tree.updateComplete;
+    const group = tree.shadowRoot!.querySelector<HTMLElement>('[part=tree]')!;
+    await expect(group).toHaveAttribute('role', 'group');
+    group.focus();
+    tree.items = items;
+    await tree.updateComplete;
+    await expect(group).toHaveAttribute('role', 'tree');
+    await expect(tree.shadowRoot!.activeElement?.getAttribute('data-id')).toBe('src');
+  },
+};
+export const Unavailable: Story = {
+  render: () =>
+    html`<t-tree
+      label="Unavailable files"
+      .items=${[
+        { id: 'first', label: 'First file', disabled: true },
+        { id: 'second', label: 'Second file', disabled: true },
+      ]}
+    ></t-tree>`,
+};
 export const LiveBranchCollapse: Story = {
   render: () =>
     html`<p>An application can collapse a branch while one of its descendants has focus.</p>
