@@ -4,7 +4,7 @@ import { baseStyles, TerminalElement } from '../internal/base';
  * Responsive flex layout. Gap follows --t-space or --t-stack-gap.
  * @slot - Items.
  * @csspart layout - Flex container.
- * @cssprop --t-stack-gap - gap.
+ * @cssprop --t-stack-gap - Gap between items. Defaults to --t-space (16px in comfortable density, 12px in compact).
  */
 export class TStack extends TerminalElement {
   static properties = {

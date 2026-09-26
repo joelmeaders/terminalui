@@ -51,6 +51,16 @@ const storySources = await Promise.all(
     .map((f) => readFile(join('stories', f), 'utf8')),
 );
 const entries = [];
+const appearanceGuide = await readFile('docs/appearance.md', 'utf8');
+const themesSource = await readFile('src/themes.css', 'utf8');
+const sharedCssProperties = new Set(
+  [...appearanceGuide.matchAll(/^\| `(--t-[\w-]+)`\s*\|/gm)].map((match) => match[1]),
+);
+for (const match of themesSource.matchAll(/(--t-[\w-]+)\s*:|var\((--t-[\w-]+)/g))
+  assert(
+    sharedCssProperties.has(match[1] ?? match[2]),
+    `Appearance guide: undocumented shared CSS property ${match[1] ?? match[2]}.`,
+  );
 for (const component of components) {
   const tag = component.tagName;
   const guide = guides[tag];
@@ -74,6 +84,19 @@ for (const component of components) {
       `${tag}: unknown example event.`,
     );
   const source = await readFile(`src/components/${tag.slice(2)}.ts`, 'utf8');
+  for (const property of component.cssProperties) {
+    assert(property.name.startsWith('--t-'), `${tag}: private CSS property published.`);
+    assert(
+      property.description && !/^\w+\.$/.test(property.description.trim()),
+      `${tag}: CSS property ${property.name} needs a useful description.`,
+    );
+  }
+  for (const match of source.matchAll(/var\((--t-[\w-]+)/g))
+    assert(
+      sharedCssProperties.has(match[1]) ||
+        component.cssProperties.some((property) => property.name === match[1]),
+      `${tag}: undocumented component CSS property ${match[1]}.`,
+    );
   for (const match of source.matchAll(/\bpart="([^"$]*)"/g))
     for (const part of match[1].split(/\s+/))
       assert(
@@ -326,6 +349,27 @@ try {
       if (tag === 't-input') {
         await page.getByRole('textbox', { name: 'Callsign', exact: false }).fill('DOCUMENTED');
         assert.equal(await page.locator(tag).evaluate((el) => el.value), 'DOCUMENTED');
+      }
+      if (tag === 't-split-pane') {
+        const host = page.locator(tag);
+        assert.equal(
+          await host.locator('.layout').evaluate((element) => getComputedStyle(element).height),
+          '240px',
+          `${framework}/${tag}: documented CSS height must reach the shadow layout.`,
+        );
+        const separator = host.getByRole('separator', { name: 'Record list', exact: true });
+        await separator.focus();
+        const logged = page.waitForEvent('console', {
+          predicate: (message) => message.text() === '41',
+        });
+        await separator.press('ArrowRight');
+        await logged;
+        assert.equal(await host.evaluate((element) => element.size), 41);
+        assert.equal(
+          await separator.evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+          `${framework}/${tag}: keyboard resizing must retain focus.`,
+        );
       }
       if (tag === 't-tree') {
         const host = page.locator(tag);

@@ -17,7 +17,7 @@ import { inlineSlotStyles } from '../internal/slots';
  * @csspart trigger - Native trigger button.
  *
  * @csspart panel - Non-modal panel.
- * @cssprop --t-popover-width - width.
+ * @cssprop --t-popover-width - Preferred panel width. Defaults to 320px; floating placement limits the panel to the available viewport.
  */
 export class TPopover extends TerminalElement {
   static properties = {

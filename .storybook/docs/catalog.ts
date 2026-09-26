@@ -810,6 +810,7 @@ export const guides: Record<string, ComponentGuide> = {
     usage: [
       'Supply primary and secondary slots. size is the primary pane percentage, bounded by min and max.',
       'Horizontal panes stack below stackAt CSS pixels. Set stackAt=0 to disable that behavior.',
+      'Set --t-split-height on an ancestor or host to size the inner layout. It defaults to 360px with a 120px minimum; the panes remain scrollable.',
       'Set min=0 to allow the primary pane to collapse fully. Set max=100 to allow the secondary pane to collapse fully.',
     ],
     accessibility: [
@@ -822,6 +823,7 @@ export const guides: Record<string, ComponentGuide> = {
         primaryLabel: 'Record list',
         secondaryLabel: 'Record details',
       },
+      attrs: { style: '--t-split-height: 240px' },
       children: [
         { tag: 'p', attrs: { slot: 'primary' }, children: ['Atmospheric survey'] },
         { tag: 'p', attrs: { slot: 'secondary' }, children: ['Survey details and metadata.'] },

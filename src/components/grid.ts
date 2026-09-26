@@ -5,8 +5,8 @@ import { baseStyles, TerminalElement } from '../internal/base';
  * Auto-fitting grid. Set columns for a fixed maximum; it collapses at narrow container widths.
  * @slot - Cells.
  * @csspart layout - Grid.
- * @cssprop --t-grid-min - min.
- * @cssprop --t-grid-gap - gap.
+ * @cssprop --t-grid-min - Minimum automatic column width, capped by the container width. Defaults to 240px. Does not apply when columns is set.
+ * @cssprop --t-grid-gap - Gap between rows and columns. Defaults to --t-space (16px in comfortable density, 12px in compact).
  */
 export class TGrid extends TerminalElement {
   static properties = { columns: { type: Number } };

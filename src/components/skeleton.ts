@@ -3,8 +3,8 @@ import { baseStyles, TerminalElement } from '../internal/base';
 /**
  * Decorative loading placeholder. Set aria-busy on the content region it represents.
  * @csspart placeholder - Shape.
- * @cssprop --t-skeleton-width - width.
- * @cssprop --t-skeleton-height - height.
+ * @cssprop --t-skeleton-width - Placeholder width. Defaults to 100% for text and rectangle shapes, or 48px for a circle.
+ * @cssprop --t-skeleton-height - Placeholder height. Defaults to 1em for text, 100px for a rectangle, or 48px for a circle.
  */
 export class TSkeleton extends TerminalElement {
   static properties = { shape: { reflect: true }, animated: { type: Boolean, reflect: true } };

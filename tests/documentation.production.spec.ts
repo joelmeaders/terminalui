@@ -13,6 +13,9 @@ const entries = Object.keys(guides).map((tag) => {
   const title = /title: '([^']+)'/.exec(source)![1];
   return { tag, id: title.toLowerCase().replaceAll('/', '-').replaceAll(' ', '-') + '--docs' };
 });
+const sharedCssProperties = [
+  ...readFileSync('docs/appearance.md', 'utf8').matchAll(/^\| `(--t-[\w-]+)`\s*\|/gm),
+].map((match) => match[1]);
 
 test('appearance inheritance guide is available in introductions and component styling at narrow widths', async ({
   page,
@@ -35,6 +38,13 @@ test('appearance inheritance guide is available in introductions and component s
     await expect(guide).toContainText('--t-screen-background');
     await expect(guide).toContainText('shadow roots');
     await expect(guide).toContainText('[attr.data-theme]');
+    await expect(
+      guide.getByRole('heading', { name: 'Shared CSS property reference' }),
+    ).toBeVisible();
+    for (const property of sharedCssProperties)
+      await expect(guide.getByRole('cell', { name: property, exact: true })).toBeVisible();
+    await expect(guide).toContainText('They do not scale with --t-space or density.');
+    await expect(guide).toContainText('--t-split-height');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
       true,
     );
@@ -44,6 +54,12 @@ test('appearance inheritance guide is available in introductions and component s
       JSON.stringify({ violations: report.violations, incomplete: report.incomplete }, null, 2),
     );
     expect(report.violations).toEqual([]);
+    await guide
+      .locator('table')
+      .nth(2)
+      .screenshot({
+        path: testInfo.outputPath(`${id}-spacing-reference-320.png`),
+      });
   }
 });
 
@@ -158,6 +174,23 @@ for (const { tag, id } of entries) {
     await expect(article.locator('.tk-docs-lead')).toHaveText(guides[tag].purpose);
     await expect(article.getByTestId('framework-example')).toContainText('/assets/terminal.js');
     await expect(article.locator('#styling')).toContainText('CSS');
+    if (tag === 't-split-pane') {
+      const properties = article.getByRole('region', {
+        name: 'Component CSS properties',
+        exact: true,
+      });
+      await expect(
+        properties.getByRole('cell', { name: '--t-split-height', exact: true }),
+      ).toBeVisible();
+      await expect(properties).toContainText('minimum of 120px');
+      for (const framework of ['html', 'react', 'vue', 'angular']) {
+        await article
+          .getByRole('combobox', { name: 'Documentation framework' })
+          .selectOption(framework);
+        await expect(article.getByTestId('framework-example')).toContainText('--t-split-height');
+        await expect(article.getByTestId('framework-example')).toContainText('240px');
+      }
+    }
     await expect(article.locator('#accessibility')).toContainText(guides[tag].accessibility[0]);
     await expect(article.locator('#states')).toContainText('States and examples');
     await expect(article.locator('h1,h2,h3,h4').filter({ hasText: /^$/ })).toHaveCount(0);
@@ -665,6 +698,13 @@ test('all component manuals reflow at actual 400% Chromium browser zoom', async 
       const select = page.getByRole('combobox', { name: 'Documentation framework' });
       await expect(select).toBeVisible();
       await expect(page.getByRole('heading', { name: 'API reference', exact: true })).toBeVisible();
+      if (tag === 't-button') {
+        await page.getByText('Cascading appearance settings', { exact: true }).click();
+        const guide = page.locator('#styling details');
+        await expect(guide).toHaveAttribute('open', '');
+        for (const property of sharedCssProperties)
+          await expect(guide.getByRole('cell', { name: property, exact: true })).toBeVisible();
+      }
       for (const framework of ['html', 'react', 'vue', 'angular'] as const) {
         await select.selectOption(framework);
         await expect(select).toHaveValue(framework);

@@ -11,6 +11,23 @@
   white-space: normal;
   overflow-wrap: anywhere;
 }
+@media (max-width: 600px) {
+  .tk-docs :is(#appearance-guide, #styling details) table:has(th:nth-child(2):last-child) {
+    table-layout: fixed;
+    width: 100%;
+  }
+  .tk-docs :is(#appearance-guide, #styling details) table:has(th:nth-child(2):last-child) th,
+  .tk-docs :is(#appearance-guide, #styling details) table:has(th:nth-child(2):last-child) td {
+    box-sizing: border-box;
+    padding: 8px;
+  }
+  .tk-docs
+    :is(#appearance-guide, #styling details)
+    table:has(th:nth-child(2):last-child)
+    th:first-child {
+    width: 50%;
+  }
+}
 .tk-docs-controls {
   max-width: 100%;
   overflow-x: auto;

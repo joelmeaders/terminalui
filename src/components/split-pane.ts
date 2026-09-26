@@ -23,6 +23,7 @@ export interface SplitPaneChange {
  * @csspart secondary - Secondary scroll region.
  *
  * @csspart separator - Keyboard and pointer resize handle.
+ * @cssprop --t-split-height - Inner layout height. Defaults to 360px, with a minimum of 120px. Each pane scrolls within this height.
  */
 export class TSplitPane extends TerminalElement {
   static properties = {
