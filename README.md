@@ -331,7 +331,7 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 8.0 KB gzip for one button and 9.9 KB for the original three form controls. Registration of all 56 components measures about 54.4 KB. One selected Ionicons example, its registry, and `t-icon` measure about 10.6 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS measures about 2.2 KB gzip.
+The local size check measures about 8.0 KB gzip for one button and 9.9 KB for the original three form controls. Registration of all 56 components measures about 54.6 KB. One selected Ionicons example, its registry, and `t-icon` measure about 10.6 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS measures about 2.2 KB gzip.
 
 A selective React button wrapper measures about 8.6 KB, excluding the shared React runtime. Import individual component subpaths to avoid registering the full catalog. Importing and using more exported APIs adds their code.
 

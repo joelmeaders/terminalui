@@ -35,3 +35,75 @@ export const Empty: Story = { render: () => html`<t-pagination total="0"></t-pag
 export const Disabled: Story = {
   render: () => html`<t-pagination total="125" disabled></t-pagination>`,
 };
+export const KeyboardPages: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Numbered actions keep focus on the chosen page when nearby page buttons change. Use Tab, Enter, and Space as for native buttons.',
+      },
+    },
+  },
+  render: () => html`<t-pagination label="Archive pages" total="100" page="3"></t-pagination>`,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-pagination')!;
+    const button = host.shadowRoot!.querySelector<HTMLButtonElement>('[aria-label="Page 4"]')!;
+    button.focus();
+    await userEvent.keyboard('{Enter}');
+    await host.updateComplete;
+    await expect(host.page).toBe(4);
+    await expect(host.shadowRoot!.activeElement).toBe(button);
+    await expect(button).toHaveAttribute('aria-current', 'page');
+    // Native Tab order through shadow roots is checked in Playwright.
+    await userEvent.keyboard(' ');
+    await host.updateComplete;
+    await expect(host.page).toBe(4);
+    await expect(host.shadowRoot!.activeElement).toBe(button);
+  },
+};
+export const BoundaryFocus: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Next becomes disabled at the final page. Keyboard focus recovers to the current page instead of remaining on an unavailable action.',
+      },
+    },
+  },
+  render: () => html`<t-pagination label="Archive pages" total="100" page="9"></t-pagination>`,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-pagination')!;
+    const next = host.shadowRoot!.querySelector<HTMLButtonElement>('[aria-label="Next page"]')!;
+    next.focus();
+    await userEvent.keyboard('{Enter}');
+    await host.updateComplete;
+    await expect(next).toBeDisabled();
+    await expect(host.shadowRoot!.activeElement).toHaveAttribute('aria-label', 'Page 10');
+  },
+};
+export const LiveResults: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Changing total clamps page without a user-change event. A removed focused page recovers to the current page. Disabling all actions uses the named navigation region.',
+      },
+    },
+  },
+  render: () => html`<t-pagination label="Archive pages" total="100" page="8"></t-pagination>`,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-pagination')!;
+    host.shadowRoot!.querySelector<HTMLButtonElement>('[aria-label="Page 8"]')!.focus();
+    host.total = 20;
+    await host.updateComplete;
+    await expect(host.page).toBe(2);
+    await expect(host.shadowRoot!.activeElement).toHaveAttribute('aria-label', 'Page 2');
+    host.disabled = true;
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toBe(host.shadowRoot!.querySelector('nav'));
+    await expect(host.shadowRoot!.activeElement).toHaveAttribute('aria-label', 'Archive pages');
+    host.disabled = false;
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toHaveAttribute('aria-label', 'Page 2');
+  },
+};

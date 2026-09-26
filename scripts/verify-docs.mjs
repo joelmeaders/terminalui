@@ -421,6 +421,38 @@ try {
         assert.equal(new URL(page.url()).hash, '#archive');
         await page.setViewportSize(viewport);
       }
+      if (tag === 't-pagination') {
+        const host = page.locator(tag);
+        assert.equal(
+          await host.getByRole('navigation', { name: expected.label, exact: true }).count(),
+          1,
+        );
+        const destination = expected.page + 1;
+        const button = host.getByRole('button', { name: `Page ${destination}`, exact: true });
+        await button.focus();
+        const logged = page.waitForEvent('console', {
+          predicate: (message) => message.text() === String(destination),
+        });
+        await button.press('Enter');
+        await logged;
+        await host.evaluate(async (element) => element.updateComplete);
+        assert.equal(await host.evaluate((element) => element.page), destination);
+        assert.equal(await button.getAttribute('aria-current'), 'page');
+        assert.equal(
+          await button.evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        await host.evaluate(async (element) => {
+          element.total = 0;
+          await element.updateComplete;
+        });
+        const current = host.getByRole('button', { name: 'Page 1', exact: true });
+        assert.equal(
+          await current.evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        assert.equal(await host.getByRole('status').textContent(), 'Page 1 of 1');
+      }
       if (tag === 't-toolbar') {
         const host = page.locator(tag);
         assert.equal(

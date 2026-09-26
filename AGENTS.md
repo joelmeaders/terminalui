@@ -21,6 +21,7 @@ Include accessibility in implementation, stories, tests, documentation, and revi
 - Follow the relevant WAI-ARIA Authoring Practices pattern for composite widgets. Test navigation, selection, and disabled options.
 - Composite navigation must follow rendered slot order across open shadow roots. Test live inert, hidden, and collapsed actions. Preserve focus outside the widget during live changes.
 - Choice controls must leave focus unchanged on initial render. Recover focus after live option changes only when the control already had focus.
+- Key dynamic actions by stable identifiers. Preserve the focused action's identity when the visible list changes. Recover to a visible destination if that action becomes unavailable.
 - When a region hides focused content, recover focus to a visible control or surviving region. Test nested slots and shadow roots. Preserve focus outside the component.
 - Modals must contain keyboard focus and restore it on close. Account for slots, shadow roots, radio groups, and collapsed disclosures.
 - Modals must prevent background wheel, touch, and keyboard scrolling while keeping their content scrollable. Preserve page position and styles. Test stacked modals and removal cleanup.

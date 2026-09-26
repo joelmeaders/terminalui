@@ -660,11 +660,14 @@ export const guides: Record<string, ComponentGuide> = {
     usage: [
       'total is the record count, pageSize is records per page, and page is one-based.',
       'The component does not fetch or slice records. Use t-change to update displayed data.',
+      'Replace total or pageSize when the result set changes. External updates clamp page without emitting t-change.',
     ],
     accessibility: [
       'The current page is identified, bounds disable unavailable navigation, and all buttons have names.',
+      'Use native Tab and Enter or Space. A surviving action retains focus. A removed or disabled action recovers to the current page, or the named region when all actions are disabled.',
+      'External updates preserve focus outside the component. Application event handlers may move focus deliberately after loading content.',
     ],
-    example: { props: { total: 95, pageSize: 10, page: 1, label: 'Archive pages' } },
+    example: { props: { total: 95, pageSize: 10, page: 3, label: 'Archive pages' } },
     event: {
       name: 't-change',
       read: 'detail.page',
