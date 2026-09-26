@@ -83,6 +83,13 @@ const timedPlay: Story['play'] = async ({ canvasElement }) => {
   close.focus();
   await toast.updateComplete;
   await expect(toast.shadowRoot!.activeElement).toBe(close);
+  // Check focus immediately, then let the finite entrance finish before axe samples contrast.
+  await Promise.all(
+    toast
+      .shadowRoot!.querySelector('[part=notice]')!
+      .getAnimations()
+      .map((animation) => animation.finished),
+  );
 };
 export const CountdownBar: Story = {
   render: timedRender,

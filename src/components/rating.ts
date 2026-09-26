@@ -1,9 +1,11 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { TRadioGroup } from './radio-group';
+import { activeElement, recoverFocus } from '../internal/floating';
 
 /**
  * Rating from native radio options. Empty string means unrated. Selected values are integer strings.
+ * A hidden or disabled clear action recovers focus to an available radio or the disabled group's legend.
  *
  * @csspart clear - Optional clear action.
  * @csspart input - input element.
@@ -20,6 +22,7 @@ export class TRating extends TRadioGroup {
   /** Show an action that removes the rating. Required ratings become invalid when cleared. */
   clearable = false;
   orientation: 'vertical' | 'horizontal' = 'horizontal';
+  private focusedClear?: HTMLElement;
   static styles = [
     ...TRadioGroup.styles,
     css`
@@ -58,6 +61,8 @@ export class TRating extends TRadioGroup {
     `,
   ];
   protected willUpdate(changed: PropertyValues) {
+    const from = this.shadowRoot?.activeElement as HTMLElement | null;
+    this.focusedClear = from?.getAttribute('part') === 'clear' ? from : undefined;
     super.willUpdate(changed);
     if (changed.has('max')) {
       const count = Math.max(1, Math.min(10, Math.floor(this.max) || 5));
@@ -67,9 +72,28 @@ export class TRating extends TRadioGroup {
       }));
     }
   }
-  /** Remove the selected rating and emit standard input/change events. */
+  protected updated(changed: PropertyValues) {
+    const from = this.focusedClear;
+    this.focusedClear = undefined;
+    super.updated(changed);
+    if (!from) return;
+    const clear = this.renderRoot.querySelector<HTMLButtonElement>('[part=clear]:not(:disabled)');
+    recoverFocus(
+      from,
+      clear ??
+        (this.isDisabled
+          ? this.renderRoot.querySelector<HTMLElement>('legend')
+          : (this.control ?? this.renderRoot.querySelector<HTMLElement>('fieldset'))),
+    );
+  }
+  disconnectedCallback() {
+    this.focusedClear = undefined;
+    super.disconnectedCallback();
+  }
+  /** Remove the selected rating and emit standard input/change events. Return focus to an available radio unless an application event handler moves it elsewhere. */
   clear() {
     if (this.isDisabled || !this.value) return;
+    const from = activeElement(this.ownerDocument);
     this.value = '';
     this.renderRoot.querySelectorAll<HTMLInputElement>('input').forEach((input) => {
       input.checked = false;
@@ -78,7 +102,8 @@ export class TRating extends TRadioGroup {
     this.syncForm();
     this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
     this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
-    this.focus();
+    if (!this.isDisabled)
+      recoverFocus(from, this.control ?? this.renderRoot.querySelector<HTMLElement>('fieldset'));
   }
   render() {
     return html`<fieldset
@@ -87,7 +112,7 @@ export class TRating extends TRadioGroup {
         aria-invalid=${this.hasVisibleError ? 'true' : 'false'}
         ?disabled=${this.isDisabled}
       >
-        <legend>
+        <legend tabindex="-1">
           ${this.label}${this.required ? html` <abbr title="required" aria-hidden="true">*</abbr>` : nothing}
         </legend>
         <div class="options">

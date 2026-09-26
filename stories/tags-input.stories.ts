@@ -45,3 +45,47 @@ export const EmptyRequired: Story = { args: { values: [], required: true } };
 export const Limited: Story = { args: { values: ['Lit', 'TypeScript'], maxTags: 2 } };
 export const Disabled: Story = { args: { disabled: true } };
 export const Invalid: Story = { args: { error: 'Choose at least two relevant skills.' } };
+export const LiveActions: Story = {
+  args: { values: ['Lit', 'TypeScript', 'CSS'] },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Removal actions retain tag identity after reordering. Removing the focused tag externally returns focus to the entry without a user event.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-tags-input')!;
+    const action = host.shadowRoot!.querySelector<HTMLButtonElement>(
+      '[aria-label="Remove TypeScript"]',
+    )!;
+    action.focus();
+    host.values = ['CSS', 'Lit', 'TypeScript'];
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toBe(action);
+    await expect(action).toHaveAttribute('aria-label', 'Remove TypeScript');
+    host.values = ['CSS'];
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toBe(host.shadowRoot!.querySelector('input'));
+  },
+};
+export const DisabledActions: Story = {
+  args: { values: ['Lit', 'TypeScript'] },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Disabling a focused removal action uses the named selected-tag list. Keyboard users can then leave the disabled control.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-tags-input')!;
+    host.shadowRoot!.querySelector<HTMLButtonElement>('[aria-label="Remove TypeScript"]')!.focus();
+    host.disabled = true;
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toBe(host.shadowRoot!.querySelector('.tags'));
+    await expect(host.shadowRoot!.activeElement).toHaveAttribute('aria-label', 'Skills selected');
+  },
+};

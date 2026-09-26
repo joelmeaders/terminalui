@@ -805,6 +805,44 @@ try {
         );
         assert.deepEqual(await host.evaluate((element) => element.userEvents), ['settings']);
       }
+      if (tag === 't-tags-input') {
+        const host = page.locator(tag);
+        const removed = expected.values[1];
+        const action = host.getByRole('button', { name: `Remove ${removed}`, exact: true });
+        await action.focus();
+        await host.evaluate(async (element) => {
+          element.userEvents = [];
+          for (const type of ['input', 'change'])
+            element.addEventListener(type, () => element.userEvents.push(type));
+          element.values = [...element.values].reverse();
+          await element.updateComplete;
+        });
+        assert.equal(
+          await action.evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        assert.deepEqual(await host.evaluate((element) => element.userEvents), []);
+        await action.press('Enter');
+        await host.evaluate(async (element) => element.updateComplete);
+        assert.deepEqual(await host.evaluate((element) => element.values), [expected.values[0]]);
+        assert.deepEqual(await host.evaluate((element) => element.userEvents), ['input', 'change']);
+        const entry = host.getByRole('textbox', { name: expected.label, exact: true });
+        assert.equal(
+          await entry.evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        const submitted = await host.evaluate((element, name) => {
+          // Recipes show one control. Add native form context only for this assertion.
+          const form = document.createElement('form');
+          element.before(form);
+          form.append(element);
+          const entries = new FormData(form).getAll(name);
+          form.after(element);
+          form.remove();
+          return entries;
+        }, expected.name);
+        assert.deepEqual(submitted, [expected.values[0]]);
+      }
       if (['t-radio-group', 't-segmented-control', 't-rating', 't-multi-select'].includes(tag)) {
         assert.equal(
           await page.evaluate(() => document.activeElement === document.body),
@@ -873,6 +911,21 @@ try {
           await host.evaluate((element) => element.shadowRoot.activeElement.value),
           next,
         );
+        if (tag === 't-rating') {
+          await host.getByRole('button', { name: `Clear ${expected.label}`, exact: true }).focus();
+          await host.evaluate(async (element) => {
+            element.clearable = false;
+            await element.updateComplete;
+          });
+          assert.equal(
+            await host.evaluate((element) => element.shadowRoot.activeElement.value),
+            next,
+          );
+          assert.deepEqual(await host.evaluate((element) => element.userEvents), [
+            'input',
+            'change',
+          ]);
+        }
       }
       if (tag === 't-calendar') {
         assert.equal(await page.getByRole('group', { name: 'Mission date' }).count(), 1);

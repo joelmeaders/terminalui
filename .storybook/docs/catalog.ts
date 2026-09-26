@@ -744,6 +744,12 @@ export const guides: Record<string, ComponentGuide> = {
       'clearable adds a named action. Clearing a required rating makes it invalid.',
       'Changing max keeps focus on the same value when possible, then the nearest available rating. A required rating becomes invalid if its selected value is removed.',
     ],
+    {
+      accessibility: [
+        ...fieldAccess,
+        'A hidden or disabled clear action returns focus to an available radio, or the visible legend when the whole group is disabled. Outside focus and deliberate application focus changes remain unchanged.',
+      ],
+    },
   ),
   't-segmented-control': field(
     'Choose one of a few compact, mutually exclusive modes.',
@@ -1010,7 +1016,14 @@ export const guides: Record<string, ComponentGuide> = {
       'Enter or comma adds a tag; Backspace in an empty field removes the last tag. Duplicate and empty tags are ignored.',
       'values is a string array; value is its JSON string. FormData contains one entry per tag under name.',
       'Angular forms bind the JSON string value, not the values array. Use maxTags to limit the count.',
+      'Replace values or value for external updates. Removal actions retain their tag identity. External updates do not emit input or change.',
     ],
+    {
+      accessibility: [
+        ...fieldAccess,
+        'Removing an unavailable focused action returns focus to the entry field. Disabled actions use the named selected-tag list. Outside focus and deliberate application focus changes remain unchanged.',
+      ],
+    },
   ),
   't-textarea': field(
     'Collect multiline text.',

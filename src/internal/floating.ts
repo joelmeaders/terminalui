@@ -81,3 +81,18 @@ export function activeElement(owner: Document = document): HTMLElement | undefin
     ? (current as HTMLElement)
     : undefined;
 }
+
+/** Recover focus after a control changes, unless the consumer moved it elsewhere. */
+export function recoverFocus(
+  from: HTMLElement | undefined,
+  target: HTMLElement | null | undefined,
+) {
+  if (!target?.isConnected) return;
+  const owner = target.ownerDocument;
+  const current = activeElement(owner);
+  if (current !== from && current !== owner.body) return;
+  if (current === target) return;
+  target.focus({ preventScroll: true });
+  if (activeElement(owner) === target)
+    target.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
+}

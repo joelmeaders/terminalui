@@ -66,3 +66,49 @@ export const LiveMaximum: Story = {
     await expect(host.validity.valueMissing).toBe(true);
   },
 };
+export const LiveClearAction: Story = {
+  args: { value: '3' },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A hidden clear action returns focus to the selected radio. Clearing the value externally disables the action and uses the first available radio.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-rating')!;
+    host.shadowRoot!.querySelector<HTMLButtonElement>('[part=clear]')!.focus();
+    host.clearable = false;
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toBe(
+      host.shadowRoot!.querySelector('input[value="3"]'),
+    );
+    host.clearable = true;
+    await host.updateComplete;
+    host.shadowRoot!.querySelector<HTMLButtonElement>('[part=clear]')!.focus();
+    host.value = '';
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toBe(
+      host.shadowRoot!.querySelector('input[value="1"]'),
+    );
+  },
+};
+export const DisabledClearAction: Story = {
+  args: { value: '3' },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Disabling the focused clear action returns focus to the visible legend of the named rating group. Native radio and clear actions remain disabled.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-rating')!;
+    host.shadowRoot!.querySelector<HTMLButtonElement>('[part=clear]')!.focus();
+    host.disabled = true;
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toBe(host.shadowRoot!.querySelector('legend'));
+  },
+};

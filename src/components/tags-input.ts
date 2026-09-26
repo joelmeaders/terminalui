@@ -1,10 +1,14 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
+import { repeat } from 'lit/directives/repeat.js';
 import { FormControl, fieldStyles } from '../internal/form-control';
+import { activeElement, recoverFocus } from '../internal/floating';
 
 /**
  * Editable unique text tags. Each tag submits a separate FormData entry under name.
  * The value property is a JSON array string. The values property is the corresponding string array.
  * Enter or comma adds a tag. Backspace in an empty entry removes the last tag.
+ * Live tag changes retain removal-action identity or recover focus to the entry field.
+ * Disabled actions recover to the named selected-tag list. Outside focus remains unchanged.
  *
  * @csspart input - Tag entry field.
  *
@@ -32,6 +36,7 @@ export class TTagsInput extends FormControl {
   private serialized = '';
   private entryError = '';
   private statusMessage = '';
+  private focusedRemoval?: { from: HTMLElement; tag: string };
   get validationMessage() {
     return this.error || this.customValidationMessage || this.entryError || super.validationMessage;
   }
@@ -80,6 +85,9 @@ export class TTagsInput extends FormControl {
     return [...new Set(values.map((value) => value.trim()).filter(Boolean))];
   }
   protected willUpdate(changed: PropertyValues) {
+    const from = this.shadowRoot?.activeElement as HTMLElement | null;
+    this.focusedRemoval =
+      from?.getAttribute('part') === 'remove' ? { from, tag: from.dataset.tag! } : undefined;
     if (changed.has('value') && this.value !== this.serialized) {
       try {
         const parsed: unknown = this.value ? JSON.parse(this.value) : [];
@@ -98,6 +106,24 @@ export class TTagsInput extends FormControl {
       this.entryError = '';
     }
     this.value = this.serialized = JSON.stringify(this.values);
+  }
+  protected updated(changed: PropertyValues) {
+    const focused = this.focusedRemoval;
+    this.focusedRemoval = undefined;
+    super.updated(changed);
+    if (!focused) return;
+    const action = [...this.renderRoot.querySelectorAll<HTMLButtonElement>('[part=remove]')].find(
+      (button) => button.dataset.tag === focused.tag && !button.disabled,
+    );
+    recoverFocus(
+      focused.from,
+      action ??
+        (this.isDisabled ? this.renderRoot.querySelector<HTMLElement>('.tags') : this.control),
+    );
+  }
+  disconnectedCallback() {
+    this.focusedRemoval = undefined;
+    super.disconnectedCallback();
   }
   protected syncForm() {
     super.syncForm();
@@ -147,12 +173,13 @@ export class TTagsInput extends FormControl {
     this.statusMessage = `Added ${tag}. ${this.values.length} ${this.values.length === 1 ? 'tag' : 'tags'} selected.`;
     return true;
   }
-  /** Remove a selected tag. Focus returns to the entry field. */
+  /** Remove a selected tag. Focus returns to the entry field unless an application event handler moves it elsewhere. */
   removeTag(value: string) {
     if (this.isDisabled || !this.values.includes(value)) return;
+    const from = activeElement(this.ownerDocument);
     this.changeValues(this.values.filter((tag) => tag !== value));
     this.statusMessage = `Removed ${value}. ${this.values.length} ${this.values.length === 1 ? 'tag' : 'tags'} selected.`;
-    this.focus();
+    recoverFocus(from, this.control);
   }
   protected handleInput(event: Event) {
     event.stopPropagation();
@@ -191,8 +218,25 @@ export class TTagsInput extends FormControl {
     return html`<label for="entry" class="label"
         >${this.label}${this.required ? html` <abbr title="required" aria-hidden="true">*</abbr>` : nothing}</label
       >
-      <ul class="tags" aria-label=${`${this.label || 'Tags'} selected`}>
-        ${this.values.map((tag) => html`<li class="tag" part="tag"><span>${tag}</span><button type="button" part="remove" aria-label=${`Remove ${tag}`} ?disabled=${this.isDisabled} @click=${() => this.removeTag(tag)}>×</button></li>`)}
+      <ul class="tags" tabindex="-1" aria-label=${`${this.label || 'Tags'} selected`}>
+        ${repeat(
+          this.values,
+          (tag) => tag,
+          (tag) =>
+            html`<li class="tag" part="tag">
+              <span>${tag}</span
+              ><button
+                type="button"
+                part="remove"
+                data-tag=${tag}
+                aria-label=${`Remove ${tag}`}
+                ?disabled=${this.isDisabled}
+                @click=${() => this.removeTag(tag)}
+              >
+                ×
+              </button>
+            </li>`,
+        )}
       </ul>
       <input
         id="entry"
