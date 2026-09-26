@@ -11,7 +11,7 @@ export interface TabItem {
  * @slot id - Use each tab's ID as the slot name for its panel content.
  * @csspart tab - tab element.
  * @csspart panel - panel element.
- * @fires t-change - Selection changed. detail.value is the selected tab ID.
+ * @fires {CustomEvent<{ value: string }>} t-change - Selection changed. detail.value is the selected tab ID.
  */
 export class TTabs extends TerminalElement {
   static properties = {

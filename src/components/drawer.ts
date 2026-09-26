@@ -10,7 +10,7 @@ import { ModalScrollController } from '../internal/modal-scroll';
  *
  * @slot footer - Footer actions.
  *
- * @fires t-close - The drawer closed.
+ * @fires {CustomEvent<null>} t-close - The drawer closed.
  *
  * @csspart dialog - Native modal panel.
  *

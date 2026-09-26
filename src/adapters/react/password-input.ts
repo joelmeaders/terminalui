@@ -9,6 +9,6 @@ export const TPasswordInput = createComponent({
   events: {
     onInput: 'input' as EventName<Event>,
     onChange: 'change' as EventName<Event>,
-    onTVisibilityChange: 't-visibility-change' as EventName<CustomEvent<unknown>>,
+    onTVisibilityChange: 't-visibility-change' as EventName<CustomEvent<{ revealed: boolean }>>,
   },
 });

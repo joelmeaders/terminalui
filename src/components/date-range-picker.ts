@@ -16,8 +16,8 @@ type RangeIssue = { field: 'start' | 'end' | 'both'; message: string; flags: Val
  * @slot trigger-icon - Decorative icon before the calendar button label.
  * @fires input - A user edited a date or completed a calendar selection. Read `event.target.value`.
  * @fires change - A user committed a typed date or completed a calendar selection.
- * @fires t-change - A calendar selection completed: `{ start, end, value }`.
- * @fires t-close - The calendar dialog closed.
+ * @fires {CustomEvent<{ start: string; end: string; value: string }>} t-change - A calendar selection completed: `{ start, end, value }`.
+ * @fires {CustomEvent<null>} t-close - The calendar dialog closed.
  * @csspart fields - Paired text fields.
  * @csspart start-input - Native start-date text field.
  * @csspart end-input - Native end-date text field.

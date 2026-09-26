@@ -19,9 +19,9 @@ interface VisibleItem {
  * Single-select tree with roving focus, arrows, Home/End, typeahead, and sibling expansion.
  * Empty hierarchies use a named group. Restored items retain focus without changing selection.
  *
- * @fires t-select - Selection changed: `{ value, item }`.
+ * @fires {CustomEvent<{ value: string; item: TreeItem }>} t-select - Selection changed: `{ value, item }`.
  *
- * @fires t-toggle - Branch changed: `{ id, expanded, expandedIds }`.
+ * @fires {CustomEvent<{ id: string; expanded: boolean; expandedIds: string[] }>} t-toggle - Branch changed: `{ id, expanded, expandedIds }`.
  *
  * @csspart tree - Hierarchy container, including the empty group.
  *

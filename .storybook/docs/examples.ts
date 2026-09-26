@@ -195,7 +195,9 @@ export function exampleFor(tag: string, framework: Framework): string {
         `on${event.name
           .split('-')
           .map((p) => p[0].toUpperCase() + p.slice(1))
-          .join('')}={(event) => console.log(${eventRead})}`,
+          .join(
+            '',
+          )}={(event) => console.log(${event.read.startsWith('detail') ? `event.${event.read}` : eventRead})}`,
       );
     if (guide.action) additions.push('ref={element}');
     const hooks = [form && 'useState', guide.action && 'useRef'].filter(Boolean);

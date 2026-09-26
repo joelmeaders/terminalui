@@ -11,7 +11,7 @@ export interface StepItem {
 /**
  * Ordered step navigation. Applications own the associated content and validation.
  *
- * @fires t-select - User selects a step: `{ value, index, step }`.
+ * @fires {CustomEvent<{ value: string; index: number; step: StepItem }>} t-select - User selects a step: `{ value, index, step }`.
  *
  * @csspart nav - Navigation landmark.
  *

@@ -5,7 +5,7 @@ import { baseStyles, TerminalElement } from '../internal/base';
  * @slot - Main content.
  * @slot icon - Decorative icon replacing the built-in status symbol.
  * @csspart notice - notice element.
- * @fires t-dismiss - The notice was dismissed. No detail payload.
+ * @fires {CustomEvent<null>} t-dismiss - The notice was dismissed. No detail payload.
  */
 export class TAlert extends TerminalElement {
   static properties = {

@@ -183,6 +183,8 @@ Use Terminal Kit or native submit and reset buttons:
 
 Fields emit bubbling, composed `input` and `change` events. Read `event.target.value`, `event.target.checked`, or `event.target.files`. Range values are strings. Programmatic property changes update the display without emitting an input event. Await `element.updateComplete` when a script must read the updated DOM or form state immediately after setting properties. Use `setCustomValidity()`, `checkValidity()`, and `reportValidity()` for browser validation.
 
+React custom event handlers infer their documented payloads. For example, `TMenu`'s `onTSelect` provides `event.detail.value` as a string and `event.detail.option` as `MenuOption`. Native input/change events remain `Event`. See [framework integration](docs/frameworks.md) for typed examples.
+
 Set arrays such as `options`, `tabs`, `items`, `columns`, and `rows` as JavaScript properties. Pass new arrays when changing their contents. Slot names must match unique tab IDs.
 
 Tabs default to a horizontal list. Set `orientation="vertical"` for a side list that moves above its panel on narrow screens. Horizontal arrow keys follow text direction; vertical tabs use Up and Down.

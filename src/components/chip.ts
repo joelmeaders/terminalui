@@ -8,8 +8,8 @@ import { optionalSlotStyles, syncSlot } from '../internal/slots';
  *
  * @slot start - Decorative icon before the label. It is hidden from assistive technology.
  * @slot end - Decorative icon after the label. It is hidden from assistive technology.
- * @fires t-toggle - User changed selection: `{ selected, label }`.
- * @fires t-remove - User requested removal: `{ label }`. The element remains until the application removes it.
+ * @fires {CustomEvent<{ selected: boolean; label: string }>} t-toggle - User changed selection: `{ selected, label }`.
+ * @fires {CustomEvent<{ label: string }>} t-remove - User requested removal: `{ label }`. The element remains until the application removes it.
  * @csspart chip - Outer token surface.
  * @csspart action - Native selection button, present when selectable.
  * @csspart label - Visible token label.

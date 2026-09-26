@@ -12,11 +12,11 @@ export type TableRow = Record<string, unknown>;
  * Native table with local filtering, sorting, paging, and optional row selection.
  * No virtualization or cell editing.
  *
- * @fires t-filter - User changed the local query: `{ query }`.
- * @fires t-sort - Sort changed: `{ key, direction }`.
- * @fires t-page-change - User changed the one-based page: `{ page, pageSize }`.
+ * @fires {CustomEvent<{ query: string }>} t-filter - User changed the local query: `{ query }`.
+ * @fires {CustomEvent<{ key: string; direction: 'ascending' | 'descending' }>} t-sort - Sort changed: `{ key, direction }`.
+ * @fires {CustomEvent<{ page: number; pageSize: number }>} t-page-change - User changed the one-based page: `{ page, pageSize }`.
  *
- * @fires t-selection-change - Selection changed: `{ selectedKeys }`.
+ * @fires {CustomEvent<{ selectedKeys: (string | number)[] }>} t-selection-change - Selection changed: `{ selectedKeys }`.
  *
  * @csspart filter - Optional labeled search field.
  * @csspart pagination - Page navigation landmark.

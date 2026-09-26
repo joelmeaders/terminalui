@@ -9,6 +9,6 @@ export const TPagination = createComponent({
   events: {
     onInput: 'input' as EventName<Event>,
     onChange: 'change' as EventName<Event>,
-    onTChange: 't-change' as EventName<CustomEvent<unknown>>,
+    onTChange: 't-change' as EventName<CustomEvent<{ page: number; pageSize: number }>>,
   },
 });

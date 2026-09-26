@@ -16,7 +16,7 @@ export interface MenuOption {
  * @slot start - Non-interactive icon before the trigger label.
  * @slot end - Non-interactive icon or content after the trigger label, before the arrow.
  *
- * @fires t-select - Selected action: `{ value, option }`.
+ * @fires {CustomEvent<{ value: string; option: MenuOption }>} t-select - Selected action: `{ value, option }`.
  *
  * @csspart trigger - Native trigger button.
  *

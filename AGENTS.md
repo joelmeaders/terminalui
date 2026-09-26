@@ -68,6 +68,7 @@ For framework examples, verify that labels, focus, values, and events survive th
 - Use Storybook as the component documentation entry point. Do not add a second documentation system without a demonstrated need.
 - Each component needs a guide in `.storybook/docs/catalog.ts`: purpose, usage, a complete example, events or form behavior, and accessibility guidance. Keep one example recipe and generate the HTML/JS/CSS, Angular, Vue, and React versions from it.
 - Document public slots, events, CSS parts, and component CSS properties in source JSDoc. Keep private implementation details out of the published manifest.
+- Give each custom event a typed `@fires {CustomEvent<Payload>}` annotation. Use `CustomEvent<null>` for no payload. Generate manifest and React handler types from the same declaration. Keep payload type regressions in the installed-package check.
 - Keep project setup and icon-provider instructions in the shared Markdown guides. Storybook must display those guides where users need them, including icon registration and imports on both icon component pages.
 - Preserve the global framework selector across component navigation. Clearly distinguish framework integration code from the shared Web Component preview.
 - Run `npm run test:docs` after the package build. It compiles and renders all framework examples. Built Storybook documentation, switcher, accessibility, and reflow checks run in `npm run test:production` and the full check.

@@ -12,7 +12,7 @@ import { inlineSlotStyles } from '../internal/slots';
  * @slot start - Non-interactive icon before the trigger label.
  * @slot end - Non-interactive icon after the trigger label.
  *
- * @fires t-toggle - CustomEvent<{open:boolean}> after the panel changes visibility.
+ * @fires {CustomEvent<{ open: boolean }>} t-toggle - The panel changed visibility.
  *
  * @csspart trigger - Native trigger button.
  *

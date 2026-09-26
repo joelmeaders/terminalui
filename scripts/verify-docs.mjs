@@ -104,6 +104,13 @@ for (const { tag } of entries) {
     `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>${tag} example</title></head><body>${renderExample('html')}</body></html>`,
   );
   const reactExample = renderExample('react');
+  if (tag !== 'typography' && guides[tag].event?.read.startsWith('detail')) {
+    assert(
+      reactExample.includes(`console.log(event.${guides[tag].event.read})`),
+      `${tag}: React examples must use their inferred custom event payload.`,
+    );
+    assert(!reactExample.includes('as CustomEvent'), `${tag}: React event casts are unnecessary.`);
+  }
   if (tag !== 'typography') {
     assert(
       reactExample.includes(`from '@terminal-kit/core/react/${tag.slice(2)}'`),

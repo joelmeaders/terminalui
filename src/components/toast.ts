@@ -9,7 +9,7 @@ import { optionalSlotStyles, syncSlot } from '../internal/slots';
  * @slot icon - Optional decorative status icon.
  * @slot actions - Named notification actions. Focus pauses auto-dismiss. Hidden when closed.
  *
- * @fires t-close - CustomEvent<{reason:'dismiss'|'timeout'|'programmatic'}>.
+ * @fires {CustomEvent<{ reason: 'dismiss' | 'timeout' | 'programmatic' }>} t-close - The notification closed with its dismissal reason.
  *
  * @csspart notice - Notification surface.
  *

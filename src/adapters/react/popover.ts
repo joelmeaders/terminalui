@@ -9,6 +9,6 @@ export const TPopover = createComponent({
   events: {
     onInput: 'input' as EventName<Event>,
     onChange: 'change' as EventName<Event>,
-    onTToggle: 't-toggle' as EventName<CustomEvent<unknown>>,
+    onTToggle: 't-toggle' as EventName<CustomEvent<{ open: boolean }>>,
   },
 });

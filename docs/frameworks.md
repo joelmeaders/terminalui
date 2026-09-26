@@ -58,7 +58,25 @@ export function Settings() {
 ```
 
 Use `checked` for checkbox and switch state. Use `onTSelect`, `onTChange`, `onTClose`, and similar names for `t-*` events.
-Custom event details use `unknown` until you narrow them to the component's documented payload.
+Custom event handlers infer the component's documented payload. Nested menu options, tree items, commands, numeric values, and literal states retain their types. Events without a payload have `detail: null`. Native `input` and `change` handlers receive `Event`; read the value from their typed element target.
+
+```tsx
+import { TMenu } from '@terminal-kit/core/react/menu';
+
+export function FileActions() {
+  return (
+    <TMenu
+      label="File actions"
+      options={[{ value: 'open', label: 'Open report' }]}
+      onTSelect={(event) => {
+        // value is string; option is MenuOption. No event cast is needed.
+        console.log(event.detail.value, event.detail.option.label);
+      }}
+    />
+  );
+}
+```
+
 These bindings do not provide React server rendering or hydration. Render this library in a browser client boundary.
 The examples assume a client bundler that accepts CSS imports, such as Vite. With Vite and TypeScript, include `vite/client` in your application's types so local CSS imports are recognized.
 

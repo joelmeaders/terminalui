@@ -8,7 +8,7 @@ import { ModalScrollController } from '../internal/modal-scroll';
  * @slot footer - Actions.
  * @csspart dialog - dialog element.
  * @csspart body - Scrollable dialog content.
- * @fires t-close - The dialog closed. No detail payload.
+ * @fires {CustomEvent<null>} t-close - The dialog closed. No detail payload.
  */
 export class TDialog extends TerminalElement {
   static properties = { open: { type: Boolean, reflect: true }, heading: {} };

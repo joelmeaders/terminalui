@@ -4,7 +4,7 @@ import { TInput } from './input';
 /**
  * Password field with an accessible visibility action. Inherits native input constraints and form behavior.
  *
- * @fires t-visibility-change - CustomEvent<{revealed:boolean}> when the user changes visibility.
+ * @fires {CustomEvent<{ revealed: boolean }>} t-visibility-change - The user changed password visibility.
  *
  * @csspart reveal - Password visibility button.
  */

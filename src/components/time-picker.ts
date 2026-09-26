@@ -23,8 +23,8 @@ const minutes = Array.from({ length: 60 }, (_, value) => value);
  * @slot trigger-icon - Decorative icon inside the time trigger.
  * @fires input - A user typed a time or applied a modal choice. Read `event.target.value`.
  * @fires change - A user committed a typed time or applied a modal choice.
- * @fires t-change - A modal choice was applied: `{ value }`.
- * @fires t-close - The modal closed.
+ * @fires {CustomEvent<{ value: string }>} t-change - A modal choice was applied: `{ value }`.
+ * @fires {CustomEvent<null>} t-close - The modal closed.
  * @csspart control - Text field and modal trigger row.
  * @csspart input - Native time-text input.
  * @csspart trigger - Button that opens the modal.

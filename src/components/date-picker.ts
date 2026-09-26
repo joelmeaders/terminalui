@@ -14,8 +14,8 @@ import type { TDialog } from './dialog';
  * @slot end - Trailing icon or short suffix. Inert while disabled.
  * @fires input - The user edited the date or selected a calendar day.
  * @fires change - The user committed a typed date or selected a calendar day.
- * @fires t-change - The user selected a calendar day: `{ value }`.
- * @fires t-close - The calendar dialog closed.
+ * @fires {CustomEvent<{ value: string }>} t-change - The user selected a calendar day: `{ value }`.
+ * @fires {CustomEvent<null>} t-close - The calendar dialog closed.
  * @csspart control - Input and calendar-trigger row.
  * @csspart input - Native date-text input.
  * @csspart trigger - Button that opens the calendar dialog.

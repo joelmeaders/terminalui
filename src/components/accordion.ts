@@ -3,7 +3,7 @@ import { baseStyles, TerminalElement } from '../internal/base';
 import { inlineSlotStyles } from '../internal/slots';
 /**
  * Native disclosure. Emits t-toggle with {open}.
- * @fires t-toggle - Disclosure changed. detail.open is the new boolean state.
+ * @fires {CustomEvent<{ open: boolean }>} t-toggle - Disclosure changed. detail.open is the new boolean state.
  * @slot - Expanded content.
  * @slot start - Non-interactive icon before the summary label.
  * @slot end - Non-interactive icon or status after the summary label.

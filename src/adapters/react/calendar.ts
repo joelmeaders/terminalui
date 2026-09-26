@@ -9,7 +9,7 @@ export const TCalendar = createComponent({
   events: {
     onInput: 'input' as EventName<Event>,
     onChange: 'change' as EventName<Event>,
-    onTChange: 't-change' as EventName<CustomEvent<unknown>>,
-    onTMonthChange: 't-month-change' as EventName<CustomEvent<unknown>>,
+    onTChange: 't-change' as EventName<CustomEvent<{ value: string }>>,
+    onTMonthChange: 't-month-change' as EventName<CustomEvent<{ month: string }>>,
   },
 });

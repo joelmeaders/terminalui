@@ -260,13 +260,18 @@ const config = {
     module: 'NodeNext',
     moduleResolution: 'NodeNext',
     strict: true,
+    jsx: 'react-jsx',
     skipLibCheck: false,
     noEmit: true,
     types: [],
     lib: ['ES2022', 'DOM', 'DOM.Iterable'],
   },
-  include: ['consumer.ts'],
+  include: ['consumer.ts', 'react-events.tsx'],
 };
+await writeFile(
+  join(consumer, 'react-events.tsx'),
+  await readFile('tests/types/react-events.tsx', 'utf8'),
+);
 await writeFile(join(consumer, 'tsconfig.json'), JSON.stringify(config));
 execFileSync(
   process.execPath,
@@ -509,6 +514,6 @@ try {
   await browser.close();
 }
 console.log(
-  `Verified external npm install, native and React button isolation, all ${catalog.length} element exports, React subpaths and compatible barrel wrappers, NodeNext types, icon registry, provider isolation, Angular AOT consumer with array-valued multi-select and six other form bindings, standalone registration, native typography CSS, and ${noticeDirectories.length} exact provider notices.`,
+  `Verified external npm install, native and React button isolation, all ${catalog.length} element exports, React subpaths and compatible barrel wrappers, custom event payload contracts, NodeNext types, icon registry, provider isolation, Angular AOT consumer with array-valued multi-select and six other form bindings, standalone registration, native typography CSS, and ${noticeDirectories.length} exact provider notices.`,
 );
 console.log(`Consumer artifacts: ${consumer}`);

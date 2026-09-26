@@ -9,6 +9,8 @@ export const TToast = createComponent({
   events: {
     onInput: 'input' as EventName<Event>,
     onChange: 'change' as EventName<Event>,
-    onTClose: 't-close' as EventName<CustomEvent<unknown>>,
+    onTClose: 't-close' as EventName<
+      CustomEvent<{ reason: 'dismiss' | 'timeout' | 'programmatic' }>
+    >,
   },
 });

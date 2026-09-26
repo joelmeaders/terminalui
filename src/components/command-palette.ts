@@ -16,9 +16,9 @@ export interface CommandItem {
  * Searchable modal command list. No global shortcut is registered.
  * Empty results remain a status notice without an expanded listbox. Loading lists are busy.
  *
- * @fires t-select - Command chosen: `{ value, command }`.
+ * @fires {CustomEvent<{ value: string; command: CommandItem }>} t-select - Command chosen: `{ value, command }`.
  *
- * @fires t-close - Modal closed and focus returned.
+ * @fires {CustomEvent<null>} t-close - Modal closed and focus returned.
  *
  * @csspart dialog - Native modal.
  *

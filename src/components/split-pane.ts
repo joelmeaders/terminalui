@@ -14,9 +14,9 @@ export interface SplitPaneChange {
  *
  * @slot secondary - Secondary pane contents.
  *
- * @fires t-input - Resize preview: `{ size, orientation, source }`.
+ * @fires {CustomEvent<SplitPaneChange>} t-input - Resize preview: `{ size, orientation, source }`.
  *
- * @fires t-change - Committed resize, with the same detail as t-input.
+ * @fires {CustomEvent<SplitPaneChange>} t-change - Committed resize, with the same detail as t-input.
  *
  * @csspart primary - Primary scroll region.
  *

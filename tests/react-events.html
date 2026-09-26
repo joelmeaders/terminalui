@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" data-theme="amber">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>React custom event fixture</title>
+    <style>
+      body {
+        background: var(--t-bg);
+        color: var(--t-text);
+        font-family: var(--t-font);
+        padding: 24px;
+      }
+      button {
+        min-height: 28px;
+        color: var(--t-text);
+        background: var(--t-surface);
+        border: 1px solid var(--t-control-border);
+      }
+      button:focus-visible {
+        outline: 2px solid var(--t-focus);
+        outline-offset: 2px;
+      }
+      output {
+        display: block;
+        overflow-wrap: anywhere;
+      }
+      t-split-pane {
+        --t-split-height: 120px;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="fixture"></main>
+    <script type="module" src="/tests/react-events.tsx"></script>
+  </body>
+</html>

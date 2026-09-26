@@ -4,9 +4,9 @@ import './icon';
 /**
  * Copy explicit text to the clipboard after user activation.
  *
- * @fires t-copy - Text was copied: { value }.
+ * @fires {CustomEvent<{ value: string }>} t-copy - Text was copied: { value }.
  *
- * @fires t-copy-error - Clipboard access failed. No success is announced.
+ * @fires {CustomEvent<null>} t-copy-error - Clipboard access failed. No success is announced.
  *
  * @csspart button - Native action button.
  *

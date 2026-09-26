@@ -9,7 +9,7 @@ export const TCopyButton = createComponent({
   events: {
     onInput: 'input' as EventName<Event>,
     onChange: 'change' as EventName<Event>,
-    onTCopy: 't-copy' as EventName<CustomEvent<unknown>>,
-    onTCopyError: 't-copy-error' as EventName<CustomEvent<unknown>>,
+    onTCopy: 't-copy' as EventName<CustomEvent<{ value: string }>>,
+    onTCopyError: 't-copy-error' as EventName<CustomEvent<null>>,
   },
 });

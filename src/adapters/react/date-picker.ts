@@ -9,7 +9,7 @@ export const TDatePicker = createComponent({
   events: {
     onInput: 'input' as EventName<Event>,
     onChange: 'change' as EventName<Event>,
-    onTChange: 't-change' as EventName<CustomEvent<unknown>>,
-    onTClose: 't-close' as EventName<CustomEvent<unknown>>,
+    onTChange: 't-change' as EventName<CustomEvent<{ value: string }>>,
+    onTClose: 't-close' as EventName<CustomEvent<null>>,
   },
 });

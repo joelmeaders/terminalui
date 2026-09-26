@@ -9,6 +9,6 @@ export const TAlert = createComponent({
   events: {
     onInput: 'input' as EventName<Event>,
     onChange: 'change' as EventName<Event>,
-    onTDismiss: 't-dismiss' as EventName<CustomEvent<unknown>>,
+    onTDismiss: 't-dismiss' as EventName<CustomEvent<null>>,
   },
 });

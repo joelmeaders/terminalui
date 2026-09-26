@@ -40,8 +40,8 @@ const today = () => {
  *
  * @fires input - User selected a date. Read `event.target.value`.
  * @fires change - User selected a date. Read `event.target.value`.
- * @fires t-change - User selected a date: `{ value }`.
- * @fires t-month-change - User changed the displayed month: `{ month }`.
+ * @fires {CustomEvent<{ value: string }>} t-change - User selected a date: `{ value }`.
+ * @fires {CustomEvent<{ month: string }>} t-month-change - User changed the displayed month: `{ month }`.
  *
  * @csspart calendar - Calendar surface.
  * @csspart previous - Previous-month button.
