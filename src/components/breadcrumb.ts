@@ -8,6 +8,7 @@ export interface BreadcrumbItem {
 }
 /**
  * Native navigation links. The last item is current unless another item is marked current.
+ * Complete labels wrap at narrow widths. Links have a minimum 24-by-24 CSS pixel target.
  *
  * @csspart nav - Navigation landmark.
  *
@@ -24,6 +25,7 @@ export class TBreadcrumb extends TerminalElement {
     css`
       :host {
         display: block;
+        min-width: 0;
       }
       ol {
         display: flex;
@@ -35,13 +37,21 @@ export class TBreadcrumb extends TerminalElement {
       }
       li {
         display: flex;
+        min-width: 0;
+        max-width: 100%;
         gap: var(--t-space-2, 8px);
         align-items: baseline;
+        overflow-wrap: anywhere;
+      }
+      li > span:not(.separator) {
+        min-width: 0;
       }
       a {
         display: inline-flex;
         align-items: center;
         min-height: 24px;
+        min-width: 24px;
+        max-width: 100%;
         color: var(--t-accent);
         text-underline-offset: 3px;
       }
@@ -49,6 +59,7 @@ export class TBreadcrumb extends TerminalElement {
         color: var(--t-text);
       }
       .separator {
+        flex: none;
         color: var(--t-muted);
       }
     `,

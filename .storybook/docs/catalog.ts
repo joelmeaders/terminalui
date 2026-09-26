@@ -118,19 +118,27 @@ export const guides: Record<string, ComponentGuide> = {
     usage: [
       'Supply items with label and optional href/current. The final item is current by default.',
       'Use real application URLs for preceding locations. Replace the items array when navigation changes.',
+      'Long labels and filenames wrap without truncation. Native links retain their complete names and URLs.',
     ],
     accessibility: [
       'Give multiple breadcrumb landmarks distinct labels. The current item exposes aria-current.',
+      'Links have a minimum 24-by-24 CSS pixel target. Keyboard activation follows native browser link behavior.',
     ],
     example: {
       props: {
         label: 'Project location',
         items: [
           { label: 'Home', href: '/' },
-          { label: 'Projects', href: '/projects' },
-          { label: 'Archive' },
+          { label: 'telemetry_archive_2026_09_26_observation_reports.json', href: '#archive' },
+          { label: 'observation_report_2026_09_26_orbital_telemetry.json' },
         ],
       },
+    },
+    event: {
+      name: 'click',
+      read: 'type',
+      description:
+        'Native link clicks bubble through the breadcrumb. Handling a click does not cancel navigation unless the application calls preventDefault().',
     },
   },
   't-button': {

@@ -372,6 +372,55 @@ try {
         await page.getByRole('textbox', { name: 'Callsign', exact: false }).fill('DOCUMENTED');
         assert.equal(await page.locator(tag).evaluate((el) => el.value), 'DOCUMENTED');
       }
+      if (tag === 't-breadcrumb') {
+        const host = page.locator(tag);
+        const viewport = page.viewportSize();
+        await page.setViewportSize({ width: 320, height: 800 });
+        assert.equal(
+          await host.getByRole('navigation', { name: expected.label, exact: true }).count(),
+          1,
+        );
+        for (const label of await host.locator('li > a,li > span:not(.separator)').all()) {
+          const geometry = await label.evaluate((element) => {
+            const box = element.getBoundingClientRect();
+            const range = document.createRange();
+            range.selectNodeContents(element);
+            const rects = [...range.getClientRects()].filter((rect) => rect.width > 0);
+            return {
+              text: element.textContent,
+              clipped: rects.some((rect) => rect.left < box.left - 1 || rect.right > box.right + 1),
+              lines: rects.length,
+            };
+          });
+          assert(
+            !geometry.clipped,
+            `${framework}/${tag}: complete label must remain within its row.`,
+          );
+          if (geometry.text !== 'Home')
+            assert(
+              geometry.lines > 1,
+              `${framework}/${tag}: filenames must wrap at narrow widths.`,
+            );
+        }
+        const link = host.getByRole('link', { name: expected.items[1].label, exact: true });
+        assert.equal(await link.getAttribute('href'), '#archive');
+        assert.equal(
+          await host.locator('[aria-current=page]').textContent(),
+          expected.items[2].label,
+        );
+        await link.focus();
+        assert.equal(
+          await link.evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        const logged = page.waitForEvent('console', {
+          predicate: (message) => message.text() === 'click',
+        });
+        await link.press('Enter');
+        await logged;
+        assert.equal(new URL(page.url()).hash, '#archive');
+        await page.setViewportSize(viewport);
+      }
       if (tag === 't-toolbar') {
         const host = page.locator(tag);
         assert.equal(
