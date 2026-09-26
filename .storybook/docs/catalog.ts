@@ -929,6 +929,7 @@ export const guides: Record<string, ComponentGuide> = {
       'Give the tablist a label. Horizontal tabs use Left/Right (reversed in RTL); vertical tabs use Up/Down. Home and End reach the first and last enabled tabs.',
       'In manual mode, the selected tab is the entry point when focus returns to the list. Arrow focus does not announce a new panel until activation.',
       'Only the selected panel is visible. Keep the panel content ready when selection changes automatically.',
+      'If all tabs disappear or become disabled while a tab has focus, focus moves to the named container. Empty lists use a group role until tabs return. Restored choices receive focus on the selected tab. Updates leave focus outside the component unchanged and do not emit t-change.',
       'Use links for navigation to different pages.',
     ],
     example: {

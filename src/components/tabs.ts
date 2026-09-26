@@ -1,4 +1,4 @@
-import { css, html, type PropertyValues } from 'lit';
+import { css, html, nothing, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 export interface TabItem {
   id: string;
@@ -7,6 +7,7 @@ export interface TabItem {
 }
 /**
  * Tabs with automatic or manual keyboard activation. Slots use each tab's id.
+ * An unavailable list retains focus when its focused tab disappears. Empty lists use a named group.
  * @slot id - Use each tab's ID as the slot name for its panel content.
  * @csspart tab - tab element.
  * @csspart panel - panel element.
@@ -40,19 +41,23 @@ export class TTabs extends TerminalElement {
         display: block;
         min-width: 0;
       }
-      [role='tablist'] {
+      .tablist {
         display: flex;
         gap: 0;
+        min-height: 24px;
         border-bottom: var(--t-divider-width, 1px) solid var(--t-border);
         overflow-x: auto;
         padding: 4px 4px 0;
+      }
+      .tablist:focus-visible {
+        outline-offset: -2px;
       }
       :host([orientation='vertical']) {
         display: grid;
         grid-template-columns: minmax(0, 32%) minmax(0, 1fr);
         gap: var(--t-space, 16px);
       }
-      :host([orientation='vertical']) [role='tablist'] {
+      :host([orientation='vertical']) .tablist {
         flex-direction: column;
         align-items: stretch;
         gap: 4px;
@@ -104,7 +109,7 @@ export class TTabs extends TerminalElement {
         :host([orientation='vertical']) {
           display: block;
         }
-        :host([orientation='vertical']) [role='tablist'] {
+        :host([orientation='vertical']) .tablist {
           border-inline-end: 0;
           border-bottom: var(--t-divider-width, 1px) solid var(--t-border);
         }
@@ -118,7 +123,7 @@ export class TTabs extends TerminalElement {
       changed.has('activation') ||
       changed.has('focusedId')
     ) {
-      this.hadTabFocus = this.shadowRoot?.activeElement?.matches('[role=tab]') ?? false;
+      this.hadTabFocus = this.shadowRoot?.activeElement?.matches('[role=tab], .tablist') ?? false;
       const previousActive = this.active;
       if (!this.tabs.some((t) => t.id === this.active && !t.disabled))
         this.active = this.tabs.find((t) => !t.disabled)?.id ?? '';
@@ -140,9 +145,10 @@ export class TTabs extends TerminalElement {
         changed.has('focusedId'))
     ) {
       const targetId = this.activation === 'manual' ? this.focusedId : this.active;
-      const target = Array.from(
-        this.renderRoot.querySelectorAll<HTMLButtonElement>('[role=tab]'),
-      ).find((tab) => tab.dataset.tabId === targetId);
+      const target =
+        Array.from(this.renderRoot.querySelectorAll<HTMLButtonElement>('[role=tab]')).find(
+          (tab) => tab.dataset.tabId === targetId && !tab.disabled,
+        ) ?? this.renderRoot.querySelector<HTMLElement>('.tablist');
       if (target && this.shadowRoot?.activeElement !== target) {
         target.focus();
         target.scrollIntoView({ block: 'nearest', inline: 'nearest' });
@@ -184,9 +190,11 @@ export class TTabs extends TerminalElement {
   }
   render() {
     return html`<div
-        role="tablist"
+        class="tablist"
+        role=${this.tabs.length ? 'tablist' : 'group'}
         aria-label=${this.label}
-        aria-orientation=${this.orientation}
+        aria-orientation=${this.tabs.length ? this.orientation : nothing}
+        tabindex=${this.tabs.some((tab) => !tab.disabled) ? -1 : 0}
         @keydown=${this.onKey}
         @focusout=${this.onFocusOut}
       >

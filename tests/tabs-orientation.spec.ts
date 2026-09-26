@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import type { TTabs } from '../src/components/tabs';
+import { writeFile } from 'node:fs/promises';
 
 async function mount(page: Page, orientation = 'horizontal', activation = 'automatic') {
   await page.route('**/@vite/client', (route) => route.abort());
@@ -241,5 +243,182 @@ test('vertical tabs reflow at 320 CSS pixels and retain accessible states in six
         body: JSON.stringify(report.incomplete, null, 2),
         contentType: 'application/json',
       });
+  }
+});
+
+for (const activation of ['automatic', 'manual']) {
+  for (const state of ['empty', 'disabled']) {
+    test(`${activation} tabs retain focus through ${state} choices and restore an enabled tab`, async ({
+      page,
+    }) => {
+      await mount(page, 'horizontal', activation);
+      const tabs = page.locator('t-tabs');
+      const list = tabs.locator('.tablist');
+      await tabs.evaluate((element) => {
+        const outside = document.createElement('button');
+        outside.textContent = 'After tabs';
+        element.after(outside);
+      });
+      await tabs.getByRole('tab', { name: 'Settings' }).click();
+      await tabs.evaluate((element, next) => {
+        const host = element as TTabs;
+        host.tabs = next === 'empty' ? [] : host.tabs.map((tab) => ({ ...tab, disabled: true }));
+      }, state);
+      await expect(list).toBeFocused();
+      await expect(list).toHaveAttribute('role', state === 'empty' ? 'group' : 'tablist');
+      await expect(
+        tabs.getByRole(state === 'empty' ? 'group' : 'tablist', {
+          name: 'Record sections',
+          exact: true,
+        }),
+      ).toHaveCount(1);
+      await expect(list).toHaveAttribute('tabindex', '0');
+      await expect(tabs).toHaveAttribute('active', '');
+      await expect(tabs.getByRole('tabpanel')).toHaveCount(0);
+      for (const key of ['ArrowRight', 'ArrowLeft', 'Home', 'End']) {
+        await page.keyboard.press(key);
+        await expect(list).toBeFocused();
+      }
+      await tabs.evaluate((element) => {
+        (element as TTabs).tabs = [
+          { id: 'overview', label: 'Overview' },
+          { id: 'settings', label: 'Settings' },
+        ];
+      });
+      await expect(tabs.getByRole('tab', { name: 'Overview' })).toBeFocused();
+      await expect(list).toHaveAttribute('tabindex', '-1');
+      await expect(list).toHaveAttribute('role', 'tablist');
+      await expect(tabs.getByRole('tab', { name: 'Overview' })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      );
+      await expect(tabs).toHaveAttribute('data-change-count', '1');
+      await tabs.evaluate((element, next) => {
+        const host = element as TTabs;
+        host.tabs = next === 'empty' ? [] : host.tabs.map((tab) => ({ ...tab, disabled: true }));
+      }, state);
+      await expect(list).toBeFocused();
+      await page.keyboard.press('Tab');
+      const outside = page.getByRole('button', { name: 'After tabs', exact: true });
+      await expect(outside).toBeFocused();
+      await tabs.evaluate((element) => {
+        (element as TTabs).tabs = [{ id: 'overview', label: 'Overview' }];
+      });
+      await expect(outside).toBeFocused();
+      await expect(tabs).toHaveAttribute('data-change-count', '1');
+    });
+  }
+  test(`${activation} tabs leave focus outside during initial and later empty states`, async ({
+    page,
+  }) => {
+    await mount(page, 'horizontal', activation);
+    await page.locator('#fixture').evaluate((element) => {
+      const outside = document.createElement('button');
+      outside.textContent = 'Outside tabs';
+      element.before(outside);
+      outside.focus();
+      const tabs = element.querySelector('t-tabs')!;
+      tabs.tabs = [];
+    });
+    const outside = page.getByRole('button', { name: 'Outside tabs', exact: true });
+    await expect(outside).toBeFocused();
+    await page.locator('t-tabs').evaluate(async (element) => {
+      const host = element as TTabs;
+      host.tabs = [{ id: 'overview', label: 'Overview' }];
+      await host.updateComplete;
+      host.tabs = [];
+      await host.updateComplete;
+      const initial = document.createElement('t-tabs');
+      initial.label = 'Initially empty';
+      element.after(initial);
+      await initial.updateComplete;
+      initial.tabs = [{ id: 'first', label: 'First', disabled: true }];
+      await initial.updateComplete;
+    });
+    await expect(outside).toBeFocused();
+    await expect(page.locator('t-tabs').first()).not.toHaveAttribute('data-change-count');
+  });
+}
+
+test('empty and disabled tablists retain visible focus and accessible names in all palettes', async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await mount(page);
+  const tabs = page.locator('t-tabs');
+  const list = tabs.locator('.tablist');
+  for (const state of ['empty', 'disabled']) {
+    await tabs.evaluate((element, next) => {
+      (element as TTabs).tabs =
+        next === 'empty' ? [] : [{ id: 'overview', label: 'Overview', disabled: true }];
+    }, state);
+    await list.focus();
+    await expect(
+      tabs.getByRole(state === 'empty' ? 'group' : 'tablist', {
+        name: 'Record sections',
+        exact: true,
+      }),
+    ).toHaveCount(1);
+    await expect(list).toHaveAttribute('role', state === 'empty' ? 'group' : 'tablist');
+    if (state === 'empty') await expect(list).not.toHaveAttribute('aria-orientation');
+    await page.keyboard.press('Shift');
+    for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {
+      await page.locator('html').evaluate((element, palette) => {
+        element.dataset.theme = palette;
+      }, theme);
+      await expect(list).toBeFocused();
+      await expect(list).toHaveCSS('outline-style', 'solid');
+      await expect(list).toHaveCSS('outline-width', '2px');
+      const result = await list.evaluate((element) => {
+        const style = getComputedStyle(element);
+        const background = getComputedStyle(document.body).backgroundColor;
+        const luminance = (color: string) =>
+          color
+            .match(/[\d.]+/g)!
+            .slice(0, 3)
+            .map(Number)
+            .map((value) => {
+              const channel = value / 255;
+              return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+            })
+            .reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+        const values = [luminance(style.outlineColor), luminance(background)].sort((a, b) => b - a);
+        return {
+          foreground: style.outlineColor,
+          background,
+          ratio: (values[0] + 0.05) / (values[1] + 0.05),
+          height: element.getBoundingClientRect().height,
+        };
+      });
+      expect(result.height).toBeGreaterThanOrEqual(24);
+      expect(result.ratio, `${theme}/${state}: ${JSON.stringify(result)}`).toBeGreaterThanOrEqual(
+        3,
+      );
+      const report = await new AxeBuilder({ page }).include('t-tabs').analyze();
+      expect(report.violations).toEqual([]);
+      expect(
+        report.incomplete.filter((finding) => finding.id === 'aria-required-children'),
+      ).toEqual([]);
+      const path = testInfo.outputPath(`${theme}-${state}-tabs-axe-review.json`);
+      await writeFile(
+        path,
+        JSON.stringify(
+          {
+            incomplete: report.incomplete,
+            focus: result,
+            browser: page.context().browser()?.version(),
+          },
+          null,
+          2,
+        ),
+      );
+      await testInfo.attach(`${theme}-${state}-tabs-axe-review`, {
+        path,
+        contentType: 'application/json',
+      });
+      if (testInfo.project.name === 'chromium' && ['amber', 'paper'].includes(theme)) {
+        await page.screenshot({ path: testInfo.outputPath(`${theme}-${state}-focus.png`) });
+      }
+    }
   }
 });

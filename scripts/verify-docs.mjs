@@ -320,6 +320,59 @@ try {
         await page.getByRole('textbox', { name: 'Callsign', exact: false }).fill('DOCUMENTED');
         assert.equal(await page.locator(tag).evaluate((el) => el.value), 'DOCUMENTED');
       }
+      if (tag === 't-tabs') {
+        const host = page.locator(tag);
+        assert.equal(
+          await page.evaluate(() => document.activeElement === document.body),
+          true,
+          `${framework}/${tag}: initial rendering must not move focus.`,
+        );
+        assert.equal(
+          await host.getByRole('tablist', { name: expected.label, exact: true }).count(),
+          1,
+        );
+        await host.evaluate((element) => {
+          element.userEvents = [];
+          element.addEventListener('t-change', (event) =>
+            element.userEvents.push(event.detail.value),
+          );
+        });
+        await host.getByRole('tab', { name: 'Overview', exact: true }).focus();
+        const logged = page.waitForEvent('console', {
+          predicate: (message) => message.text().includes('settings'),
+        });
+        await page.keyboard.press('ArrowRight');
+        await logged;
+        assert.equal(await host.evaluate((element) => element.active), 'settings');
+        assert.equal(
+          await host
+            .getByRole('tab', { name: 'Settings', exact: true })
+            .evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        await host.evaluate(async (element) => {
+          element.documentationTabs = element.tabs;
+          element.tabs = [];
+          await element.updateComplete;
+        });
+        assert.equal(
+          await host
+            .getByRole('group', { name: expected.label, exact: true })
+            .evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        await host.evaluate(async (element) => {
+          element.tabs = element.documentationTabs;
+          await element.updateComplete;
+        });
+        assert.equal(
+          await host
+            .getByRole('tab', { name: 'Overview', exact: true })
+            .evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+        );
+        assert.deepEqual(await host.evaluate((element) => element.userEvents), ['settings']);
+      }
       if (['t-radio-group', 't-segmented-control', 't-rating', 't-multi-select'].includes(tag)) {
         assert.equal(
           await page.evaluate(() => document.activeElement === document.body),
