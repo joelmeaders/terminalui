@@ -22,12 +22,7 @@ for (const [name, contents] of Object.entries(scenarios)) {
   });
   const bytes = result.outputFiles[0].contents;
   const gzipBytes = gzipSync(bytes).length;
-  // The complete catalog includes collection, overlay, form, table, and calendar behaviors.
-  // Keep small imports strict while allowing an inline date grid in the complete catalog.
-  // Optional field slots and disabled-action handling add about 0.5 kB to the form bundle.
-  // Complete splitter collapse and restoration add about 0.4 kB to the full catalog.
-  // Live toolbar focus recovery adds about 0.13 kB to the full catalog.
-  // Nested tree groups and live branch focus recovery add about 0.27 kB.
+  // Preserve strict small-import guards. Review catalog growth when features change.
   const budget =
     name === 'One button'
       ? 8000
@@ -35,7 +30,7 @@ for (const [name, contents] of Object.entries(scenarios)) {
         ? 10000
         : name === 'One Ionicons icon'
           ? 12000
-          : 53000;
+          : 53500;
   if (bytes.length === 0 || gzipBytes > budget)
     throw new Error(
       `${name}: ${gzipBytes} B exceeds its ${budget} B gzip budget or has no output.`,

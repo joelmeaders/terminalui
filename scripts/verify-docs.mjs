@@ -309,6 +309,75 @@ try {
         await page.getByRole('textbox', { name: 'Callsign', exact: false }).fill('DOCUMENTED');
         assert.equal(await page.locator(tag).evaluate((el) => el.value), 'DOCUMENTED');
       }
+      if (['t-radio-group', 't-segmented-control', 't-rating', 't-multi-select'].includes(tag)) {
+        assert.equal(
+          await page.evaluate(() => document.activeElement === document.body),
+          true,
+          `${framework}/${tag}: initial rendering must not move focus.`,
+        );
+      }
+      if (['t-radio-group', 't-segmented-control', 't-rating'].includes(tag)) {
+        const host = page.locator(tag);
+        assert.equal(
+          await host.getByRole('group', { name: expected.label, exact: true }).count(),
+          1,
+        );
+        await host.evaluate((element) => {
+          element.userEvents = [];
+          for (const type of ['input', 'change'])
+            element.addEventListener(type, () => element.userEvents.push(type));
+          element.focus();
+          element.documentationFocusedChoice = element.shadowRoot.activeElement;
+        });
+        assert.equal(
+          await host.evaluate((element) => element.documentationFocusedChoice.value),
+          expected.value,
+        );
+        if (tag === 't-rating')
+          await host.evaluate((element) => {
+            element.max = 2;
+          });
+        else
+          await host.evaluate((element) => {
+            element.options = [...element.options].reverse();
+          });
+        await host.evaluate(async (element) => {
+          await element.updateComplete;
+        });
+        assert.equal(
+          await host.evaluate((element) => element.shadowRoot.activeElement.value),
+          tag === 't-rating' ? '2' : expected.value,
+        );
+        if (tag !== 't-rating')
+          assert.equal(
+            await host.evaluate(
+              (element) => element.shadowRoot.activeElement === element.documentationFocusedChoice,
+            ),
+            true,
+          );
+        assert.deepEqual(await host.evaluate((element) => element.userEvents), []);
+        const next = await host.evaluate((element) => {
+          const enabled = [...element.shadowRoot.querySelectorAll('input:not(:disabled)')];
+          return enabled[(enabled.indexOf(element.shadowRoot.activeElement) + 1) % enabled.length]
+            .value;
+        });
+        const logged =
+          framework === 'html'
+            ? page.waitForEvent('console', { predicate: (message) => message.text() === next })
+            : null;
+        await page.keyboard.press('ArrowRight');
+        if (logged) await logged;
+        assert.equal(
+          await host.evaluate((element) => element.value),
+          next,
+          `${framework}/${tag}: keyboard selection must update the value.`,
+        );
+        assert.deepEqual(await host.evaluate((element) => element.userEvents), ['input', 'change']);
+        assert.equal(
+          await host.evaluate((element) => element.shadowRoot.activeElement.value),
+          next,
+        );
+      }
       if (tag === 't-calendar') {
         assert.equal(await page.getByRole('group', { name: 'Mission date' }).count(), 1);
         const day = page.locator('t-calendar [data-date="2026-09-25"]');

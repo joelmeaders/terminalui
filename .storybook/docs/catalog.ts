@@ -687,7 +687,14 @@ export const guides: Record<string, ComponentGuide> = {
     [
       'Choices use { value, label, disabled? }. Values must be unique.',
       'Use horizontal or vertical orientation. Arrow keys move between enabled native radio choices.',
+      'Replace options to update choices. Focus follows the same value, then the nearest enabled position. Selection does not change automatically.',
     ],
+    {
+      accessibility: [
+        ...fieldAccess,
+        'An empty or fully disabled choice list focuses its named group for required or custom errors. Provide help text when choices are unavailable.',
+      ],
+    },
   ),
   't-range': field(
     'Choose a value within a continuous numeric range.',
@@ -703,6 +710,7 @@ export const guides: Record<string, ComponentGuide> = {
     [
       'Use integer strings for selected values; an empty string means unrated. max is clamped to 1–10.',
       'clearable adds a named action. Clearing a required rating makes it invalid.',
+      'Changing max keeps focus on the same value when possible, then the nearest available rating. A required rating becomes invalid if its selected value is removed.',
     ],
   ),
   't-segmented-control': field(
@@ -719,7 +727,14 @@ export const guides: Record<string, ComponentGuide> = {
     [
       'Uses native radios and a string value. Options have value, label, and optional disabled.',
       'Use tabs when each choice reveals a separate content panel.',
+      'Replace options to update choices. Focus follows their unique values without selecting another mode automatically.',
     ],
+    {
+      accessibility: [
+        ...fieldAccess,
+        'An empty or fully disabled choice list focuses its named group for validation. Give users help text when modes are unavailable.',
+      ],
+    },
   ),
   't-select': field(
     'Choose one item from a native select list.',

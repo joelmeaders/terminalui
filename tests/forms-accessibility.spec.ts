@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 async function fixture(page: Page, markup: string) {
   await page.route('**/@vite/client', (route) =>
@@ -132,6 +133,171 @@ test('radio focus chooses the selected enabled radio and errors describe every c
   });
   await page.locator('t-radio-group').evaluate((element: any) => element.focus());
   await expect(page.getByRole('radio', { name: 'Beta' })).toBeFocused();
+});
+
+for (const tag of ['t-radio-group', 't-segmented-control', 't-rating', 't-multi-select']) {
+  test(`${tag} does not acquire focus on initial render`, async ({ page }) => {
+    await fixture(page, `<${tag} label="Choice" required></${tag}>`);
+    await page.locator(tag).evaluate(async (element: any) => {
+      await element.updateComplete;
+    });
+    expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true);
+    expect(
+      await page.locator(tag).evaluate((element: any) => element.shadowRoot.activeElement),
+    ).toBeNull();
+  });
+}
+
+for (const tag of ['t-radio-group', 't-segmented-control']) {
+  test(`${tag} preserves choice identity through live updates without changing selection`, async ({
+    page,
+  }) => {
+    await fixture(
+      page,
+      `<form><${tag} label="Environment" name="environment" value="b" required help="Choose an environment."></${tag}><button type="button">Outside</button></form>`,
+    );
+    const host = page.locator(tag);
+    await host.evaluate((element: any) => {
+      element.options = ['a', 'b', 'c'].map((value) => ({ value, label: value.toUpperCase() }));
+      element.events = [];
+      for (const type of ['input', 'change'])
+        element.addEventListener(type, () => element.events.push(type));
+    });
+    await page.getByRole('radio', { name: 'B', exact: true }).focus();
+    await host.evaluate((element: any) => {
+      element.focusedInput = element.shadowRoot.activeElement;
+      element.options = [element.options[2], element.options[0], { value: 'b', label: 'Beta' }];
+    });
+    await expect(page.getByRole('radio', { name: 'Beta', exact: true })).toBeFocused();
+    expect(
+      await host.evaluate(
+        (element: any) => element.focusedInput === element.shadowRoot.activeElement,
+      ),
+    ).toBe(true);
+    await host.evaluate((element: any) => {
+      element.options = element.options.filter((option: any) => option.value !== 'b');
+    });
+    await expect(page.getByRole('radio', { name: 'A', exact: true })).toBeFocused();
+    expect(
+      await host.evaluate((element: any) => [
+        element.value,
+        element.validity.valueMissing,
+        new FormData(element.closest('form')).has('environment'),
+      ]),
+    ).toEqual(['b', true, false]);
+    await host.evaluate((element: any) => {
+      element.options = element.options.map((option: any) => ({
+        ...option,
+        disabled: option.value === 'a',
+      }));
+    });
+    await expect(page.getByRole('radio', { name: 'C', exact: true })).toBeFocused();
+    await host.evaluate((element: any) => {
+      element.options = [];
+    });
+    const group = host.getByRole('group', { name: 'Environment', exact: true });
+    await expect(group).toBeFocused();
+    await expect(group).toHaveAccessibleDescription('Choose an environment.');
+    expect(await group.evaluate((element) => getComputedStyle(element).outlineWidth)).toBe('2px');
+    await host.evaluate((element: any) => {
+      element.options = [{ value: 'b', label: 'Beta' }];
+    });
+    await expect(page.getByRole('radio', { name: 'Beta', exact: true })).toBeFocused();
+    await expect(page.getByRole('radio', { name: 'Beta', exact: true })).toBeChecked();
+    expect(
+      await host.evaluate((element: any) => [
+        element.events,
+        new FormData(element.closest('form')).get('environment'),
+      ]),
+    ).toEqual([[], 'b']);
+    await page.getByRole('button', { name: 'Outside' }).focus();
+    await host.evaluate((element: any) => {
+      element.options = [{ value: 'a', label: 'Alpha' }];
+    });
+    await expect(page.getByRole('button', { name: 'Outside' })).toBeFocused();
+  });
+
+  test(`${tag} focuses its named empty group for required and custom errors`, async ({
+    page,
+  }, testInfo) => {
+    await fixture(
+      page,
+      `<form><${tag} label="Environment" name="environment" required help="Choices will appear here."></${tag}><button type="submit">Save</button></form>`,
+    );
+    const host = page.locator(tag);
+    const group = host.getByRole('group', { name: 'Environment', exact: true });
+    await page.getByRole('button', { name: 'Save' }).click();
+    await expect(group).toBeFocused();
+    await expect(group).toHaveAccessibleDescription('Select an option.');
+    await expect(group).toHaveAttribute('aria-invalid', 'true');
+    for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {
+      await page
+        .locator('html')
+        .evaluate((element, value) => (element.dataset.theme = value), theme);
+      const results = await new AxeBuilder({ page }).include(tag).analyze();
+      expect(results.violations, `${theme}: ${JSON.stringify(results.violations)}`).toEqual([]);
+      if (results.incomplete.length)
+        await testInfo.attach(`${theme}-empty-radio-axe-review`, {
+          body: JSON.stringify(results.incomplete, null, 2),
+          contentType: 'application/json',
+        });
+    }
+    await host.evaluate((element: any) => {
+      element.required = false;
+      element.setCustomValidity('No environments are available.');
+    });
+    expect(await host.evaluate((element: any) => element.validity.customError)).toBe(true);
+    await expect(group).toHaveAccessibleDescription('No environments are available.');
+    await host.evaluate((element: any) => {
+      element.setCustomValidity('');
+    });
+    expect(await host.evaluate((element: any) => element.checkValidity())).toBe(true);
+    await expect(group).toHaveAttribute('aria-invalid', 'false');
+    await expect(group).toHaveAccessibleDescription('Choices will appear here.');
+    await host.evaluate((element: any) => {
+      element.options = [{ value: 'a', label: 'Alpha', disabled: true }];
+      element.value = 'a';
+      element.required = true;
+    });
+    await host.evaluate((element: any) => element.reportValidity());
+    await expect(group).toBeFocused();
+    await expect(group).toHaveAccessibleDescription('Select an option.');
+    await expect(host.getByRole('radio', { name: 'Alpha' })).toBeDisabled();
+    await host.evaluate((element: any) => {
+      element.error = 'Unavailable.';
+      element.disabled = true;
+    });
+    expect(
+      await host.evaluate((element: any) => [
+        element.validity.valid,
+        new FormData(element.closest('form')).has('environment'),
+      ]),
+    ).toEqual([true, false]);
+    await page.getByRole('button', { name: 'Save' }).focus();
+    await host.evaluate((element: any) => element.focus());
+    await expect(page.getByRole('button', { name: 'Save' })).toBeFocused();
+  });
+}
+
+test('rating retains a surviving focused value and recovers focus when max shrinks', async ({
+  page,
+}) => {
+  await fixture(page, '<t-rating label="Experience" value="4" required></t-rating>');
+  const host = page.locator('t-rating');
+  await page.getByRole('radio', { name: '4 of 5 stars', exact: true }).focus();
+  await host.evaluate((element: any) => {
+    element.max = 6;
+  });
+  await expect(page.getByRole('radio', { name: '4 of 6 stars', exact: true })).toBeFocused();
+  await host.evaluate((element: any) => {
+    element.max = 2;
+  });
+  await expect(page.getByRole('radio', { name: '2 of 2 stars', exact: true })).toBeFocused();
+  expect(
+    await host.evaluate((element: any) => [element.value, element.validity.valueMissing]),
+  ).toEqual(['4', true]);
+  await page.keyboard.press('ArrowLeft');
+  await expect(page.getByRole('radio', { name: '1 of 2 stars', exact: true })).toBeChecked();
 });
 
 test('slider exposes a stable name and native value without a second live value', async ({

@@ -43,6 +43,8 @@ type Story = StoryObj<typeof meta.args>;
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const host = canvasElement.querySelector('t-segmented-control')!;
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toBeNull();
     await userEvent.click(host.shadowRoot!.querySelectorAll('input')[1]);
     await expect(host.value).toBe('grid');
   },
@@ -51,3 +53,19 @@ export const Vertical: Story = { args: { orientation: 'vertical' } };
 export const Disabled: Story = { args: { disabled: true } };
 export const Required: Story = { args: { required: true, value: '' } };
 export const Invalid: Story = { args: { error: 'Choose an available display mode.' } };
+export const EmptyRequired: Story = {
+  render: () =>
+    html`<t-segmented-control
+      label="Display mode"
+      required
+      help="No display modes are available."
+    ></t-segmented-control>`,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-segmented-control')!;
+    await host.updateComplete;
+    host.reportValidity();
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toBe(host.shadowRoot!.querySelector('fieldset'));
+    await expect(host.shadowRoot!.querySelector('#help')).toHaveTextContent('Select an option.');
+  },
+};

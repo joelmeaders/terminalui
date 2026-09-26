@@ -1,4 +1,5 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
+import { repeat } from 'lit/directives/repeat.js';
 import { TRadioGroup } from './radio-group';
 
 /**
@@ -14,7 +15,7 @@ export class TRating extends TRadioGroup {
     clearable: { type: Boolean },
   };
   label = 'Rating';
-  /** Number of choices, clamped to 1–10. */
+  /** Number of choices, clamped to 1–10. Live changes retain focus or use the nearest available rating. */
   max = 5;
   /** Show an action that removes the rating. Required ratings become invalid when cleared. */
   clearable = false;
@@ -57,6 +58,7 @@ export class TRating extends TRadioGroup {
     `,
   ];
   protected willUpdate(changed: PropertyValues) {
+    super.willUpdate(changed);
     if (changed.has('max')) {
       const count = Math.max(1, Math.min(10, Math.floor(this.max) || 5));
       this.options = Array.from({ length: count }, (_, index) => ({
@@ -79,12 +81,19 @@ export class TRating extends TRadioGroup {
     this.focus();
   }
   render() {
-    return html`<fieldset ?disabled=${this.isDisabled}>
+    return html`<fieldset
+        tabindex="-1"
+        aria-describedby="help"
+        aria-invalid=${this.hasVisibleError ? 'true' : 'false'}
+        ?disabled=${this.isDisabled}
+      >
         <legend>
           ${this.label}${this.required ? html` <abbr title="required" aria-hidden="true">*</abbr>` : nothing}
         </legend>
         <div class="options">
-          ${this.options.map(
+          ${repeat(
+            this.options,
+            (option) => option.value,
             (option) =>
               html`<label
                 ><input

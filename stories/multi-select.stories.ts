@@ -46,6 +46,8 @@ type Story = StoryObj<typeof meta.args>;
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const host = canvasElement.querySelector('t-multi-select')!;
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toBeNull();
     await userEvent.click(host.shadowRoot!.querySelectorAll('.option')[1] as HTMLElement);
     await expect(host.values).toEqual(['archive', 'engineering']);
   },

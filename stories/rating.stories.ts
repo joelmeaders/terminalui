@@ -39,6 +39,8 @@ type Story = StoryObj<typeof meta.args>;
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const host = canvasElement.querySelector('t-rating')!;
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toBeNull();
     await userEvent.click(host.shadowRoot!.querySelectorAll('input')[3]);
     await expect(host.value).toBe('4');
     await userEvent.click(host.shadowRoot!.querySelector('button')!);
@@ -49,3 +51,18 @@ export const Selected: Story = { args: { value: '4' } };
 export const Disabled: Story = { args: { value: '3', disabled: true } };
 export const Required: Story = { args: { required: true } };
 export const Invalid: Story = { args: { error: 'Select a rating before you continue.' } };
+export const LiveMaximum: Story = {
+  args: { value: '4', required: true },
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-rating')!;
+    await host.updateComplete;
+    host.focus();
+    host.max = 2;
+    await host.updateComplete;
+    await expect(host.shadowRoot!.activeElement).toBe(
+      host.shadowRoot!.querySelector('input[value="2"]'),
+    );
+    await expect(host.value).toBe('4');
+    await expect(host.validity.valueMissing).toBe(true);
+  },
+};

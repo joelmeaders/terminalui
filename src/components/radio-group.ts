@@ -1,16 +1,21 @@
-import { css, html, nothing } from 'lit';
+import { css, html, nothing, type PropertyValues } from 'lit';
+import { repeat } from 'lit/directives/repeat.js';
 import { FormControl, fieldStyles } from '../internal/form-control';
+import { activeElement } from '../internal/floating';
 import type { SelectOption } from './select';
 
 /**
  * Form-associated native radio group. Arrow keys move between enabled options.
+ * Live updates retain focus by value without changing selection. Empty groups can receive validation focus.
  * @csspart input - input element.
  */
 export class TRadioGroup extends FormControl {
   static properties = { options: { attribute: false }, orientation: { reflect: true } };
-  /** Choices. Replace the array to update options. Each value must be unique. */
+  /** Choices with unique values. Replace the array to update options and preserve focus by value. */
   options: SelectOption[] = [];
   orientation: 'vertical' | 'horizontal' = 'vertical';
+  private focusedChoice?: { element: HTMLInputElement; value: string; index: number };
+  private groupHadFocus = false;
   static styles = [
     fieldStyles,
     css`
@@ -19,6 +24,10 @@ export class TRadioGroup extends FormControl {
         padding: 0;
         margin: 0;
         min-width: 0;
+      }
+      fieldset:focus {
+        outline: 2px solid var(--t-focus);
+        outline-offset: 4px;
       }
       legend {
         padding: 0;
@@ -49,27 +58,74 @@ export class TRadioGroup extends FormControl {
         padding: 0;
         flex: none;
       }
+      @media (forced-colors: active) {
+        fieldset:focus {
+          outline-color: Highlight;
+        }
+      }
     `,
   ];
   protected get control() {
     return (
       this.renderRoot?.querySelector<HTMLInputElement>('input:checked:not(:disabled)') ??
       this.renderRoot?.querySelector<HTMLInputElement>('input:not(:disabled)') ??
-      this.renderRoot?.querySelector<HTMLInputElement>('input') ??
       null
     );
   }
+  protected willUpdate(_changed: PropertyValues) {
+    const active = this.shadowRoot?.activeElement;
+    const choice =
+      active instanceof HTMLInputElement && active.type === 'radio' ? active : undefined;
+    this.focusedChoice = choice
+      ? {
+          element: choice,
+          value: choice.value,
+          index: [
+            ...this.renderRoot.querySelectorAll<HTMLInputElement>('input:not(:disabled)'),
+          ].indexOf(choice),
+        }
+      : undefined;
+    this.groupHadFocus = active instanceof HTMLFieldSetElement;
+  }
+  protected updated(changed: PropertyValues) {
+    super.updated(changed);
+    const focused = this.focusedChoice;
+    const groupHadFocus = this.groupHadFocus;
+    this.focusedChoice = undefined;
+    this.groupHadFocus = false;
+    if ((!focused && !groupHadFocus) || this.isDisabled) return;
+    const group = this.renderRoot.querySelector<HTMLElement>('fieldset');
+    const current = activeElement();
+    if (
+      current &&
+      current !== focused?.element &&
+      current !== group &&
+      current !== this &&
+      current !== document.body
+    )
+      return;
+    const enabled = [...this.renderRoot.querySelectorAll<HTMLInputElement>('input:not(:disabled)')];
+    const target = focused
+      ? (enabled.find((choice) => choice.value === focused.value) ??
+        enabled[Math.min(focused.index, enabled.length - 1)])
+      : this.control;
+    if (current !== target) (target ?? group)?.focus();
+  }
   protected syncForm() {
-    super.syncForm();
     const selected = this.options.find((option) => option.value === this.value && !option.disabled);
     this.internals.setFormValue(!this.isDisabled && selected ? this.value : null);
-    if (!this.isDisabled && !this.error && !this.customValidationMessage) {
-      this.internals.setValidity(
-        this.required && !selected ? { valueMissing: true } : {},
-        this.required && !selected ? 'Select an option.' : '',
-        this.control ?? undefined,
-      );
-    }
+    const customError = this.error || this.customValidationMessage;
+    const missing = this.required && !selected;
+    const message = this.isDisabled ? '' : customError || (missing ? 'Select an option.' : '');
+    this.internals.setValidity(
+      message ? (customError ? { customError: true } : { valueMissing: true }) : {},
+      message,
+      this.control ?? this.renderRoot.querySelector<HTMLElement>('fieldset') ?? undefined,
+    );
+  }
+  focus(options?: FocusOptions) {
+    if (this.isDisabled) return;
+    (this.control ?? this.renderRoot.querySelector<HTMLElement>('fieldset'))?.focus(options);
   }
   formResetCallback() {
     this.value = this.getAttribute('value') ?? this.initialValue;
@@ -80,12 +136,19 @@ export class TRadioGroup extends FormControl {
     this.syncForm();
   }
   render() {
-    return html`<fieldset ?disabled=${this.isDisabled}>
+    return html`<fieldset
+        tabindex="-1"
+        aria-describedby="help"
+        aria-invalid=${this.hasVisibleError ? 'true' : 'false'}
+        ?disabled=${this.isDisabled}
+      >
         <legend>
           ${this.label}${this.required ? html` <abbr title="required" aria-hidden="true">*</abbr>` : nothing}
         </legend>
         <div class="options">
-          ${this.options.map(
+          ${repeat(
+            this.options,
+            (option) => option.value,
             (option) =>
               html`<label
                 ><input

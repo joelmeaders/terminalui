@@ -157,7 +157,7 @@ export class TMultiSelect extends FormControl {
       this.focusedChoice = choice
         ? { element: choice, value: choice.value, index: enabled.indexOf(choice) }
         : undefined;
-      this.groupHadFocus = active === this.renderRoot.querySelector('fieldset');
+      this.groupHadFocus = active instanceof HTMLFieldSetElement;
     }
     if (changed.has('value') && this.value !== this.serialized) {
       try {
