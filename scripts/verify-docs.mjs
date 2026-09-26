@@ -416,6 +416,47 @@ try {
           true,
           `${framework}/${tag}: live inert changes must recover focus.`,
         );
+        const viewport = page.viewportSize();
+        await page.setViewportSize({ width: 320, height: 720 });
+        const native = host.locator(':scope > button');
+        const link = host.locator(':scope > a');
+        for (const action of [native, link]) {
+          const layout = await action.evaluate((element) => {
+            const box = element.getBoundingClientRect();
+            const range = document.createRange();
+            range.selectNodeContents(element);
+            const rects = [...range.getClientRects()].filter((rect) => rect.width > 0);
+            return {
+              width: element.scrollWidth,
+              available: element.clientWidth,
+              lines: rects.length,
+              clipped: rects.some((rect) => rect.left < box.left - 1 || rect.right > box.right + 1),
+            };
+          });
+          assert(
+            layout.width <= layout.available + 1 && !layout.clipped && layout.lines > 1,
+            `${framework}/${tag}: complete native labels must wrap within their controls.`,
+          );
+        }
+        await native.focus();
+        const logged = page.waitForEvent('console', {
+          predicate: (message) => message.text() === 'click',
+        });
+        await native.press('Enter');
+        await logged;
+        await native.press('End');
+        assert.equal(
+          await link.evaluate((element) => element === document.activeElement),
+          true,
+          `${framework}/${tag}: native link must receive keyboard focus.`,
+        );
+        const linkBox = await link.boundingBox();
+        assert(
+          linkBox.y >= 0 && linkBox.y + linkBox.height <= 720,
+          `${framework}/${tag}: focused link must remain fully visible.`,
+        );
+        assert.equal(await link.getAttribute('href'), '#report');
+        await page.setViewportSize(viewport);
       }
       if (tag === 't-split-pane') {
         const host = page.locator(tag);

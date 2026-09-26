@@ -1045,9 +1045,11 @@ export const guides: Record<string, ComponentGuide> = {
       'Actions can be inside wrappers, open shadow roots, or nested slots. Rendered slot order sets keyboard order.',
       'Handle each action with its own click handler or form behavior. The toolbar manages keyboard focus.',
       'Use orientation="vertical" for vertical navigation. Keep text fields and other composite controls outside this toolbar.',
+      'Long labels wrap within the available width. Use type="button" for native actions that must not submit a surrounding form.',
     ],
     accessibility: [
       'A roving tab stop supports arrows and Home/End. Give each toolbar a distinct label.',
+      'Keyboard navigation scrolls the full action into view immediately, including wrapped labels. Arrow navigation does not activate an action.',
       'Disabled, hidden, inert, and collapsed actions are skipped. If the focused action becomes unavailable, focus moves to an available action.',
       'An empty toolbar keeps a focusable named container. Live changes preserve focus outside the toolbar. Original tabindex values return when actions leave.',
     ],
@@ -1065,7 +1067,23 @@ export const guides: Record<string, ComponentGuide> = {
           children: [{ tag: 't-button', children: ['Unavailable action'] }],
         },
         { tag: 't-button', props: { variant: 'secondary' }, children: ['Help'] },
+        {
+          tag: 'button',
+          attrs: { type: 'button' },
+          children: ['Refresh telemetry_archive_2026_09_26_observation_reports.json'],
+        },
+        {
+          tag: 'a',
+          attrs: { href: '#report' },
+          children: ['Open telemetry_archive_2026_09_26_observation_reports.json'],
+        },
       ],
+    },
+    event: {
+      name: 'click',
+      read: 'type',
+      description:
+        'Action clicks bubble through the toolbar. Handle an individual action or listen on the toolbar. Native submit buttons retain their form behavior.',
     },
   },
   't-tooltip': {

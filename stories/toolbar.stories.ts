@@ -105,3 +105,40 @@ export const ProjectedActions: Story = {
     );
   },
 };
+export const LongLabels: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Native actions keep full filenames at narrow widths. Labels wrap instead of truncating. Arrows and Home/End scroll the focused action into view.',
+      },
+    },
+  },
+  render: () =>
+    html`<div style="max-width:320px">
+      <t-toolbar label="Telemetry report actions" data-density="compact">
+        <button type="button">Refresh telemetry_archive_2026_09_26_observation_reports.json</button>
+        <button type="button" disabled>Unavailable report</button>
+        <button type="button">Export telemetry_archive_2026_09_26_observation_reports.json</button>
+        <a href="#report">Open telemetry_archive_2026_09_26_observation_reports.json</a>
+      </t-toolbar>
+    </div>`,
+  play: async ({ canvasElement }) => {
+    const [first, , second] = canvasElement.querySelectorAll('button');
+    await userEvent.click(first);
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(document.activeElement).toBe(second);
+    await userEvent.keyboard('{End}');
+    await expect(document.activeElement).toBe(canvasElement.querySelector('a'));
+    for (const action of canvasElement.querySelectorAll('button,a')) {
+      const box = action.getBoundingClientRect();
+      const range = document.createRange();
+      range.selectNodeContents(action);
+      await expect(
+        [...range.getClientRects()].every(
+          (rect) => rect.left >= box.left - 1 && rect.right <= box.right + 1,
+        ),
+      ).toBe(true);
+    }
+  },
+};

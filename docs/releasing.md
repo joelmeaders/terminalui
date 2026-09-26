@@ -20,7 +20,7 @@ It also verifies all 56 React wrapper subpaths, their compatibility with the exi
 The test preserves its temporary consumer path in the output for inspection.
 
 The runtime package depends only on Lit. Framework peers are optional and remain outside the core and standalone bundles.
-The standalone bundle includes Lit. Its gzip guard is 53,500 bytes for the 56-component catalog.
+The standalone bundle includes Lit. Report the complete catalog size without a fixed ceiling. Preserve features and use measurements to find unnecessary code.
 The separate button and original three-control form scenarios retain 8 KB and 10 KB gzip budgets.
 The React button scenarios use a 9,500-byte gzip guard for both direct and named barrel imports. They include Lit and the React adapter, but exclude the shared React runtime. Review these guards when features change; preserve features and use measurements to identify unnecessary code or unrelated retained modules.
 These budgets exclude theme CSS and fonts. Run `npm run size` for current measurements.

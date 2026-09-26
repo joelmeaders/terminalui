@@ -23,6 +23,7 @@ const actionChanges: MutationObserverInit = {
  * Roving toolbar for native buttons/links, rendered slots, and open shadow roots.
  * Disabled, hidden, inert, and collapsed actions are skipped.
  * Focus moves to an available action when the focused action becomes unavailable.
+ * Long action labels wrap. Keyboard focus scrolls the full action into view immediately.
  * Text fields and other composite widgets must remain outside this toolbar.
  *
  * @slot - Action buttons or links. Native separators may separate action groups.
@@ -65,7 +66,11 @@ export class TToolbar extends TerminalElement {
         align-items: stretch;
       }
       ::slotted(*) {
+        box-sizing: border-box;
+        min-width: 0;
         max-width: 100%;
+        overflow-wrap: anywhere;
+        scroll-margin: 8px;
       }
       ::slotted(button) {
         min-height: var(--t-control-height, 42px);
@@ -154,7 +159,10 @@ export class TToolbar extends TerminalElement {
     if (this.actions.includes(active!)) this.current = active;
     for (const element of found) element.tabIndex = element === this.current ? 0 : -1;
     this.empty = this.actions.length === 0;
-    if (lostAction || active === toolbar) (this.current ?? toolbar)?.focus();
+    if (lostAction || active === toolbar) {
+      if (this.current) this.focusAction(this.current);
+      else toolbar?.focus();
+    }
   }
   private isAvailable(element: HTMLElement) {
     if (
@@ -184,7 +192,8 @@ export class TToolbar extends TerminalElement {
   private focusAction(element: HTMLElement) {
     this.current = element;
     for (const action of this.actions) action.tabIndex = action === element ? 0 : -1;
-    element.focus();
+    element.focus({ preventScroll: true });
+    element.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
   }
   private onFocus(event: FocusEvent) {
     const action = this.actions.find((element) => event.composedPath().includes(element));

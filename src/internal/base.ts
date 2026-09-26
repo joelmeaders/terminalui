@@ -81,6 +81,7 @@ export const baseStyles = css`
   :focus-visible {
     outline: 2px solid var(--t-focus, #f5ba5b);
     outline-offset: 4px;
+    scroll-margin: 8px;
   }
   button:disabled,
   input:disabled,
