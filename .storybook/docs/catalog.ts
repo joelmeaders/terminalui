@@ -1041,6 +1041,7 @@ export const guides: Record<string, ComponentGuide> = {
     ],
     accessibility: [
       'Arrows, Home/End, typeahead, and sibling expansion support keyboard browsing.',
+      'Expanded children belong to nested groups. A live branch collapse returns focus to a visible ancestor without changing selection. Items moved between branches retain focus by ID.',
       'Provide an accessible tree label. Use simpler navigation when a hierarchy is unnecessary.',
     ],
     example: {

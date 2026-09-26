@@ -55,3 +55,22 @@ export const Selected: Story = {
     ></t-tree>`,
 };
 export const Empty: Story = { render: () => html`<t-tree label="No files"></t-tree>` };
+export const LiveBranchCollapse: Story = {
+  render: () =>
+    html`<p>An application can collapse a branch while one of its descendants has focus.</p>
+      <t-tree
+        label="Project files"
+        .items=${items}
+        .expandedIds=${['src', 'components']}
+        value="button"
+      ></t-tree>`,
+  play: async ({ canvasElement }) => {
+    const tree = canvasElement.querySelector('t-tree')!;
+    tree.shadowRoot!.querySelector<HTMLElement>('[data-id="button"]')!.focus();
+    tree.expandedIds = ['src'];
+    await tree.updateComplete;
+    await expect(tree.shadowRoot!.activeElement?.getAttribute('data-id')).toBe('components');
+    await expect(tree.value).toBe('button');
+    await expect(tree.shadowRoot!.querySelector('[data-id="src"] > [role="group"]')).not.toBeNull();
+  },
+};

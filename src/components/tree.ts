@@ -1,4 +1,4 @@
-import { css, html, nothing, type PropertyValues } from 'lit';
+import { css, html, nothing, type PropertyValues, type TemplateResult } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { baseStyles, TerminalElement } from '../internal/base';
 
@@ -24,7 +24,11 @@ interface VisibleItem {
  *
  * @csspart tree - Tree container.
  *
- * @csspart item - Tree row.
+ * @csspart item - Tree item with its optional expanded child group.
+ *
+ * @csspart row - Visible label, toggle, selection, and focus surface.
+ *
+ * @csspart group - Expanded child group owned by its parent item.
  */
 export class TTree extends TerminalElement {
   static properties = {
@@ -40,12 +44,13 @@ export class TTree extends TerminalElement {
   items: TreeItem[] = [];
   /** Selected identifier. Selection does not follow keyboard focus. */
   value = '';
-  /** Expanded branch identifiers. Replace the array for external updates. */
+  /** Expanded branch identifiers. Replace the array for external updates. Collapsing a focused descendant restores focus to a visible ancestor. */
   expandedIds: string[] = [];
   private focusedId = '';
   private search = '';
   private searchTime = 0;
   private restoreFocus = false;
+  private previousVisible: VisibleItem[] = [];
   static styles = [
     baseStyles,
     css`
@@ -57,7 +62,7 @@ export class TTree extends TerminalElement {
         padding: var(--t-space-2, 8px);
         box-shadow: var(--_t-edge-glow);
       }
-      [role='treeitem'] {
+      .row {
         display: flex;
         align-items: center;
         gap: 8px;
@@ -67,13 +72,17 @@ export class TTree extends TerminalElement {
         cursor: pointer;
       }
       [role='treeitem']:focus-visible {
+        outline: none;
+      }
+      [role='treeitem']:focus-visible > .row {
+        outline: 2px solid var(--t-focus);
         outline-offset: -2px;
       }
-      [aria-selected='true'] {
+      [aria-selected='true'] > .row {
         color: var(--t-accent);
         background: var(--t-raised);
       }
-      [aria-disabled='true'] {
+      [aria-disabled='true'] > .row {
         opacity: 0.55;
         cursor: not-allowed;
       }
@@ -98,13 +107,29 @@ export class TTree extends TerminalElement {
     visit(this.items, 1);
     return entries;
   }
-  protected willUpdate(_changed: PropertyValues) {
-    const visible = this.visible().filter((entry) => !entry.item.disabled);
+  protected willUpdate(changed: PropertyValues) {
+    const rows = this.visible();
+    const visible = rows.filter((entry) => !entry.item.disabled);
+    const hasFocus = Boolean(this.shadowRoot?.activeElement);
+    this.restoreFocus = hasFocus && (changed.has('items') || changed.has('expandedIds'));
     if (!visible.some((entry) => entry.item.id === this.focusedId)) {
-      this.restoreFocus = Boolean(this.shadowRoot?.activeElement);
-      this.focusedId =
-        visible.find((entry) => entry.item.id === this.value)?.item.id ?? visible[0]?.item.id ?? '';
+      const previous = this.previousVisible.find((entry) => entry.item.id === this.focusedId);
+      let parent = previous?.parent;
+      while (parent && !visible.some((entry) => entry.item.id === parent))
+        parent = this.previousVisible.find((entry) => entry.item.id === parent)?.parent;
+      const previousIndex = this.previousVisible.findIndex(
+        (entry) => entry.item.id === this.focusedId,
+      );
+      this.focusedId = hasFocus
+        ? (parent ??
+          rows.slice(Math.max(0, previousIndex)).find((entry) => !entry.item.disabled)?.item.id ??
+          visible.at(-1)?.item.id ??
+          '')
+        : (visible.find((entry) => entry.item.id === this.value)?.item.id ??
+          visible[0]?.item.id ??
+          '');
     }
+    this.previousVisible = rows;
   }
   protected updated() {
     if (!this.restoreFocus) return;
@@ -176,21 +201,17 @@ export class TTree extends TerminalElement {
     event.stopPropagation();
     if (next) void this.focusItem(next);
   }
-  render() {
-    const visible = this.visible();
-    return html`<div
-      part="tree"
-      role="tree"
-      aria-label=${this.label}
-      tabindex=${this.focusedId ? -1 : 0}
-    >
+  private renderItems(items: TreeItem[], level: number, parent?: string): TemplateResult {
+    return html`
       ${repeat(
-        visible,
-        (entry) => entry.item.id,
-        (entry) =>
-          html`<div
+        items,
+        (item) => item.id,
+        (item, index) => {
+          const entry = { item, level, parent, position: index + 1, size: items.length };
+          return html`<div
             part="item"
             role="treeitem"
+            aria-label=${item.label}
             data-id=${entry.item.id}
             tabindex=${entry.item.disabled ? nothing : entry.item.id === this.focusedId ? 0 : -1}
             aria-level=${entry.level}
@@ -199,29 +220,51 @@ export class TTree extends TerminalElement {
             aria-expanded=${entry.item.children?.length ? String(this.expandedIds.includes(entry.item.id)) : nothing}
             aria-selected=${entry.item.id === this.value}
             aria-disabled=${Boolean(entry.item.disabled)}
-            style=${`padding-inline-start: ${(entry.level - 1) * 20}px`}
             @focus=${() => {
               if (!entry.item.disabled) this.focusedId = entry.item.id;
             }}
             @keydown=${(event: KeyboardEvent) => this.onKey(event, entry)}
-            @click=${() => this.select(entry.item)}
+            @click=${(event: Event) => {
+              if ((event.target as Element).closest('[role="treeitem"]') === event.currentTarget)
+                this.select(item);
+            }}
           >
-            <span
-              class="toggle"
-              aria-hidden="true"
-              @click=${(event: Event) => {
-                if (entry.item.children?.length) {
-                  event.stopPropagation();
-                  if (!entry.item.disabled) {
-                    void this.focusItem(entry.item.id);
-                    this.toggle(entry.item);
+            <div class="row" part="row" style=${`padding-inline-start: ${(level - 1) * 20}px`}>
+              <span
+                class="toggle"
+                aria-hidden="true"
+                @click=${(event: Event) => {
+                  if (entry.item.children?.length) {
+                    event.stopPropagation();
+                    if (!entry.item.disabled) {
+                      void this.focusItem(entry.item.id);
+                      this.toggle(entry.item);
+                    }
                   }
-                }
-              }}
-              >${entry.item.children?.length ? (this.expandedIds.includes(entry.item.id) ? '▾' : '▸') : '·'}</span
-            ><span>${entry.item.label}</span>
-          </div>`,
+                }}
+                >${entry.item.children?.length ? (this.expandedIds.includes(entry.item.id) ? '▾' : '▸') : '·'}</span
+              ><span>${entry.item.label}</span>
+            </div>
+            ${
+              item.children?.length && this.expandedIds.includes(item.id)
+                ? html`<div role="group" part="group">
+                    ${this.renderItems(item.children, level + 1, item.id)}
+                  </div>`
+                : nothing
+            }
+          </div>`;
+        },
       )}
+    `;
+  }
+  render() {
+    return html`<div
+      part="tree"
+      role="tree"
+      aria-label=${this.label}
+      tabindex=${this.focusedId ? -1 : 0}
+    >
+      ${this.renderItems(this.items, 1)}
     </div>`;
   }
 }

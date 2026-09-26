@@ -331,6 +331,128 @@ test('tree maintains one tabstop and supports branch, selection, and typeahead k
   await expect(page.getByRole('treeitem', { name: 'Replacement' })).toBeFocused();
 });
 
+test('tree exposes each expanded child group inside its named parent', async ({
+  page,
+}, testInfo) => {
+  await fixture(page, '<t-tree label="Files"></t-tree>');
+  await page.locator('t-tree').evaluate((element: any) => {
+    element.items = [
+      {
+        id: 'archive',
+        label: 'Archive',
+        children: [
+          { id: 'reports', label: 'Reports', children: [{ id: 'survey', label: 'Survey' }] },
+          { id: 'notes', label: 'Notes' },
+        ],
+      },
+    ];
+    element.expandedIds = ['archive', 'reports'];
+    element.dataset.clicks = '0';
+    element.addEventListener(
+      'click',
+      () => (element.dataset.clicks = String(Number(element.dataset.clicks) + 1)),
+    );
+  });
+  const archive = page.getByRole('treeitem', { name: 'Archive', exact: true });
+  const reports = page.getByRole('treeitem', { name: 'Reports', exact: true });
+  await expect(archive.locator(':scope > [role="group"]')).toHaveCount(1);
+  await expect(reports.locator(':scope > [role="group"]')).toHaveCount(1);
+  await expect(archive).toHaveAccessibleName('Archive');
+  await expect(reports).toHaveAccessibleName('Reports');
+  await expect(reports.locator('[role="treeitem"]')).toHaveAttribute('aria-level', '3');
+  await expect(archive.locator(':scope > [role="group"] > [role="treeitem"]')).toHaveCount(2);
+  await reports.focus();
+  await page.keyboard.press('Shift');
+  await expect(reports.locator(':scope > .row')).toHaveCSS('outline-width', '2px');
+  await page.keyboard.press('ArrowRight');
+  await expect(page.getByRole('treeitem', { name: 'Survey', exact: true })).toBeFocused();
+  await page.keyboard.press('ArrowLeft');
+  await expect(reports).toBeFocused();
+  await page.keyboard.press('ArrowLeft');
+  await expect(reports.locator('[role="group"]')).toHaveCount(0);
+  await page.getByRole('treeitem', { name: 'Notes', exact: true }).click();
+  await expect(page.locator('t-tree')).toHaveJSProperty('value', 'notes');
+  await expect(page.locator('t-tree')).toHaveAttribute('data-clicks', '1');
+  await expect(archive).toHaveAttribute('aria-selected', 'false');
+  const results = await new AxeBuilder({ page }).include('#fixture').analyze();
+  await testInfo.attach('tree-hierarchy-axe-review', {
+    body: JSON.stringify(
+      { violations: results.violations, incomplete: results.incomplete },
+      null,
+      2,
+    ),
+    contentType: 'application/json',
+  });
+  if (results.incomplete.length)
+    console.log('tree axe review items:', results.incomplete.map((item) => item.id).join(', '));
+  expect(results.violations).toEqual([]);
+});
+
+test('tree keeps focus near a live collapsed or removed branch without changing selection', async ({
+  page,
+}) => {
+  await fixture(page, '<t-tree label="Files"></t-tree><button id="outside">Outside</button>');
+  await page.locator('t-tree').evaluate((element: any) => {
+    element.items = [
+      { id: 'intro', label: 'Introduction' },
+      {
+        id: 'archive',
+        label: 'Archive',
+        children: [
+          { id: 'reports', label: 'Reports', children: [{ id: 'survey', label: 'Survey' }] },
+          { id: 'notes', label: 'Notes' },
+        ],
+      },
+    ];
+    element.expandedIds = ['archive', 'reports'];
+    element.value = 'survey';
+    element.dataset.events = '0';
+    element.addEventListener(
+      't-select',
+      () => (element.dataset.events = String(Number(element.dataset.events) + 1)),
+    );
+  });
+  const tree = page.locator('t-tree');
+  const survey = page.getByRole('treeitem', { name: 'Survey', exact: true });
+  await survey.focus();
+  await tree.evaluate((element: any) => (element.expandedIds = ['archive']));
+  await expect(page.getByRole('treeitem', { name: 'Reports', exact: true })).toBeFocused();
+  await tree.evaluate((element: any) => {
+    element.expandedIds = ['archive', 'reports'];
+    element.items = element.items.map((item: any) =>
+      item.id !== 'archive'
+        ? item
+        : {
+            ...item,
+            children: item.children.map((child: any) =>
+              child.id === 'reports' ? { ...child, disabled: true } : child,
+            ),
+          },
+    );
+  });
+  await survey.focus();
+  await tree.evaluate((element: any) => (element.expandedIds = ['archive']));
+  await expect(page.getByRole('treeitem', { name: 'Archive', exact: true })).toBeFocused();
+  await tree.evaluate((element: any) => (element.expandedIds = ['archive', 'reports']));
+  await survey.focus();
+  await tree.evaluate((element: any) => {
+    element.items = [
+      { id: 'intro', label: 'Introduction' },
+      { id: 'archive', label: 'Archive', children: [{ id: 'survey', label: 'Survey' }] },
+    ];
+  });
+  await expect(survey).toBeFocused();
+  await tree.evaluate((element: any) => (element.items = []));
+  await expect(page.getByRole('tree', { name: 'Files' })).toBeFocused();
+  await tree.evaluate((element: any) => (element.items = [{ id: 'restored', label: 'Restored' }]));
+  await expect(page.getByRole('treeitem', { name: 'Restored' })).toBeFocused();
+  await expect(tree).toHaveJSProperty('value', 'survey');
+  await expect(tree).toHaveAttribute('data-events', '0');
+  await page.locator('#outside').focus();
+  await tree.evaluate((element: any) => (element.items = [{ id: 'final', label: 'Final' }]));
+  await expect(page.locator('#outside')).toBeFocused();
+});
+
 test('new navigation and table surfaces pass automated accessibility checks', async ({ page }) => {
   await fixture(
     page,
