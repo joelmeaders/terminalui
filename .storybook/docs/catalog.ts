@@ -355,10 +355,22 @@ export const guides: Record<string, ComponentGuide> = {
   ),
   't-combobox': field(
     'Search a list and select one known option.',
-    { name: 'department', label: 'Department', options: choices, value: 'archive' },
+    {
+      name: 'department',
+      label: 'Department',
+      options: [
+        ...choices,
+        {
+          value: 'telemetry',
+          label: 'Telemetry / environmental_sensor_validation_and_calibration_team',
+        },
+      ],
+      value: 'archive',
+    },
     [
       'Options use { value, label, disabled? }. Replace the array to update results.',
       'Typing filters the list. Only an enabled option becomes the submitted value. Set loading while your application obtains options.',
+      'Long option labels wrap within the popup. Its options scroll vertically, while a loading notice remains visible below them.',
     ],
     {
       accessibility: [
@@ -578,9 +590,11 @@ export const guides: Record<string, ComponentGuide> = {
       'This is a single-level action menu. Use links or a tree for deeper navigation.',
       'Replace options to update an open menu. Keep values stable so focus stays with the same action.',
       'Use emptyMessage to customize the notice when no actions are available. Separators alone do not count as actions.',
+      'Trigger and action labels wrap at narrow widths. Long action lists scroll vertically within the space around the trigger.',
     ],
     accessibility: [
       'Arrow keys, Home/End, and typeahead move through enabled actions. Escape dismisses and restores focus.',
+      'One enabled action is a tab stop while open. Tab dismisses and continues from the trigger. When no action is enabled, the popup itself supports native keyboard scrolling.',
       'If the focused action disappears or becomes disabled, focus moves to an available action. An empty popup keeps focus on its named group and announces emptyMessage. Escape and Tab still dismiss it. Menu semantics return when actions are available.',
     ],
     example: {
@@ -589,6 +603,10 @@ export const guides: Record<string, ComponentGuide> = {
         options: [
           { value: 'rename', label: 'Rename' },
           { value: 'archive', label: 'Archive' },
+          {
+            value: 'export',
+            label: 'Export environmental_readings_2026_09_26_sector17_revision3.json',
+          },
         ],
       },
     },

@@ -113,3 +113,44 @@ export const WithSlots: Story = {
       ><t-icon slot="start" name="more"></t-icon
     ></t-menu>`,
 };
+
+const archiveActions = [
+  {
+    value: 'download',
+    label: 'Download environmental_readings_2026_09_26_sector17_revision3.json',
+  },
+  {
+    value: 'delete',
+    label: 'Delete environmental_readings_2026_09_26_sector17_revision3.json',
+    disabled: true,
+  },
+  {
+    value: 'copy',
+    label: 'Copy atmospheric_sensor_calibration_2026_09_26_laboratory_analysis.json',
+  },
+  {
+    value: 'archive',
+    label: 'Archive atmospheric_sensor_calibration_2026_09_26_laboratory_analysis.json',
+  },
+];
+export const LongLabels: Story = {
+  render: () =>
+    html`<section style="max-width:320px;min-height:360px">
+      <p>Use the arrow keys to browse the available actions. Filenames wrap within the menu.</p>
+      <t-menu
+        label="Actions for environmental_readings_2026_09_26_sector17_revision3.json"
+        .options=${archiveActions}
+      ></t-menu>
+    </section>`,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-menu')!;
+    await userEvent.click(host.shadowRoot!.querySelector('.trigger')!);
+    await userEvent.keyboard('{End}');
+    const item = host.shadowRoot!.activeElement as HTMLElement;
+    await expect(item.dataset.value).toBe('archive');
+    await expect(item).toHaveAttribute('tabindex', '0');
+    const panel = host.shadowRoot!.querySelector<HTMLElement>('[part=menu]')!;
+    await expect(panel.scrollWidth).toBeLessThanOrEqual(panel.clientWidth + 1);
+    await expect(host.scrollWidth).toBeLessThanOrEqual(host.clientWidth + 1);
+  },
+};

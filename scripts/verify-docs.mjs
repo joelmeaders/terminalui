@@ -257,6 +257,28 @@ const server = createServer(async (request, response) => {
 });
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const browser = await chromium.launch();
+async function verifyWrappedChoice(host, role, label) {
+  const row = host.getByRole(role, { name: label, exact: true });
+  const layout = await row.evaluate((element) => {
+    const boundary = element.getBoundingClientRect();
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const lines = [...range.getClientRects()].filter((rect) => rect.width > 0);
+    return {
+      width: element.scrollWidth,
+      available: element.clientWidth,
+      lines: lines.length,
+      clipped: lines.some(
+        (rect) => rect.left < boundary.left - 1 || rect.right > boundary.right + 1,
+      ),
+    };
+  });
+  assert(layout.lines > 1, `${role}: long documentation choice must wrap.`);
+  assert(
+    layout.width <= layout.available + 1 && !layout.clipped,
+    `${role}: complete label must fit the row.`,
+  );
+}
 try {
   const page = await browser.newPage();
   const errors = [];
@@ -417,6 +439,8 @@ try {
       }
       if (tag === 't-menu') {
         const host = page.locator(tag);
+        const viewport = page.viewportSize();
+        await page.setViewportSize({ width: 320, height: 720 });
         const trigger = host.getByRole('button', { name: expected.label, exact: true });
         await trigger.click();
         await host.evaluate(async (element) => {
@@ -442,6 +466,9 @@ try {
           element.options = element.documentationOptions;
           await element.updateComplete;
         });
+        await page.keyboard.press('End');
+        await verifyWrappedChoice(host, 'menuitem', expected.options.at(-1).label);
+        await page.keyboard.press('Home');
         const logged = page.waitForEvent('console', {
           predicate: (message) => message.text() === 'rename',
         });
@@ -452,9 +479,12 @@ try {
           await trigger.evaluate((element) => element === element.getRootNode().activeElement),
           true,
         );
+        await page.setViewportSize(viewport);
       }
       if (tag === 't-combobox') {
         const host = page.locator(tag);
+        const viewport = page.viewportSize();
+        await page.setViewportSize({ width: 320, height: 720 });
         const search = host.getByRole('combobox', { name: expected.label, exact: true });
         await search.focus();
         await host.evaluate(async (element) => {
@@ -478,10 +508,21 @@ try {
         assert.equal(await search.getAttribute('aria-expanded'), 'true');
         assert.deepEqual(await host.evaluate((element) => element.userEvents), []);
         await page.keyboard.press('ArrowDown');
+        await page.keyboard.press('End');
+        await verifyWrappedChoice(host, 'option', expected.options.at(-1).label);
+        assert.equal(
+          await host
+            .getByRole('listbox')
+            .evaluate((element) => getComputedStyle(element).overflowY),
+          'auto',
+          `${framework}/${tag}: the controlled listbox must own option scrolling.`,
+        );
+        await page.keyboard.press('Home');
         await page.keyboard.press('ArrowDown');
         await page.keyboard.press('Enter');
         assert.equal(await host.evaluate((element) => element.value), 'engineering');
         assert.deepEqual(await host.evaluate((element) => element.userEvents), ['input', 'change']);
+        await page.setViewportSize(viewport);
       }
       if (tag === 't-command-palette') {
         const host = page.locator(tag);

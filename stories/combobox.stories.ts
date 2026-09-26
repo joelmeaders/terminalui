@@ -94,3 +94,31 @@ export const WithSlots: Story = {
       ><t-icon slot="start" name="search"></t-icon
     ></t-combobox>`,
 };
+
+const reports = [
+  'environmental_readings_2026_09_26_sector17_revision3.json',
+  'atmospheric_sensor_calibration_2026_09_26_laboratory_analysis.json',
+  'laboratory_validation_2026_09_26_atmospheric_sample_results.json',
+  'archive_environmental_sample_summary_2026_09_26_sector17.json',
+];
+export const LongLabels: Story = {
+  render: () =>
+    html`<section style="max-width:320px;min-height:320px">
+      <p>Use the arrow keys to browse saved reports. Enter selects a report.</p>
+      <t-combobox
+        label="Saved report"
+        .options=${reports.map((label, index) => ({ value: `report-${index}`, label, disabled: index === 1 }))}
+      ></t-combobox>
+    </section>`,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-combobox')!;
+    const input = host.shadowRoot!.querySelector('input')!;
+    await userEvent.click(input);
+    await userEvent.keyboard('{ArrowDown}{End}');
+    await expect(host.shadowRoot!.activeElement).toBe(input);
+    await expect(input).toHaveAttribute('aria-activedescendant', 'option-3');
+    const list = host.shadowRoot!.querySelector<HTMLElement>('[role=listbox]')!;
+    await expect(list.scrollWidth).toBeLessThanOrEqual(list.clientWidth + 1);
+    await expect(host.value).toBe('');
+  },
+};

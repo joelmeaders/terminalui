@@ -16,8 +16,8 @@ export function observeFloating(
       gap = 8;
     panel.style.maxWidth = `${Math.max(0, width - margin * 2)}px`;
     panel.style.maxHeight = `${Math.max(0, height - margin * 2)}px`;
-    const target = anchor.getBoundingClientRect(),
-      box = panel.getBoundingClientRect();
+    const target = anchor.getBoundingClientRect();
+    let box = panel.getBoundingClientRect();
     const room = {
       top: target.top - y,
       bottom: y + height - target.bottom,
@@ -35,6 +35,13 @@ export function observeFloating(
       : 'bottom';
     const need = side === 'top' || side === 'bottom' ? box.height + gap : box.width + gap;
     if (room[side] < need && room[opposite[side]] > room[side]) side = opposite[side];
+    if (side === 'top' || side === 'bottom') {
+      const available = room[side] - gap - margin;
+      if (available > 0) {
+        panel.style.maxHeight = `${Math.min(height - margin * 2, available)}px`;
+        box = panel.getBoundingClientRect();
+      }
+    }
     let left = target.left,
       top = target.bottom + gap;
     if (side === 'top') top = target.top - box.height - gap;

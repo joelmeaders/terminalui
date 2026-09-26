@@ -8,6 +8,7 @@ import { fieldSlotStyles, optionalSlotStyles, syncSlot } from '../internal/slots
 /**
  * Searchable single select. Only enabled options can supply the submitted value.
  * Empty results remain a status notice without an expanded listbox. Loading lists are busy.
+ * Long choices wrap inside the controlled scrolling listbox. Loading notices stay below the options.
  * @slot start - Leading icon, short prefix, or named action. Inert while disabled.
  * @slot end - Trailing icon, short suffix, or named action. Inert while disabled.
  * @csspart control - Frame around the native combobox and optional affixes.
@@ -57,12 +58,18 @@ export class TCombobox extends FormControl {
         font: inherit;
       }
       .scroll {
+        min-height: 0;
         max-height: calc(240px - var(--t-line-width, 1px) - var(--t-line-width, 1px));
         overflow: auto;
         padding: 4px;
       }
+      .list:popover-open {
+        display: grid;
+        grid-template-rows: minmax(0, 1fr) auto;
+      }
       [role='option'] {
         padding: 8px;
+        overflow-wrap: anywhere;
         cursor: pointer;
         font-size: 13px;
         border: var(--t-divider-width, 1px) solid transparent;
@@ -297,30 +304,29 @@ export class TCombobox extends FormControl {
           }}
           @mousedown=${(event: MouseEvent) => event.preventDefault()}
         >
-          <div class="scroll">
-            <div
-              id="options"
-              role=${hasList ? 'listbox' : 'group'}
-              aria-label=${this.label}
-              aria-busy=${this.loading ? 'true' : 'false'}
-            >
-              ${options.map(
-                (option, index) =>
-                  html`<div
-                    id=${`option-${index}`}
-                    part="option"
-                    role="option"
-                    aria-selected=${option.value === this.value ? 'true' : 'false'}
-                    aria-disabled=${option.disabled ? 'true' : 'false'}
-                    ?data-active=${index === this.active}
-                    @click=${() => this.choose(option)}
-                  >
-                    ${option.label}
-                  </div>`,
-              )}
-            </div>
-            ${this.loading || !options.length ? html`<div class="status" role="status">${this.loading ? 'Loading options…' : this.emptyMessage}</div>` : nothing}
+          <div
+            class="scroll"
+            id="options"
+            role=${hasList ? 'listbox' : 'group'}
+            aria-label=${this.label}
+            aria-busy=${this.loading ? 'true' : 'false'}
+          >
+            ${options.map(
+              (option, index) =>
+                html`<div
+                  id=${`option-${index}`}
+                  part="option"
+                  role="option"
+                  aria-selected=${option.value === this.value ? 'true' : 'false'}
+                  aria-disabled=${option.disabled ? 'true' : 'false'}
+                  ?data-active=${index === this.active}
+                  @click=${() => this.choose(option)}
+                >
+                  ${option.label}
+                </div>`,
+            )}
           </div>
+          ${this.loading || !options.length ? html`<div class="status" role="status">${this.loading ? 'Loading options…' : this.emptyMessage}</div>` : nothing}
         </div>
       </div>
       ${this.renderDescription()}`;

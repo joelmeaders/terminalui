@@ -13,6 +13,7 @@ export interface MenuOption {
 /**
  * Single-level action menu with arrow navigation, typeahead, and focus return.
  * With no actions, the popup is a named group with an empty-state status notice.
+ * Long labels wrap. Focused actions scroll into view. With no enabled actions, the popup supports native keyboard scrolling.
  * @slot start - Non-interactive icon before the trigger label.
  * @slot end - Non-interactive icon or content after the trigger label, before the arrow.
  *
@@ -53,12 +54,16 @@ export class TMenu extends TerminalElement {
     css`
       :host {
         display: inline-block;
+        min-width: 0;
+        max-width: 100%;
         position: relative;
       }
       button {
         color: var(--t-text);
         background: var(--t-surface);
         padding: var(--t-space-2, 8px) var(--t-space-3, 12px);
+        max-width: 100%;
+        overflow-wrap: anywhere;
       }
       .trigger {
         border: var(--t-line-width, 1px) solid var(--t-control-border, var(--t-border));
@@ -83,7 +88,7 @@ export class TMenu extends TerminalElement {
         width: 100%;
         border: 0;
         text-align: start;
-        white-space: nowrap;
+        white-space: normal;
       }
       [role='menuitem']:focus,
       [role='menuitem']:hover {
@@ -148,16 +153,15 @@ export class TMenu extends TerminalElement {
       this.cleanup = undefined;
       this.menuHadFocus = false;
       this.focusedOption = undefined;
+      this.syncTabStops();
     }
-    if (changed.has('open') && this.open) (this.buttons()[0] ?? panel).focus();
+    if (changed.has('open') && this.open) this.focusAction(this.buttons()[0] ?? panel);
     else if (changed.has('options') && this.open && this.menuHadFocus) {
       const buttons = this.buttons();
       const match = buttons.find((button) => button.dataset.value === this.focusedOption?.value);
-      (
-        match ??
-        buttons[Math.min(this.focusedOption?.index ?? 0, buttons.length - 1)] ??
-        panel
-      ).focus();
+      this.focusAction(
+        match ?? buttons[Math.min(this.focusedOption?.index ?? 0, buttons.length - 1)] ?? panel,
+      );
     }
     this.menuHadFocus = false;
     this.focusedOption = undefined;
@@ -167,9 +171,21 @@ export class TMenu extends TerminalElement {
       ...this.renderRoot.querySelectorAll<HTMLButtonElement>('[role=menuitem]:not(:disabled)'),
     ];
   }
+  private syncTabStops(current?: HTMLElement) {
+    for (const button of this.renderRoot.querySelectorAll<HTMLButtonElement>('[role=menuitem]'))
+      button.tabIndex = button === current && !button.disabled ? 0 : -1;
+    const panel = this.renderRoot.querySelector<HTMLElement>('#menu')!;
+    panel.tabIndex = panel === current ? 0 : -1;
+  }
+  private focusAction(current: HTMLElement) {
+    this.syncTabStops(current);
+    current.focus({ preventScroll: true });
+    current.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
+  }
   private dismiss(restore = true) {
     this.open = false;
     this.search = '';
+    this.syncTabStops();
     if (restore) this.renderRoot.querySelector<HTMLButtonElement>('.trigger')?.focus();
   }
   private async show(last = false) {
@@ -177,9 +193,9 @@ export class TMenu extends TerminalElement {
     this.open = true;
     await this.updateComplete;
     const buttons = this.buttons();
-    (
-      buttons[last ? buttons.length - 1 : 0] ?? this.renderRoot.querySelector<HTMLElement>('#menu')
-    )?.focus();
+    const target =
+      buttons[last ? buttons.length - 1 : 0] ?? this.renderRoot.querySelector<HTMLElement>('#menu');
+    if (target) this.focusAction(target);
   }
   private choose(option: MenuOption) {
     if (option.disabled || option.separator) return;
@@ -202,6 +218,7 @@ export class TMenu extends TerminalElement {
       this.dismiss();
       return;
     }
+    if (!buttons.length) return;
     if (event.key === 'ArrowDown') next = (index + 1) % buttons.length;
     else if (event.key === 'ArrowUp') next = (index - 1 + buttons.length) % buttons.length;
     else if (event.key === 'Home') next = 0;
@@ -228,7 +245,7 @@ export class TMenu extends TerminalElement {
       if (next >= 0) next = (index + 1 + next) % buttons.length;
     } else return;
     event.preventDefault();
-    buttons[next]?.focus();
+    if (buttons[next]) this.focusAction(buttons[next]);
   }
   render() {
     const hasActions = this.options.some((option) => !option.separator);
@@ -259,7 +276,7 @@ export class TMenu extends TerminalElement {
         aria-label=${this.label}
         @keydown=${this.onKey}
       >
-        ${this.options.map((option) => (option.separator ? html`<div role="separator"></div>` : html`<button part="item" type="button" role="menuitem" data-value=${option.value} tabindex="-1" ?disabled=${option.disabled} @click=${() => this.choose(option)}>${option.label}</button>`))}
+        ${this.options.map((option) => (option.separator ? html`<div role="separator"></div>` : html`<button part="item" type="button" role="menuitem" data-value=${option.value} tabindex="-1" ?disabled=${option.disabled} @focus=${(event: FocusEvent) => this.syncTabStops(event.currentTarget as HTMLElement)} @click=${() => this.choose(option)}>${option.label}</button>`))}
         ${hasActions ? nothing : html`<p class="empty" role="status">${this.emptyMessage}</p>`}
       </div>`;
   }
