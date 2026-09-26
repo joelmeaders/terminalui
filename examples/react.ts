@@ -1,10 +1,13 @@
-import { createElement as h, useState } from 'react';
+import { createElement as h, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { TInput, TButton, TCheckbox } from '@terminal-kit/core/react';
+import { TInput } from '@terminal-kit/core/react/input';
+import { TButton } from '@terminal-kit/core/react/button';
+import { TCheckbox } from '@terminal-kit/core/react/checkbox';
 import '@terminal-kit/core/themes.css';
 import './shared.css';
 import type { TInput as TInputElement } from '@terminal-kit/core/components/input';
 function Example() {
+  const input = useRef<TInputElement | null>(null);
   const [value, setValue] = useState('Initial');
   const [checked, setChecked] = useState(false);
   const [disabled, setDisabled] = useState(false);
@@ -13,12 +16,14 @@ function Example() {
     null,
     h('h1', null, 'React'),
     h(TInput, {
+      ref: input,
       label: 'Name',
       value,
       disabled,
       onInput: (event: Event) => setValue((event.target as TInputElement).value),
     }),
     h(TButton, { onClick: () => setValue('Updated') }, 'Update from app'),
+    h(TButton, { onClick: () => input.current?.focus() }, 'Focus name'),
     h(TCheckbox, {
       label: 'Subscribe',
       checked,

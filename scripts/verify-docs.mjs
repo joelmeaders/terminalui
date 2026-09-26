@@ -103,7 +103,18 @@ for (const { tag } of entries) {
     join(out, `${tag}.html`),
     `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>${tag} example</title></head><body>${renderExample('html')}</body></html>`,
   );
-  await writeFile(join(out, `${tag}.tsx`), renderExample('react'));
+  const reactExample = renderExample('react');
+  if (tag !== 'typography') {
+    assert(
+      reactExample.includes(`from '@terminal-kit/core/react/${tag.slice(2)}'`),
+      `${tag}: React examples must import their component wrapper directly.`,
+    );
+    assert(
+      !reactExample.includes("from '@terminal-kit/core/react'"),
+      `${tag}: React examples must not import the complete wrapper barrel.`,
+    );
+  }
+  await writeFile(join(out, `${tag}.tsx`), reactExample);
   await writeFile(join(out, `${tag}.angular.ts`), renderExample('angular'));
   const sfc = renderExample('vue');
   const { descriptor, errors } = parse(sfc, {

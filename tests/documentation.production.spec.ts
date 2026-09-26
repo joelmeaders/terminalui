@@ -337,7 +337,9 @@ test('global framework selection changes code and survives navigation and reload
   await page.locator('a#components-icon--docs').click();
   await expect(frame.locator('.tk-docs-tag')).toHaveText('<t-icon>');
   await expect(select).toHaveValue('react');
-  await expect(frame.getByTestId('framework-example')).toContainText('@terminal-kit/core/react');
+  await expect(frame.getByTestId('framework-example')).toContainText(
+    "from '@terminal-kit/core/react/icon'",
+  );
   await page.reload();
   await expect(select).toHaveValue('react');
   await page

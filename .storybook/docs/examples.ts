@@ -206,12 +206,13 @@ export function exampleFor(tag: string, framework: Framework): string {
     ]
       .filter(Boolean)
       .join('\n  ');
-    return `${hooks.length ? `import { ${hooks.join(', ')} } from 'react';\n` : ''}${JSON.stringify(node).includes('style') ? "import type * as React from 'react';\n" : ''}import { ${imports
-      .map(className)
-      .map((n) => `${n} as ${n}View`)
-      .join(
-        ', ',
-      )} } from '@terminal-kit/core/react';\n${typeImport}import '@terminal-kit/core/themes.css';\nimport './example.css';\n\nexport function Example() {\n  ${declarations}\n  return (\n    <main className="example" data-theme="amber">\n      ${guide.action ? `<button type="button" onClick={(event) => element.current?.show(${showArgs('event.currentTarget')})}>${guide.action.label}</button>\n      ` : ''}${markup(node, framework, true, additions, omitted).replace(/<(\/?)(T\w+)/g, '<$1$2View')}\n    </main>\n  );\n}`;
+    const wrappers = imports
+      .map(
+        (tag) =>
+          `import { ${className(tag)} as ${className(tag)}View } from '@terminal-kit/core/react/${tag.slice(2)}';`,
+      )
+      .join('\n');
+    return `${hooks.length ? `import { ${hooks.join(', ')} } from 'react';\n` : ''}${JSON.stringify(node).includes('style') ? "import type * as React from 'react';\n" : ''}${wrappers}\n${typeImport}import '@terminal-kit/core/themes.css';\nimport './example.css';\n\nexport function Example() {\n  ${declarations}\n  return (\n    <main className="example" data-theme="amber">\n      ${guide.action ? `<button type="button" onClick={(event) => element.current?.show(${showArgs('event.currentTarget')})}>${guide.action.label}</button>\n      ` : ''}${markup(node, framework, true, additions, omitted).replace(/<(\/?)(T\w+)/g, '<$1$2View')}\n    </main>\n  );\n}`;
   }
   if (framework === 'vue') {
     const usesRef = form || guide.action;

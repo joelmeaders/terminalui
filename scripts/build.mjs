@@ -8,7 +8,13 @@ const components = (await readdir('src/components'))
 const internal = (await readdir('src/internal'))
   .filter((f) => f.endsWith('.ts'))
   .map((f) => `src/internal/${f}`);
-const adapters = ['src/adapters/react.ts', 'src/adapters/vue.ts'];
+const adapters = [
+  'src/adapters/react.ts',
+  'src/adapters/vue.ts',
+  ...(await readdir('src/adapters/react'))
+    .filter((file) => file.endsWith('.ts'))
+    .map((file) => `src/adapters/react/${file}`),
+];
 const effects = (await readdir('src/effects'))
   .filter((f) => f.endsWith('.ts'))
   .map((f) => `src/effects/${f}`);

@@ -5,6 +5,8 @@
 - Place worktrees under `{RepositoryName}-worktrees/{WorktreeName}`.
 - Preserve the terminal design, public APIs, and unrelated changes.
 - Commit each completed request after its required validation passes. Include only changes for that request.
+- Preserve component features. Use size measurements to find unnecessary complexity, not to remove features to meet a fixed budget.
+- Keep per-component imports for native elements and React wrappers. Verify retained bundle modules from an installed package, including required component dependencies. A small import must not retain unrelated components.
 
 ## Accessibility is a requirement
 

@@ -10,7 +10,7 @@ Storybook is the component documentation entry point. Each of the 56 component p
 - `docs/frameworks.md`, `docs/icons.md`, `docs/spinners.md`, `docs/slots.md`, and `docs/appearance.md` supply longer guides. The documentation page imports their contents directly. The Appearance introduction and each component's styling section reuse the appearance guide. Edit the original guide to update both repository and Storybook documentation.
 - `.storybook/docs/ComponentDocs.tsx` supplies the shared page structure. `.storybook/docs/docs.css` supplies its appearance. Stories remain the source of live states and browser interaction tests.
 
-The framework example is a complete starting recipe. Storybook Controls change the live preview, not that recipe. The page explains this distinction. React examples include a companion CSS block; Angular setup explains the global theme import. Plain HTML examples use the standalone bundle and need no browser import map.
+The framework example is a complete starting recipe. Storybook Controls change the live preview, not that recipe. The page explains this distinction. React examples import each required wrapper from its component subpath and include a companion CSS block. The documentation check requires those selective imports. Angular setup explains the global theme import. Plain HTML examples use the standalone bundle and need no browser import map.
 
 The Typography foundation page uses `docs/typography.md` and `.storybook/docs/typography.ts`. Its one native HTML recipe supplies the preview and all four framework examples. `TypographyDocs.tsx` reuses the component manual's global framework selector. Typography has no custom element or fake catalog entry.
 

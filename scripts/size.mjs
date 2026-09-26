@@ -9,8 +9,13 @@ const scenarios = {
   [`All ${count} components`]: 'import "./src/index.ts";',
   'One Ionicons icon':
     'import "./src/components/icon.ts"; import {registerIcon} from "./src/icons.ts"; import {rocketOutline} from "ionicons/icons"; registerIcon("rocket", rocketOutline);',
+  'React button (component import)':
+    'import {TButton} from "./src/adapters/react/button.ts"; globalThis.exampleButton = TButton;',
+  'React button (barrel import)':
+    'import {TButton} from "./src/adapters/react.ts"; globalThis.exampleButton = TButton;',
 };
 console.log('Production JS including Lit. CSS themes and fonts excluded.');
+console.log('React scenarios include the adapter and exclude the shared React framework runtime.');
 for (const [name, contents] of Object.entries(scenarios)) {
   const result = await build({
     stdin: { contents, resolveDir: process.cwd() },
@@ -18,6 +23,7 @@ for (const [name, contents] of Object.entries(scenarios)) {
     minify: true,
     format: 'esm',
     target: 'es2022',
+    external: ['react', 'react-dom'],
     write: false,
   });
   const bytes = result.outputFiles[0].contents;
@@ -28,9 +34,11 @@ for (const [name, contents] of Object.entries(scenarios)) {
       ? 8000
       : name === 'Form controls'
         ? 10000
-        : name === 'One Ionicons icon'
-          ? 12000
-          : 53500;
+        : name.startsWith('React button')
+          ? 9500
+          : name === 'One Ionicons icon'
+            ? 12000
+            : 53500;
   if (bytes.length === 0 || gzipBytes > budget)
     throw new Error(
       `${name}: ${gzipBytes} B exceeds its ${budget} B gzip budget or has no output.`,

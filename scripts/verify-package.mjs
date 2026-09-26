@@ -172,6 +172,50 @@ assert(
   ),
   'Core bundle must exclude optional image effects.',
 );
+for (const entry of ['react/button', 'react']) {
+  const result = await build({
+    absWorkingDir: consumer,
+    stdin: {
+      contents: `import { TButton } from '@terminal-kit/core/${entry}'; globalThis.exampleButton = TButton;`,
+      resolveDir: consumer,
+    },
+    bundle: true,
+    minify: true,
+    format: 'esm',
+    target: 'es2022',
+    external: ['react', 'react-dom'],
+    write: false,
+    metafile: true,
+  });
+  const included = Object.values(result.metafile.outputs)
+    .flatMap((output) => Object.entries(output.inputs))
+    .filter(([, data]) => data.bytesInOutput > 0)
+    .map(([file]) => file.replaceAll('\\', '/'));
+  assert.deepEqual(
+    included
+      .filter((file) => file.includes('@terminal-kit/core/dist/components/'))
+      .map((file) => file.split('/').at(-1)),
+    ['button.js'],
+    `${entry}: a used button must not retain unrelated components.`,
+  );
+  assert.deepEqual(
+    included
+      .filter((file) => file.includes('@terminal-kit/core/dist/adapters/react/'))
+      .map((file) => file.split('/').at(-1)),
+    ['button.js'],
+    `${entry}: a used button must not retain unrelated wrappers.`,
+  );
+  assert(
+    !included.some((file) => file.endsWith('/dist/index.js')),
+    `${entry}: must not include the catalog.`,
+  );
+}
+const reactImports = catalog
+  .map(
+    ({ name, tagName }) =>
+      `import { ${name} as ${name}ReactSubpath } from '@terminal-kit/core/react/${tagName.slice(2)}';`,
+  )
+  .join('\n');
 const imports = catalog
   .map(
     ({ name, path }) =>
@@ -181,6 +225,7 @@ const imports = catalog
 await writeFile(
   join(consumer, 'consumer.ts'),
   `${imports}
+${reactImports}
 import '@terminal-kit/core';
 import '@terminal-kit/core/themes.css';
 import '@terminal-kit/core/typography.css';
@@ -206,7 +251,7 @@ document.body.append(input);
 for (const name of ['package:sample','package:fa','package:lucide','package-set:box']) {
   const icon = new TIcon(); icon.name = name; icon.dataset.packageIcon = name; document.body.append(icon);
 }
-(globalThis as any).packageResult = { count: ${catalog.length}, value: input.value, react: !!ReactInput, reactWrappers: [${catalog.map(({ name }) => `ReactComponents.${name}`).join(',')}].filter(Boolean).length, vue: !!useTerminalModel, angular: !!TerminalValueAccessor };
+(globalThis as any).packageResult = { count: ${catalog.length}, value: input.value, react: !!ReactInput, reactWrappers: [${catalog.map(({ name }) => `ReactComponents.${name}`).join(',')}].filter(Boolean).length, reactSubpaths: [${catalog.map(({ name }) => `${name}ReactSubpath`).join(',')}].filter(Boolean).length, reactCompatibility: [${catalog.map(({ name }) => `${name}ReactSubpath === ReactComponents.${name}`).join(',')}].every(Boolean), vue: !!useTerminalModel, angular: !!TerminalValueAccessor };
 `,
 );
 const config = {
@@ -327,6 +372,8 @@ try {
     value: 'Installed',
     react: true,
     reactWrappers: catalog.length,
+    reactSubpaths: catalog.length,
+    reactCompatibility: true,
     vue: true,
     angular: true,
   });
@@ -462,6 +509,6 @@ try {
   await browser.close();
 }
 console.log(
-  `Verified external npm install, button subpath isolation, all ${catalog.length} element exports and React wrappers, NodeNext types, icon registry, provider isolation, Angular AOT consumer with array-valued multi-select and six other form bindings, standalone registration, native typography CSS, and ${noticeDirectories.length} exact provider notices.`,
+  `Verified external npm install, native and React button isolation, all ${catalog.length} element exports, React subpaths and compatible barrel wrappers, NodeNext types, icon registry, provider isolation, Angular AOT consumer with array-valued multi-select and six other form bindings, standalone registration, native typography CSS, and ${noticeDirectories.length} exact provider notices.`,
 );
 console.log(`Consumer artifacts: ${consumer}`);

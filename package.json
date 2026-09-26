@@ -52,6 +52,10 @@
       "types": "./dist/adapters/react.d.ts",
       "import": "./dist/adapters/react.js"
     },
+    "./react/*": {
+      "types": "./dist/adapters/react/*.d.ts",
+      "import": "./dist/adapters/react/*.js"
+    },
     "./icons": {
       "types": "./dist/icons.d.ts",
       "import": "./dist/icons.js"

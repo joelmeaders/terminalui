@@ -235,7 +235,7 @@ Run `npm run build`, then `npm run dev` to try these examples:
 
 The examples consume the built package. Browser tests check property updates, input events, checked state, disabled state, and application reset. Angular tests also check touched state. Framework dependencies are optional peers and development dependencies. They remain outside the core and standalone bundles.
 
-React 19 uses typed wrappers from `@terminal-kit/core/react`, generated for every catalog element with `@lit/react`. The wrappers forward properties, refs, and native events. Custom events use names such as `onTSelect` and `onTClose`.
+React 19 uses per-component typed wrappers such as `@terminal-kit/core/react/input`, generated for every catalog element with `@lit/react`. These imports include only the chosen wrapper and its element dependencies. The existing `@terminal-kit/core/react` barrel remains compatible and supports removal of unused wrappers in bundlers that honor package side-effect metadata. The wrappers forward properties, refs, and native events. Custom events use names such as `onTSelect` and `onTClose`.
 
 Vue 3 uses `useTerminalModel` from `@terminal-kit/core/vue` to bind typed refs to element properties and events. For Vue SFC templates, configure `isCustomElement` for tags starting with `t-`. Use property binding for arrays and objects.
 

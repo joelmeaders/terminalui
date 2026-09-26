@@ -33,13 +33,15 @@ Object and array properties require JavaScript assignment. Boolean HTML attribut
 
 ## React 19
 
-Install `react` and `@lit/react`. Import typed wrappers from `@terminal-kit/core/react`.
-The wrapper export contains every catalog component. It forwards element properties, refs, children, and native event listeners.
+Install `react` and `@lit/react`. Import typed wrappers from per-component paths such as `@terminal-kit/core/react/input`.
+Each path includes that wrapper and its required element dependencies. It forwards element properties, refs, children, and native event listeners.
+The existing `@terminal-kit/core/react` barrel remains compatible. Bundlers that honor package side-effect metadata can also remove its unused wrappers.
+Per-component paths keep the module graph focused in development and native ESM as well. Use `@terminal-kit/core` when you need to register the complete element catalog.
 The official [Lit React adapter](https://lit.dev/docs/frameworks/react/) supplies this behavior.
 
 ```tsx
 import { useState } from 'react';
-import { TInput, TCheckbox } from '@terminal-kit/core/react';
+import { TInput } from '@terminal-kit/core/react/input';
 import type { TInput as InputElement } from '@terminal-kit/core/components/input';
 import '@terminal-kit/core/themes.css';
 

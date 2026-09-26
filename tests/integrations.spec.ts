@@ -1,4 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+const catalogTags: string[] = JSON.parse(
+  readFileSync(new URL('../dist/catalog.json', import.meta.url), 'utf8'),
+).map((entry: { tagName: string }) => entry.tagName);
 for (const framework of ['plain', 'react', 'vue', 'angular']) {
   test(`${framework}: built package property and event integration`, async ({ page }) => {
     const errors: string[] = [];
@@ -39,3 +43,19 @@ for (const framework of ['react', 'vue', 'angular']) {
     if (framework === 'angular') await expect(page.getByTestId('touched')).toHaveText('false');
   });
 }
+
+test('React example registers only its components and forwards the input ref', async ({ page }) => {
+  await page.goto('/examples/react.html');
+  const input = page.getByRole('textbox', { name: 'Name', exact: true });
+  await expect(input).toHaveValue('Initial');
+  const registered = await page.evaluate(
+    (tags) => tags.filter((tag) => customElements.get(tag)).sort(),
+    catalogTags,
+  );
+  expect(registered).toEqual(['t-button', 't-checkbox', 't-input']);
+  await page.getByRole('button', { name: 'Focus name', exact: true }).click();
+  await expect(input).toBeFocused();
+  await input.press('End');
+  await page.keyboard.type('!');
+  await expect(page.locator('output')).toHaveText('Initial!');
+});
