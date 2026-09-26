@@ -73,8 +73,11 @@ export function observeFloating(
   };
 }
 
-export function activeElement(): HTMLElement | undefined {
-  let current = document.activeElement;
+/** Finds the deepest focused HTML element in its owning document, including adopted elements. */
+export function activeElement(owner: Document = document): HTMLElement | undefined {
+  let current = owner.activeElement;
   while (current?.shadowRoot?.activeElement) current = current.shadowRoot.activeElement;
-  return current instanceof HTMLElement ? current : undefined;
+  return current?.namespaceURI === 'http://www.w3.org/1999/xhtml'
+    ? (current as HTMLElement)
+    : undefined;
 }

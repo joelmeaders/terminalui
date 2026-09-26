@@ -478,6 +478,39 @@ try {
           true,
           `${framework}/${tag}: keyboard resizing must retain focus.`,
         );
+        await host.getByRole('button', { name: 'Open survey', exact: true }).focus();
+        await host.evaluate(async (element) => {
+          element.size = 0;
+          await element.updateComplete;
+        });
+        assert.equal(
+          await separator.evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+          `${framework}/${tag}: collapsing a wrapped custom control must recover focus.`,
+        );
+        await separator.press('Enter');
+        assert.equal(await host.evaluate((element) => element.size), 50);
+        await host.getByRole('button', { name: 'Inspect metadata', exact: true }).focus();
+        await host.evaluate(async (element) => {
+          element.disabled = true;
+          element.size = 100;
+          await element.updateComplete;
+        });
+        assert.equal(
+          await host
+            .locator('[part="primary"]')
+            .evaluate((element) => element === element.getRootNode().activeElement),
+          true,
+          `${framework}/${tag}: disabled recovery must focus the surviving pane.`,
+        );
+        assert.equal(
+          await host.getByRole('button', { name: 'Open survey', exact: true }).count(),
+          1,
+        );
+        assert.equal(
+          await host.getByRole('button', { name: 'Inspect metadata', exact: true }).count(),
+          0,
+        );
       }
       if (tag === 't-tree') {
         const host = page.locator(tag);

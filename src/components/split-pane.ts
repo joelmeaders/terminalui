@@ -1,6 +1,7 @@
 import { css, html, type PropertyValues } from 'lit';
 import { styleMap } from 'lit/directives/style-map.js';
 import { baseStyles, TerminalElement } from '../internal/base';
+import { activeElement } from '../internal/floating';
 
 export interface SplitPaneChange {
   size: number;
@@ -9,6 +10,8 @@ export interface SplitPaneChange {
 }
 /**
  * Two scrollable regions with an accessible, adjustable separator.
+ * Collapsing focused content moves focus to the separator, or the surviving pane when disabled.
+ * Focus recovery follows nested wrappers, rendered slots, and open shadow roots.
  *
  * @slot primary - Primary pane contents.
  *
@@ -62,6 +65,10 @@ export class TSplitPane extends TerminalElement {
   private narrow = false;
   private restoreSize?: number;
   private hiddenSlotted = new Map<Element, string | null>();
+  private focusRecovery?: {
+    from: HTMLElement;
+    part: 'separator' | 'primary' | 'secondary';
+  };
   private resize = new ResizeObserver((entries) => {
     this.narrow = this.stackAt > 0 && entries[0].contentRect.width < this.stackAt;
   });
@@ -146,6 +153,7 @@ export class TSplitPane extends TerminalElement {
   disconnectedCallback() {
     this.resize.disconnect();
     this.drag = undefined;
+    this.focusRecovery = undefined;
     for (const [element, original] of this.hiddenSlotted) {
       if (original === null) element.removeAttribute('aria-hidden');
       else element.setAttribute('aria-hidden', original);
@@ -160,24 +168,32 @@ export class TSplitPane extends TerminalElement {
       : Math.max(this.min, 90);
     this.step = Number.isFinite(this.step) && this.step > 0 ? this.step : 1;
     this.size = this.clamp(this.size);
-    this.moveFocusFromCollapsedPane();
+    this.captureCollapsedFocus();
     if (changed.has('stackAt'))
       this.narrow = this.stackAt > 0 && this.getBoundingClientRect().width < this.stackAt;
   }
-  private moveFocusFromCollapsedPane() {
-    const active = this.ownerDocument.activeElement,
-      pane =
-        this.shadowRoot?.activeElement?.closest('.pane') ?? active?.assignedSlot?.closest('.pane');
-    if (
-      (this.size === 0 && pane?.getAttribute('part') === 'primary') ||
-      (this.size === 100 && pane?.getAttribute('part') === 'secondary')
-    ) {
-      const destination = this.disabled
-        ? this.renderRoot.querySelector<HTMLElement>(
-            this.size === 0 ? '[part="secondary"]' : '[part="primary"]',
-          )
-        : this.renderRoot.querySelector<HTMLElement>('[role="separator"]');
-      destination?.focus();
+  private captureCollapsedFocus() {
+    this.focusRecovery = undefined;
+    const from = activeElement(this.ownerDocument);
+    if (!from) return;
+    let node: Element | undefined = from;
+    while (node && node !== this) {
+      if (node.getRootNode() === this.renderRoot && node.classList.contains('pane')) {
+        if (
+          (this.size === 0 && node.getAttribute('part') === 'primary') ||
+          (this.size === 100 && node.getAttribute('part') === 'secondary')
+        )
+          this.focusRecovery = {
+            from,
+            part: this.disabled ? (this.size === 0 ? 'secondary' : 'primary') : 'separator',
+          };
+        return;
+      }
+      const root = node.getRootNode();
+      node =
+        node.assignedSlot ??
+        node.parentElement ??
+        (root instanceof ShadowRoot ? root.host : undefined);
     }
   }
   private syncSlottedVisibility() {
@@ -205,6 +221,11 @@ export class TSplitPane extends TerminalElement {
   }
   protected updated() {
     this.syncSlottedVisibility();
+    const recovery = this.focusRecovery;
+    this.focusRecovery = undefined;
+    const active = activeElement(this.ownerDocument);
+    if (recovery && (active === recovery.from || active === this.ownerDocument.body))
+      this.renderRoot.querySelector<HTMLElement>(`[part="${recovery.part}"]`)?.focus();
   }
   private clamp(size: number) {
     return Math.max(this.min, Math.min(this.max, Number.isFinite(size) ? size : 50));

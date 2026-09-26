@@ -834,17 +834,34 @@ export const guides: Record<string, ComponentGuide> = {
     accessibility: [
       'The separator supports arrows, Home/End, and Shift for a larger step. Enter moves the primary pane to its minimum size or restores its previous size. If it starts at the minimum, Enter opens it at the midpoint.',
       'Name both panes. The separator uses the primary pane name unless you set label; keep an explicit label aligned with that pane.',
+      'Collapsing focused content moves focus to the separator, or to the surviving pane when resizing is disabled. Recovery follows nested wrappers, slots, and open shadow roots. Changes preserve focus outside the collapsed pane.',
     ],
     example: {
       props: {
         size: 40,
+        min: 0,
+        max: 100,
         primaryLabel: 'Record list',
         secondaryLabel: 'Record details',
       },
       attrs: { style: '--t-split-height: 240px' },
       children: [
-        { tag: 'p', attrs: { slot: 'primary' }, children: ['Atmospheric survey'] },
-        { tag: 'p', attrs: { slot: 'secondary' }, children: ['Survey details and metadata.'] },
+        {
+          tag: 'section',
+          attrs: { slot: 'primary' },
+          children: [
+            { tag: 'p', children: ['Atmospheric survey'] },
+            { tag: 'div', children: [{ tag: 't-button', children: ['Open survey'] }] },
+          ],
+        },
+        {
+          tag: 'section',
+          attrs: { slot: 'secondary' },
+          children: [
+            { tag: 'p', children: ['Survey details and metadata.'] },
+            { tag: 'div', children: [{ tag: 't-button', children: ['Inspect metadata'] }] },
+          ],
+        },
       ],
     },
     event: {
