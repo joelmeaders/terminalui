@@ -1,6 +1,6 @@
 # Terminal Kit
 
-A browser component library built with Lit. All 56 components share six terminal-inspired palettes and work in plain HTML, React, Vue, and Angular. Storybook contains API notes, interactive controls, component states, and browser interaction tests. The package includes typed framework adapters, generated editor metadata, optional icon providers, and an installable local tarball.
+A browser component library built with Lit. All 57 components share six terminal-inspired palettes and work in plain HTML, React, Vue, and Angular. Storybook contains API notes, interactive controls, component states, and browser interaction tests. The package includes typed framework adapters, generated editor metadata, optional icon providers, and an installable local tarball.
 
 ## License
 
@@ -124,6 +124,7 @@ Import the optional [image effects stylesheet](docs/image-effects.md) for scanli
 | `t-description-list`  | Semantic term/value pairs        | `items`, `label`                                                                            |
 | `t-link`              | Native navigation link           | `href`, `target`, `rel`, `download`, default slot                                           |
 | `t-toolbar`           | Arrow-key action group           | `label`, `orientation`, slotted buttons and links                                           |
+| `t-dock`              | Single-row or column workspace   | `orientation`, `align`, `order`, edit handles, edge snapping, width and height              |
 | `t-split-pane`        | Resizable two-pane layout        | `size`, `min`, `max`, `step`, `orientation`, `stackAt`, named slots                         |
 | `t-copy-button`       | Clipboard action and status      | `value`, `label`, `disabled`, `t-copy`, `t-copy-error`                                      |
 
@@ -161,7 +162,7 @@ import '@terminal-kit/core/components/button';
 import '@terminal-kit/core/themes.css';
 ```
 
-The package remains private and unpublished at version `0.1.0`. To install it in another repository, run `npm pack` here, then `npm install /path/to/terminal-kit-core-0.1.0.tgz` there. Importing the package root registers all 56 elements. Individual imports include only their component dependencies. Use one distribution path per page: do not load the standalone bundle and ESM package together.
+The package remains private and unpublished at version `0.1.0`. To install it in another repository, run `npm pack` here, then `npm install /path/to/terminal-kit-core-0.1.0.tgz` there. Importing the package root registers all 57 elements. Individual imports include only their component dependencies. Use one distribution path per page: do not load the standalone bundle and ESM package together.
 
 The build also creates TypeScript declarations, a Custom Elements Manifest, a component catalog, and VS Code HTML metadata. Storybook reads the generated manifest. See [framework integration](docs/frameworks.md) for editor configuration and [release preparation](docs/releasing.md) for package verification and publication boundaries.
 
@@ -331,7 +332,7 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 8.0 KB gzip for one button and 9.9 KB for the original three form controls. Registration of all 56 components measures about 54.9 KB. One selected Ionicons example, its registry, and `t-icon` measure about 10.6 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS measures about 2.2 KB gzip.
+The local size check measures about 8.0 KB gzip for one button and 9.9 KB for the original three form controls. Registration of all 57 components measures about 62.3 KB. A native dock import measures about 16.3 KB; its React wrapper measures about 16.9 KB with React itself excluded. One selected Ionicons example, its registry, and `t-icon` measure about 10.6 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS measures about 2.2 KB gzip.
 
 A selective React button wrapper measures about 8.6 KB, excluding the shared React runtime. Import individual component subpaths to avoid registering the full catalog. Importing and using more exported APIs adds their code.
 
@@ -341,7 +342,7 @@ Import guards remain 8,000 bytes for one native button and 10,000 for the origin
 
 ## Storybook and verification
 
-Storybook includes stories for all 56 components, introductions, appearance examples, and application patterns. Its toolbar changes palette, density, line weight, glow, screen scanlines, and motion. Appearance stories also demonstrate local overrides and the CRT preset. Docs describe slots, events, CSS parts, and form behavior. Stories include interaction checks, and the accessibility addon is configured to fail tests on detected violations.
+Storybook includes stories for all 57 components, introductions, appearance examples, and application patterns. Its toolbar changes palette, density, line weight, glow, screen scanlines, and motion. Appearance stories also demonstrate local overrides and the CRT preset. Docs describe slots, events, CSS parts, and form behavior. Stories include interaction checks, and the accessibility addon is configured to fail tests on detected violations.
 
 ```sh
 npm run build

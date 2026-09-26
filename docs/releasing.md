@@ -16,7 +16,7 @@ The Angular build uses TypeScript 6.0 and Angular compiler 22.1.
 6. Run `npm pack` to create a local installable tarball.
 
 The external package test installs the tarball outside this repository. It verifies the license, all component exports, and strict NodeNext type resolution.
-It also verifies all 56 React wrapper subpaths, their compatibility with the existing barrel, and retained bundle modules for a single native or React button. It tests optional adapter imports, compiles an Angular AOT consumer, and checks standalone browser registration.
+It also verifies all 57 React wrapper subpaths, their compatibility with the existing barrel, and retained bundle modules for a single native or React button and dock. It tests optional adapter imports, compiles an Angular AOT consumer, and checks standalone browser registration.
 The test preserves its temporary consumer path in the output for inspection.
 
 The runtime package depends only on Lit. Framework peers are optional and remain outside the core and standalone bundles.

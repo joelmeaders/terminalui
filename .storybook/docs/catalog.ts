@@ -55,6 +55,65 @@ const field = (
   ...extra,
 });
 export const guides: Record<string, ComponentGuide> = {
+  't-dock': {
+    purpose: 'Arrange application controls in one adjustable row or column.',
+    usage: [
+      'Place elements in the default slot. Native controls and existing components keep their own values, events, and keyboard behavior. Wrap plain text in an element.',
+      'The dock styles its own editor and separators. Style native child controls in your application CSS, with readable colors and sizes that fit the available strip.',
+      'Use orientation="horizontal" or "vertical". align accepts start, end, center, or justify. Justify distributes space between items without stretching their controls. The strip scrolls instead of wrapping.',
+      'Give each item a unique data-dock-id or id and a useful data-dock-label. Supply order as an array of those identifiers. Missing items append in child order. Reordering changes rendered slot order without moving application-owned child elements.',
+      'Select Edit to reveal drag handles. Select Dock settings to open Move earlier/later, Dock position, and Width/Height controls. These provide click, touch, and keyboard alternatives to dragging. Native hr elements are movable separators.',
+      'Activate a handle with Enter or Space to open its matching settings control. Item handles also select their item for Move earlier/later.',
+      'placement accepts inline, top, bottom, left, and right. Parent snapping requires a positioned parent with enough height, such as position:relative; min-height:360px. Set snapTarget="viewport" to use browser edges.',
+      'autoOrient chooses a row at top/bottom and a column at left/right when snapping. Set autoOrient to false to keep an explicit orientation. Width and height use CSS pixels; zero selects automatic sizing. Configure minWidth, maxWidth, minHeight, maxHeight, and step as needed.',
+      'Listen to t-change to save committed order, position, orientation, and dimensions. t-input reports drag previews. Escape or pointer cancellation restores the previous committed state. External property changes emit no user event.',
+      'disabled affects dock editing controls. Set disabled on application controls separately when their actions are unavailable. The dock restores its owned slot and separator attributes when items leave or it disconnects.',
+    ],
+    accessibility: [
+      'Give the group a useful label and each interactive child its own accessible name. The dock uses normal Tab order and does not intercept text-field or composite-widget keys.',
+      'Every drag action has a native click and keyboard alternative. The move handle uses physical arrow directions for edge snapping; the resize handle uses left/right for width and up/down for height. Shift multiplies the size step by ten.',
+      'Focused content retains its identity after reordering. Unavailable items recover to a visible item handle during editing or the Edit control. Disabled editing uses the named group. Outside focus and application-handler focus changes remain intact.',
+      'The item strip remains one row or column at small sizes. Use its native scrolling to reach overflow content. Keep critical controls available elsewhere when a fixed dock can cover application content.',
+      'Committed moves, snapping, and sizing use one polite status message. Avoid announcing the same change from another application live region. Pointer previews do not produce repeated status announcements. Manual assistive-technology and physical touch checks remain required.',
+    ],
+    example: {
+      props: {
+        label: 'Workspace dock',
+        orientation: 'horizontal',
+        align: 'start',
+        width: 640,
+        height: 112,
+        order: ['archive', 'separator', 'filter', 'refresh'],
+      },
+      children: [
+        {
+          tag: 't-button',
+          attrs: { 'data-dock-id': 'archive', 'data-dock-label': 'Archive' },
+          children: ['Open archive'],
+        },
+        {
+          tag: 'hr',
+          attrs: { 'data-dock-id': 'separator', 'data-dock-label': 'Command separator' },
+        },
+        {
+          tag: 't-input',
+          attrs: { 'data-dock-id': 'filter', 'data-dock-label': 'Record filter' },
+          props: { label: 'Filter records', value: 'missions' },
+        },
+        {
+          tag: 't-button',
+          attrs: { 'data-dock-id': 'refresh', 'data-dock-label': 'Refresh' },
+          children: ['Refresh records'],
+        },
+      ],
+    },
+    event: {
+      name: 't-change',
+      read: 'detail',
+      description:
+        'Save event.detail after a committed user action. It includes operation, source, order, placement, orientation, width, and height. Listen to t-edit for edit mode changes and t-input for previews.',
+    },
+  },
   't-accordion': {
     purpose: 'Reveal optional details without leaving the page.',
     usage: [

@@ -6,12 +6,13 @@ export function observeFloating(
   panel: HTMLElement,
   preferred: Placement = 'bottom',
 ) {
+  const view = anchor.ownerDocument.defaultView ?? window;
   const update = () => {
-    const viewport = window.visualViewport;
+    const viewport = view.visualViewport;
     const x = viewport?.offsetLeft ?? 0,
       y = viewport?.offsetTop ?? 0;
-    const width = viewport?.width ?? window.innerWidth,
-      height = viewport?.height ?? window.innerHeight;
+    const width = viewport?.width ?? view.innerWidth,
+      height = viewport?.height ?? view.innerHeight;
     const margin = 8,
       gap = 8;
     panel.style.maxWidth = `${Math.max(0, width - margin * 2)}px`;
@@ -60,16 +61,16 @@ export function observeFloating(
   const observer = new ResizeObserver(update);
   observer.observe(anchor);
   observer.observe(panel);
-  window.addEventListener('scroll', update, true);
-  window.addEventListener('resize', update);
-  window.visualViewport?.addEventListener('resize', update);
-  window.visualViewport?.addEventListener('scroll', update);
+  view.addEventListener('scroll', update, true);
+  view.addEventListener('resize', update);
+  view.visualViewport?.addEventListener('resize', update);
+  view.visualViewport?.addEventListener('scroll', update);
   return () => {
     observer.disconnect();
-    window.removeEventListener('scroll', update, true);
-    window.removeEventListener('resize', update);
-    window.visualViewport?.removeEventListener('resize', update);
-    window.visualViewport?.removeEventListener('scroll', update);
+    view.removeEventListener('scroll', update, true);
+    view.removeEventListener('resize', update);
+    view.visualViewport?.removeEventListener('resize', update);
+    view.visualViewport?.removeEventListener('scroll', update);
   };
 }
 

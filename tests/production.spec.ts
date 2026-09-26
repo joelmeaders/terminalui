@@ -1,4 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+const componentTags: string[] = JSON.parse(
+  readFileSync(new URL('../dist/catalog.json', import.meta.url), 'utf8'),
+).map((component: { tagName: string }) => component.tagName);
 for (const width of [1440, 390]) {
   test(`default component appearance: ${width}`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
@@ -25,61 +29,7 @@ test('production demo retains component registration and working interactions', 
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
   expect(
-    await page.evaluate(() =>
-      [
-        't-button',
-        't-input',
-        't-select',
-        't-multi-select',
-        't-checkbox',
-        't-card',
-        't-badge',
-        't-alert',
-        't-progress',
-        't-accordion',
-        't-tabs',
-        't-dialog',
-        't-tooltip',
-        't-textarea',
-        't-radio-group',
-        't-range',
-        't-switch',
-        't-combobox',
-        't-file-input',
-        't-menu',
-        't-breadcrumb',
-        't-pagination',
-        't-table',
-        't-drawer',
-        't-tree',
-        't-icon',
-        't-icon-button',
-        't-spinner',
-        't-skeleton',
-        't-divider',
-        't-avatar',
-        't-empty-state',
-        't-stack',
-        't-grid',
-        't-popover',
-        't-toast',
-        't-password-input',
-        't-number-input',
-        't-segmented-control',
-        't-rating',
-        't-tags-input',
-        't-color-picker',
-        't-command-palette',
-        't-steps',
-        't-timeline',
-        't-meter',
-        't-description-list',
-        't-link',
-        't-toolbar',
-        't-split-pane',
-        't-copy-button',
-      ].every((tag) => !!customElements.get(tag)),
-    ),
+    await page.evaluate((tags) => tags.every((tag) => !!customElements.get(tag)), componentTags),
   ).toBe(true);
   await page.getByRole('button', { name: 'Initialize', exact: false }).click();
   await expect(page.locator('.event-console')).toContainText('Primary action activated.');
@@ -99,7 +49,7 @@ test('production extensions preserve form, search, copy, icons, and motion behav
   request,
 }) => {
   await page.goto('/');
-  await expect(page.locator('.hero-meta')).toContainText('51 COMPONENTS');
+  await expect(page.locator('.hero-meta')).toContainText('57 COMPONENTS');
   await page.getByRole('spinbutton', { name: 'Crew size', exact: true }).fill('7');
   await page.getByRole('textbox', { name: 'Mission tags', exact: true }).fill('science');
   await page.getByRole('textbox', { name: 'Mission tags', exact: true }).press('Enter');
@@ -130,6 +80,52 @@ test('production extensions preserve form, search, copy, icons, and motion behav
   expect(notice.ok()).toBe(true);
   expect(await notice.text()).toContain('Creative Commons');
 });
+
+for (const width of [1440, 390]) {
+  test(`built dock preserves content and supports edit controls: ${width}`, async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/#dock');
+    const dock = page.locator('#dock t-dock');
+    const filter = dock.getByRole('textbox', { name: 'Filter dock records', exact: true });
+    await filter.fill('flight');
+    await dock.getByRole('button', { name: 'Edit dock', exact: true }).click();
+    await dock.getByRole('button', { name: 'Dock settings', exact: true }).click();
+    await dock.getByRole('combobox', { name: 'Item', exact: true }).selectOption('filter');
+    await dock.getByRole('button', { name: 'Move earlier', exact: true }).click();
+    expect(await dock.evaluate((host: HTMLElement & { order: string[] }) => host.order)).toEqual([
+      'archive',
+      'filter',
+      'separator',
+      'refresh',
+    ]);
+    await expect(filter).toHaveValue('flight');
+    await dock.getByRole('combobox', { name: 'Dock position', exact: true }).selectOption('right');
+    await expect(dock).toHaveAttribute('orientation', 'vertical');
+    await dock.getByRole('spinbutton', { name: 'Width (px)', exact: true }).fill('240');
+    await dock.getByRole('spinbutton', { name: 'Width (px)', exact: true }).press('Tab');
+    await expect
+      .poll(() => dock.evaluate((host: HTMLElement & { width: number }) => host.width))
+      .toBe(240);
+    await dock.getByRole('spinbutton', { name: 'Height (px)', exact: true }).fill('340');
+    await dock.getByRole('spinbutton', { name: 'Height (px)', exact: true }).press('Tab');
+    await expect
+      .poll(() => dock.evaluate((host: HTMLElement & { height: number }) => host.height))
+      .toBe(340);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
+      true,
+    );
+    await page.screenshot({ path: testInfo.outputPath(`dock-settings-${width}.png`) });
+    await dock.getByRole('button', { name: 'Finish editing', exact: true }).click();
+    await dock.getByRole('button', { name: 'Edit dock', exact: true }).focus();
+    await expect(dock.getByRole('button', { name: 'Edit dock', exact: true })).toBeFocused();
+    await expect(filter).toHaveValue('flight');
+    await page
+      .locator('#dock')
+      .screenshot({ path: testInfo.outputPath(`dock-vertical-${width}.png`) });
+  });
+}
 
 test('built meter controls and viewport story expose the styles, sizes, and replay', async ({
   page,
@@ -220,7 +216,7 @@ test('built spinner styles work in the demo selector and Storybook gallery', asy
     await expect(item).toHaveCSS('animation-name', 'none');
 });
 
-// Earlier page references remain available alongside the reviewed table target-size layout.
+// Previous catalog references remain alongside the reviewed dock addition.
 for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {
   test(`visual reference: ${theme}`, async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
@@ -228,7 +224,7 @@ for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {
     await page
       .getByRole('button', { name: theme[0].toUpperCase() + theme.slice(1), exact: true })
       .click();
-    await expect(page).toHaveScreenshot(`table-target-${theme}-desktop.png`, {
+    await expect(page).toHaveScreenshot(`dock-catalog-${theme}-desktop.png`, {
       fullPage: true,
       animations: 'disabled',
       maxDiffPixelRatio: 0.002,
@@ -240,7 +236,7 @@ test('visual reference: mobile and dialog', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await expect(page.getByRole('button', { name: 'Save configuration', exact: true })).toBeVisible();
-  await expect(page).toHaveScreenshot('table-target-amber-mobile.png', {
+  await expect(page).toHaveScreenshot('dock-catalog-amber-mobile.png', {
     fullPage: true,
     animations: 'disabled',
     maxDiffPixelRatio: 0.002,
@@ -285,7 +281,7 @@ for (const profile of [
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
-    await expect(page).toHaveScreenshot(`table-target-${profile.name}.png`, {
+    await expect(page).toHaveScreenshot(`dock-catalog-${profile.name}.png`, {
       fullPage: true,
       animations: 'disabled',
       maxDiffPixelRatio: 0.002,

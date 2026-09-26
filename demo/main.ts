@@ -4,6 +4,7 @@ import '../src/themes.css';
 import './style.css';
 import { library } from './library';
 import { extensions } from './extensions';
+import { dockDemo } from './dock';
 import type { TDialog } from '../src/index';
 
 const themes = [
@@ -117,6 +118,7 @@ function draw() {
           <a class="directory" href="#extensions"
             ><span>07</span> More controls <small>15</small></a
           >
+          <a class="directory" href="#dock"><span>08</span> Workspace dock <small>01</small></a>
           <div class="sidebar-note">
             <span class="crosshair" aria-hidden="true">＋</span>
             <p>FAMILIAR CONTROLS.<br />DIFFERENT ATMOSPHERE.</p>
@@ -136,7 +138,7 @@ function draw() {
                 websites and applications.
               </p>
               <div class="hero-meta">
-                <span>51 COMPONENTS</span><b>+</b><span>06 THEMES</span><b>+</b
+                <span>57 COMPONENTS</span><b>+</b><span>06 THEMES</span><b>+</b
                 ><span>ONE SHARED SYSTEM</span>
               </div>
             </div>
@@ -467,7 +469,7 @@ function draw() {
             ><span>${formMessage || 'Awaiting input. Try a component above.'}</span
             ><span class="cursor" aria-hidden="true">▌</span>
           </div>
-          ${library(draw, action)} ${extensions(draw, action)}
+          ${library(draw, action)} ${extensions(draw, action)} ${dockDemo(action)}
           <footer class="page-footer">
             <span>TERMINAL KIT / V0.1.0</span><span>MODERN PRIMITIVES. ANALOG CHARACTER.</span
             ><a href=${storybookUrl} target="_blank" rel="noreferrer"

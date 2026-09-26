@@ -10,6 +10,7 @@ import { TDatePicker } from '@terminal-kit/core/react/date-picker';
 import { TDateRangePicker } from '@terminal-kit/core/react/date-range-picker';
 import { TDialog } from '@terminal-kit/core/react/dialog';
 import { TDrawer } from '@terminal-kit/core/react/drawer';
+import { TDock } from '@terminal-kit/core/react/dock';
 import { TPagination } from '@terminal-kit/core/react/pagination';
 import { TPasswordInput } from '@terminal-kit/core/react/password-input';
 import { TPopover } from '@terminal-kit/core/react/popover';
@@ -27,6 +28,7 @@ import type { CommandItem } from '@terminal-kit/core/components/command-palette'
 import type { TreeItem } from '@terminal-kit/core/components/tree';
 import type { StepItem } from '@terminal-kit/core/components/steps';
 import type { SplitPaneChange } from '@terminal-kit/core/components/split-pane';
+import type { DockChange, DockEditChange } from '@terminal-kit/core/components/dock';
 
 // Equality detects unknown, any, widened unions, and missing payload fields.
 type Equal<A, B> =
@@ -36,6 +38,9 @@ type HandlerEvent<Props, Name extends keyof Props> =
   NonNullable<Props[Name]> extends (event: infer E) => void ? E : never;
 
 export type CustomEventContracts = [
+  Assert<Equal<HandlerEvent<ComponentProps<typeof TDock>, 'onTInput'>, CustomEvent<DockChange>>>,
+  Assert<Equal<HandlerEvent<ComponentProps<typeof TDock>, 'onTChange'>, CustomEvent<DockChange>>>,
+  Assert<Equal<HandlerEvent<ComponentProps<typeof TDock>, 'onTEdit'>, CustomEvent<DockEditChange>>>,
   Assert<
     Equal<
       HandlerEvent<ComponentProps<typeof TAccordion>, 'onTToggle'>,
@@ -191,6 +196,7 @@ export type CustomEventContracts = [
 ];
 
 export type BarrelCompatibility = [
+  Assert<Equal<ComponentProps<typeof TDock>, ComponentProps<typeof Barrel.TDock>>>,
   Assert<Equal<ComponentProps<typeof TAccordion>, ComponentProps<typeof Barrel.TAccordion>>>,
   Assert<Equal<ComponentProps<typeof TAlert>, ComponentProps<typeof Barrel.TAlert>>>,
   Assert<Equal<ComponentProps<typeof TCalendar>, ComponentProps<typeof Barrel.TCalendar>>>,

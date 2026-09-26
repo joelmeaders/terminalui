@@ -352,11 +352,33 @@ try {
             .filter((child) => child.hasAttribute('slot'))
             .map((child) => child.assignedSlot?.name),
         );
-      assert.deepEqual(
-        actualSlots,
-        expectedSlots,
-        `${framework}/${tag}: slot content was not assigned.`,
-      );
+      if (tag === 't-dock') {
+        assert.equal(
+          actualSlots.length,
+          guides[tag].example.children.length,
+          `${framework}/${tag}: every child must project into its ordered slot.`,
+        );
+        assert(
+          actualSlots.every((name) => typeof name === 'string' && name.length > 0),
+          `${framework}/${tag}: each private item slot must be assigned.`,
+        );
+        assert.equal(
+          await page
+            .locator(tag)
+            .evaluate((element) =>
+              [...element.children].every((child) =>
+                child.assignedSlot?.assignedElements().includes(child),
+              ),
+            ),
+          true,
+        );
+      } else {
+        assert.deepEqual(
+          actualSlots,
+          expectedSlots,
+          `${framework}/${tag}: slot content was not assigned.`,
+        );
+      }
       if (guides[tag].action) {
         await page.getByRole('button', { name: guides[tag].action.label, exact: true }).click();
         assert.equal(
@@ -452,6 +474,80 @@ try {
           true,
         );
         assert.equal(await host.getByRole('status').textContent(), 'Page 1 of 1');
+      }
+      if (tag === 't-dock') {
+        const dock = page.locator(tag);
+        const field = dock.getByRole('textbox', { name: 'Filter records', exact: true });
+        await field.fill('flight');
+        await field.focus();
+        await field.evaluate((input) => input.setSelectionRange(1, 4));
+        await dock.evaluate(async (element) => {
+          element.originalChildren = [...element.children];
+          element.userEvents = [];
+          for (const type of ['t-input', 't-change'])
+            element.addEventListener(type, (event) =>
+              element.userEvents.push({ type, detail: structuredClone(event.detail) }),
+            );
+          element.order = [...element.order].reverse();
+          await element.updateComplete;
+        });
+        assert.equal(
+          await field.evaluate((input) => input === input.getRootNode().activeElement),
+          true,
+        );
+        assert.deepEqual(
+          await field.evaluate((input) => [input.value, input.selectionStart, input.selectionEnd]),
+          ['flight', 1, 4],
+        );
+        assert.deepEqual(await dock.evaluate((element) => element.userEvents), []);
+        await dock.getByRole('button', { name: 'Edit dock', exact: true }).click();
+        await dock.getByRole('button', { name: 'Dock settings', exact: true }).click();
+        await dock.getByRole('combobox', { name: 'Item', exact: true }).selectOption('filter');
+        await dock.getByRole('button', { name: 'Move earlier', exact: true }).click();
+        assert.deepEqual(await dock.evaluate((element) => element.order), [
+          'filter',
+          'refresh',
+          'separator',
+          'archive',
+        ]);
+        assert.equal(
+          await dock.evaluate((element) =>
+            [...element.children].every(
+              (child, index) => child === element.originalChildren[index],
+            ),
+          ),
+          true,
+        );
+        assert.equal(await field.inputValue(), 'flight');
+        const changes = await dock.evaluate((element) => element.userEvents);
+        assert.deepEqual(
+          changes.map((event) => event.type),
+          ['t-input', 't-change'],
+        );
+        assert.equal(changes[1].detail.operation, 'reorder');
+        const width = dock.getByRole('spinbutton', { name: 'Width (px)', exact: true });
+        await width.fill('320');
+        await width.press('Tab');
+        const height = dock.getByRole('spinbutton', { name: 'Height (px)', exact: true });
+        await height.fill('144');
+        await height.press('Tab');
+        assert.equal(await dock.evaluate((element) => element.width), 320);
+        assert.equal(await dock.evaluate((element) => element.height), 144);
+        await dock.evaluate(async (element) => {
+          element.snapTarget = 'viewport';
+          await element.updateComplete;
+        });
+        await dock
+          .getByRole('combobox', { name: 'Dock position', exact: true })
+          .selectOption('bottom');
+        assert.equal(await dock.evaluate((element) => element.placement), 'bottom');
+        assert.equal(await dock.evaluate((element) => element.orientation), 'horizontal');
+        assert.deepEqual(
+          (await dock.evaluate((element) => element.userEvents)).map(
+            (event) => event.detail.operation,
+          ),
+          ['reorder', 'reorder', 'resize', 'resize', 'resize', 'resize', 'snap', 'snap'],
+        );
       }
       if (tag === 't-toolbar') {
         const host = page.locator(tag);

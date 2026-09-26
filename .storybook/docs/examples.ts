@@ -111,10 +111,32 @@ export function markup(
     } else attrs.push(`${attr}="${escapeHtml(value)}"`);
   }
   if (root) attrs.push(...additions);
+  const opening = `<${tag}${attrs.length ? ' ' + attrs.join(' ') : ''}`;
+  if (
+    [
+      'area',
+      'base',
+      'br',
+      'col',
+      'embed',
+      'hr',
+      'img',
+      'input',
+      'link',
+      'meta',
+      'param',
+      'source',
+      'track',
+      'wbr',
+    ].includes(node.tag)
+  ) {
+    if (node.children?.length) throw new Error(`Void element ${node.tag} cannot have children.`);
+    return `${opening}${framework === 'react' ? ' />' : '>'}`;
+  }
   const children = (node.children ?? []).map((child) =>
     typeof child === 'string' ? escapeHtml(child) : markup(child, framework, false),
   );
-  return `<${tag}${attrs.length ? ' ' + attrs.join(' ') : ''}>${children.length ? `\n${children.map((c) => '  ' + c.replaceAll('\n', '\n  ')).join('\n')}\n` : ''}</${tag}>`;
+  return `${opening}>${children.length ? `\n${children.map((c) => '  ' + c.replaceAll('\n', '\n  ')).join('\n')}\n` : ''}</${tag}>`;
 }
 
 /** Complete examples, generated from the same recipe for every framework. */

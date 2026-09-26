@@ -116,6 +116,38 @@ const buttonBundle = await build({
   write: false,
   metafile: true,
 });
+const dockBundle = await build({
+  absWorkingDir: consumer,
+  stdin: { contents: "import '@terminal-kit/core/components/dock';", resolveDir: consumer },
+  bundle: true,
+  minify: true,
+  format: 'iife',
+  write: false,
+  metafile: true,
+});
+const dockInputs = Object.values(dockBundle.metafile.outputs)
+  .flatMap((output) => Object.entries(output.inputs))
+  .filter(([, data]) => data.bytesInOutput > 0)
+  .map(([file]) => file.replaceAll('\\', '/'));
+assert.deepEqual(
+  dockInputs
+    .filter((file) => file.includes('@terminal-kit/core/dist/components/'))
+    .map((file) => file.split('/').at(-1)),
+  ['dock.js'],
+  'A dock subpath must retain only its own component.',
+);
+assert(
+  !dockInputs.some((file) => file.endsWith('/dist/index.js')),
+  'Dock must exclude the catalog.',
+);
+assert(
+  !dockInputs.some((file) =>
+    /node_modules\/(?:react|react-dom|vue|@angular|@lit\/react|ionicons|lucide|@fortawesome|@iconify(?:-json)?)(?:\/|$)/.test(
+      file,
+    ),
+  ),
+  'Native dock must exclude framework runtimes and icon providers.',
+);
 for (const [entry, symbol, expected, excluded] of [
   ['image-pixelate', 'mountPixelation', 'pixelate.js', 'ascii.js'],
   ['image-ascii', 'mountAscii', 'ascii.js', 'pixelate.js'],
@@ -172,11 +204,16 @@ assert(
   ),
   'Core bundle must exclude optional image effects.',
 );
-for (const entry of ['react/button', 'react']) {
+for (const [entry, symbol, component] of [
+  ['react/button', 'TButton', 'button'],
+  ['react', 'TButton', 'button'],
+  ['react/dock', 'TDock', 'dock'],
+  ['react', 'TDock', 'dock'],
+]) {
   const result = await build({
     absWorkingDir: consumer,
     stdin: {
-      contents: `import { TButton } from '@terminal-kit/core/${entry}'; globalThis.exampleButton = TButton;`,
+      contents: `import { ${symbol} } from '@terminal-kit/core/${entry}'; globalThis.exampleComponent = ${symbol};`,
       resolveDir: consumer,
     },
     bundle: true,
@@ -195,15 +232,15 @@ for (const entry of ['react/button', 'react']) {
     included
       .filter((file) => file.includes('@terminal-kit/core/dist/components/'))
       .map((file) => file.split('/').at(-1)),
-    ['button.js'],
-    `${entry}: a used button must not retain unrelated components.`,
+    [`${component}.js`],
+    `${entry}/${symbol}: must not retain unrelated components.`,
   );
   assert.deepEqual(
     included
       .filter((file) => file.includes('@terminal-kit/core/dist/adapters/react/'))
       .map((file) => file.split('/').at(-1)),
-    ['button.js'],
-    `${entry}: a used button must not retain unrelated wrappers.`,
+    [`${component}.js`],
+    `${entry}/${symbol}: must not retain unrelated wrappers.`,
   );
   assert(
     !included.some((file) => file.endsWith('/dist/index.js')),
@@ -370,6 +407,48 @@ try {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('about:blank');
+  await page.addScriptTag({ content: dockBundle.outputFiles[0].text });
+  const isolatedDock = await page.evaluate(
+    async (tags) => {
+      document.body.innerHTML =
+        '<t-dock label="Installed dock"><button data-dock-id="first" data-dock-label="First">First action</button><button data-dock-id="second" data-dock-label="Second">Second action</button></t-dock>';
+      const dock = document.querySelector('t-dock');
+      await dock.updateComplete;
+      const originalChildren = [...dock.children];
+      dock.shadowRoot.querySelector('[part=edit-button]').click();
+      await dock.updateComplete;
+      dock.shadowRoot.querySelector('[part=settings-button]').click();
+      await dock.updateComplete;
+      const select = dock.shadowRoot.querySelector('#dock-item');
+      select.value = 'second';
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      await dock.updateComplete;
+      [...dock.shadowRoot.querySelectorAll('button')]
+        .find((button) => button.textContent.trim() === 'Move earlier')
+        .click();
+      await dock.updateComplete;
+      return {
+        registered: tags.filter((tag) => !!customElements.get(tag)),
+        order: dock.order,
+        unchangedChildren: [...dock.children].every(
+          (child, index) => child === originalChildren[index],
+        ),
+        renderedOrder:
+          dock.children[1].getBoundingClientRect().left <
+          dock.children[0].getBoundingClientRect().left,
+        label: dock.shadowRoot.querySelector('[role=group]').getAttribute('aria-label'),
+      };
+    },
+    catalog.map((entry) => entry.tagName),
+  );
+  assert.deepEqual(isolatedDock, {
+    registered: ['t-dock'],
+    order: ['second', 'first'],
+    unchangedChildren: true,
+    renderedOrder: true,
+    label: 'Installed dock',
+  });
+  await page.goto('about:blank');
   await page.addScriptTag({ content: result.outputFiles[0].text });
   const data = await page.evaluate(() => globalThis.packageResult);
   assert.deepEqual(data, {
@@ -514,6 +593,6 @@ try {
   await browser.close();
 }
 console.log(
-  `Verified external npm install, native and React button isolation, all ${catalog.length} element exports, React subpaths and compatible barrel wrappers, custom event payload contracts, NodeNext types, icon registry, provider isolation, Angular AOT consumer with array-valued multi-select and six other form bindings, standalone registration, native typography CSS, and ${noticeDirectories.length} exact provider notices.`,
+  `Verified external npm install, native and React button/dock isolation, installed dock ordering and content identity, all ${catalog.length} element exports, React subpaths and compatible barrel wrappers, custom event payload contracts, NodeNext types, icon registry, provider isolation, Angular AOT consumer with array-valued multi-select and six other form bindings, standalone registration, native typography CSS, and ${noticeDirectories.length} exact provider notices.`,
 );
 console.log(`Consumer artifacts: ${consumer}`);

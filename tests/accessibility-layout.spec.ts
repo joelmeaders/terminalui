@@ -52,6 +52,7 @@ async function catalog(page: Page) {
         <t-calendar label="Mission date" value="2026-09-25" month="2026-09"></t-calendar>
         <t-grid columns="2"><p>First responsive cell.</p><p>Second responsive cell.</p></t-grid>
         <t-toolbar label="Archive actions"><button type="button">Refresh</button><button type="button">Export</button></t-toolbar>
+        <t-dock label="Record tools"><button type="button" data-dock-id="dock-refresh" data-dock-label="Refresh" style="color:var(--t-text);background:var(--t-surface);border:1px solid var(--t-control-border);font:inherit;min-height:32px;padding:4px 8px">Refresh records</button><hr data-dock-id="dock-separator" data-dock-label="Tools separator"><t-input data-dock-id="dock-query" data-dock-label="Search" label="Dock search" value="missions"></t-input></t-dock>
         <t-split-pane label="Archive divider" primary-label="Record list" secondary-label="Record details"><p slot="primary">Atmospheric survey</p><p slot="secondary">Survey details and metadata.</p></t-split-pane>
       </section>
       <section><h2>Overlays</h2><t-tooltip label="More help" message="Review the information before you continue."></t-tooltip><t-popover label="Quick settings" heading="Quick settings"><t-checkbox label="Show metadata"></t-checkbox></t-popover>

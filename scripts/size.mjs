@@ -4,6 +4,7 @@ import { readFile, readdir } from 'node:fs/promises';
 const count = (await readdir('src/components')).filter((file) => file.endsWith('.ts')).length;
 const scenarios = {
   'One button': 'import "./src/components/button.ts";',
+  'One dock': 'import "./src/components/dock.ts";',
   'Form controls':
     'import "./src/components/input.ts"; import "./src/components/select.ts"; import "./src/components/checkbox.ts";',
   [`All ${count} components`]: 'import "./src/index.ts";',
@@ -13,6 +14,10 @@ const scenarios = {
     'import {TButton} from "./src/adapters/react/button.ts"; globalThis.exampleButton = TButton;',
   'React button (barrel import)':
     'import {TButton} from "./src/adapters/react.ts"; globalThis.exampleButton = TButton;',
+  'React dock (component import)':
+    'import {TDock} from "./src/adapters/react/dock.ts"; globalThis.exampleDock = TDock;',
+  'React dock (barrel import)':
+    'import {TDock} from "./src/adapters/react.ts"; globalThis.exampleDock = TDock;',
 };
 // Guard small imports against unexpected dependencies. Report catalog growth without a fixed cap.
 const importBudgets = {

@@ -18,6 +18,7 @@ export { TDateRangePicker } from './react/date-range-picker';
 export { TDescriptionList } from './react/description-list';
 export { TDialog } from './react/dialog';
 export { TDivider } from './react/divider';
+export { TDock } from './react/dock';
 export { TDrawer } from './react/drawer';
 export { TEmptyState } from './react/empty-state';
 export { TFileInput } from './react/file-input';
