@@ -25,8 +25,9 @@ export function submitOnEnter(event: KeyboardEvent, form: HTMLFormElement | null
     return;
   const submitter = Array.from(form.elements).find(
     (element) =>
-      ((element instanceof HTMLButtonElement || element instanceof HTMLInputElement) &&
-        element.type === 'submit') ||
+      (element.namespaceURI === 'http://www.w3.org/1999/xhtml' &&
+        (element.localName === 'button' || element.localName === 'input') &&
+        (element as HTMLButtonElement | HTMLInputElement).type === 'submit') ||
       (element.localName === 't-button' &&
         (element as HTMLElement & { type: string }).type === 'submit'),
   ) as (HTMLElement & { loading?: boolean }) | undefined;
@@ -37,7 +38,9 @@ export function submitOnEnter(event: KeyboardEvent, form: HTMLFormElement | null
   }
   const blockers = Array.from(form.elements).filter(
     (element) =>
-      (element instanceof HTMLInputElement && blockingTypes.has(element.type)) ||
+      (element.namespaceURI === 'http://www.w3.org/1999/xhtml' &&
+        element.localName === 'input' &&
+        blockingTypes.has((element as HTMLInputElement).type)) ||
       (['t-input', 't-password-input', 't-number-input'].includes(element.localName) &&
         blockingTypes.has((element as HTMLElement & { type: string }).type)) ||
       element.localName === 't-date-picker' ||

@@ -21,16 +21,12 @@ export class TRating extends TRadioGroup {
   max = 5;
   /** Show an action that removes the rating. Required ratings become invalid when cleared. */
   clearable = false;
+  /** Rating layout. Horizontal is the default; vertical stacks the native choices. */
   orientation: 'vertical' | 'horizontal' = 'horizontal';
   private focusedClear?: HTMLElement;
   static styles = [
     ...TRadioGroup.styles,
     css`
-      .options {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
       label {
         min-height: 32px;
         padding: 4px 8px;

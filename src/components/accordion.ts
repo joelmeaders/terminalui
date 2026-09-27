@@ -57,7 +57,7 @@ export class TAccordion extends TerminalElement {
     </details>`;
   }
 }
-customElements.define('t-accordion', TAccordion);
+if (!customElements.get('t-accordion')) customElements.define('t-accordion', TAccordion);
 declare global {
   interface HTMLElementTagNameMap {
     't-accordion': TAccordion;

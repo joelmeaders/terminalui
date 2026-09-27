@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectAxeReport } from './helpers/axe-evidence';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/tests/image-effects.html');
@@ -155,5 +156,5 @@ test('the image remains available at 320 CSS pixels and has no axe violations', 
   ).toHaveCount(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   const results = await new AxeBuilder({ page }).analyze();
-  expect(results.violations).toEqual([]);
+  await expectAxeReport(results);
 });

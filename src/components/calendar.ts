@@ -1,6 +1,7 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { parseDate } from '../internal/date';
+import { activeElement, recoverFocus } from '../internal/floating';
 const isoDate = (date: Date) =>
   `${String(date.getUTCFullYear()).padStart(4, '0')}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
 const isoMonth = (date: Date) => isoDate(date).slice(0, 7);
@@ -271,13 +272,13 @@ export class TCalendar extends TerminalElement {
     if (this.allowed(candidate)) return isoDate(candidate);
     return isoDate(days.find((day) => this.allowed(day)) ?? requested);
   }
-  private focusDay(value: string) {
+  private focusDay(value: string, from: HTMLElement | undefined) {
     void this.updateComplete.then(() => {
+      if (value !== this.focusedDate) return;
       const button = this.renderRoot.querySelector<HTMLButtonElement>(
         `button[data-date="${value}"]`,
       );
-      button?.focus();
-      button?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      recoverFocus(from, button);
     });
   }
   /** Focus the current keyboard day when the calendar is opened from another control. */
@@ -298,9 +299,10 @@ export class TCalendar extends TerminalElement {
     if (min && date < min) date = min;
     if (max && date > max) date = max;
     if (!this.allowed(date)) return;
+    const from = activeElement(this.ownerDocument);
     this.focusedDate = isoDate(date);
     this.showMonth(isoMonth(date));
-    this.focusDay(this.focusedDate);
+    this.focusDay(this.focusedDate, from);
   }
   private navigate(count: number) {
     const next = addMonthsFirst(this.viewMonth(), count);
@@ -357,10 +359,11 @@ export class TCalendar extends TerminalElement {
     if (!this.allowed(date)) return;
     const value = isoDate(date);
     if (value === this.value && !this.range) return;
+    const from = activeElement(this.ownerDocument);
     this.value = value;
     this.focusedDate = this.value;
     this.showMonth(isoMonth(date));
-    this.focusDay(this.value);
+    this.focusDay(this.value, from);
     this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
     this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
     this.emit('t-change', { value: this.value });

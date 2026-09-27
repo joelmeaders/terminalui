@@ -1,5 +1,6 @@
 import { css, html, type PropertyValues } from 'lit';
 import { TInput } from './input';
+import { recoverFocus } from '../internal/floating';
 
 /**
  * Native number field with named step actions. The submitted value remains a string.
@@ -74,15 +75,15 @@ export class TNumberInput extends TInput {
       input.valueAsNumber = Math.min(upper, Math.max(lower, current + count));
     } else input.stepUp(count);
     if (input.value === before) return;
+    const action = this.shadowRoot?.activeElement;
     this.value = input.value;
     this.invalid = false;
     this.syncForm();
     this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
     this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
-    const action = this.shadowRoot?.activeElement;
     if (action instanceof HTMLButtonElement)
       void this.updateComplete.then(() => {
-        if (action.disabled) input.focus({ preventScroll: true });
+        if (action.disabled) recoverFocus(action, input);
       });
   }
   render() {

@@ -4,13 +4,14 @@ import { activeElement } from './floating';
 export function containModalTab(event: KeyboardEvent, dialog: HTMLDialogElement) {
   if (event.key !== 'Tab') return;
   const controls: HTMLElement[] = [];
-  const visit = (element: Element) => {
-    if (element instanceof HTMLSlotElement) {
-      const assigned = element.assignedElements({ flatten: true });
+  const visit = (node: Element) => {
+    if (node.namespaceURI !== 'http://www.w3.org/1999/xhtml') return;
+    const element = node as HTMLElement;
+    if (element.localName === 'slot') {
+      const assigned = (element as HTMLSlotElement).assignedElements({ flatten: true });
       for (const child of assigned.length ? assigned : element.children) visit(child);
       return;
     }
-    if (!(element instanceof HTMLElement)) return;
     if (element.hidden || element.inert || getComputedStyle(element).display === 'none') return;
     if (
       element.tabIndex >= 0 &&
@@ -19,7 +20,7 @@ export function containModalTab(event: KeyboardEvent, dialog: HTMLDialogElement)
       element.getClientRects().length
     )
       controls.push(element);
-    if (element instanceof HTMLDetailsElement && !element.open) {
+    if (element.localName === 'details' && !(element as HTMLDetailsElement).open) {
       // Some engines retain geometry for content hidden by a closed disclosure.
       const summary = [...element.children].find((child) => child.tagName === 'SUMMARY');
       if (summary) visit(summary);
@@ -38,20 +39,20 @@ export function containModalTab(event: KeyboardEvent, dialog: HTMLDialogElement)
     })
     .map((entry) => entry.element);
   const ordered = candidates.filter((element) => {
-    if (!(element instanceof HTMLInputElement) || element.type !== 'radio' || !element.name)
-      return true;
+    const input = element as HTMLInputElement;
+    if (element.localName !== 'input' || input.type !== 'radio' || !input.name) return true;
     const group = candidates.filter(
       (candidate): candidate is HTMLInputElement =>
-        candidate instanceof HTMLInputElement &&
-        candidate.type === 'radio' &&
-        candidate.name === element.name &&
-        candidate.form === element.form &&
+        candidate.localName === 'input' &&
+        (candidate as HTMLInputElement).type === 'radio' &&
+        (candidate as HTMLInputElement).name === input.name &&
+        (candidate as HTMLInputElement).form === input.form &&
         candidate.getRootNode() === element.getRootNode(),
     );
     const stop = group.find((radio) => radio.checked) ?? (event.shiftKey ? group.at(-1) : group[0]);
     return element === stop;
   });
-  const active = activeElement();
+  const active = activeElement(dialog.ownerDocument);
   if (event.shiftKey && active === ordered[0]) {
     event.preventDefault();
     ordered.at(-1)?.focus();

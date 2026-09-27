@@ -36,7 +36,8 @@ export const Default: Story = {
     await userEvent.click(trigger);
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     await userEvent.keyboard('{ArrowDown}');
-    await expect(menu.shadowRoot!.activeElement?.textContent).toBe('Save a copy');
+    await expect(menu.shadowRoot!.activeElement).toHaveAttribute('data-value', 'save');
+    await expect(menu.shadowRoot!.activeElement).toHaveAccessibleName('Save a copy');
     await userEvent.keyboard('{Escape}');
     await expect(menu.shadowRoot!.activeElement).toBe(trigger);
   },
@@ -53,16 +54,19 @@ export const LiveOptions: Story = {
     const menu = canvasElement.querySelector('t-menu')!;
     await userEvent.click(menu.shadowRoot!.querySelector('.trigger')!);
     await userEvent.keyboard('{End}');
-    await expect(menu.shadowRoot!.activeElement?.textContent).toBe('Save a copy');
+    await expect(menu.shadowRoot!.activeElement).toHaveAttribute('data-value', 'save');
+    await expect(menu.shadowRoot!.activeElement).toHaveAccessibleName('Save a copy');
     menu.options = [
       { value: 'save', label: 'Save a copy' },
       { value: 'open', label: 'Open' },
     ];
     await menu.updateComplete;
-    await expect(menu.shadowRoot!.activeElement?.textContent).toBe('Save a copy');
+    await expect(menu.shadowRoot!.activeElement).toHaveAttribute('data-value', 'save');
+    await expect(menu.shadowRoot!.activeElement).toHaveAccessibleName('Save a copy');
     menu.options = [{ value: 'open', label: 'Open' }];
     await menu.updateComplete;
-    await expect(menu.shadowRoot!.activeElement?.textContent).toBe('Open');
+    await expect(menu.shadowRoot!.activeElement).toHaveAttribute('data-value', 'open');
+    await expect(menu.shadowRoot!.activeElement).toHaveAccessibleName('Open');
   },
 };
 export const Empty: Story = {
@@ -82,7 +86,8 @@ export const Empty: Story = {
     menu.options = [{ value: 'open', label: 'Open' }];
     await menu.updateComplete;
     await expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
-    await expect(menu.shadowRoot!.activeElement?.textContent).toBe('Open');
+    await expect(menu.shadowRoot!.activeElement).toHaveAttribute('data-value', 'open');
+    await expect(menu.shadowRoot!.activeElement).toHaveAccessibleName('Open');
     await userEvent.keyboard('{Escape}');
     await expect(menu.shadowRoot!.activeElement).toBe(trigger);
   },

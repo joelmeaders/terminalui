@@ -21,8 +21,10 @@ const scenarios = {
 };
 // Guard small imports against unexpected dependencies. Report catalog growth without a fixed cap.
 const importBudgets = {
-  'One button': 8000,
-  'Form controls': 10000,
+  // Document adoption restores library CSS and native form behavior. The reviewed
+  // 2026-09-26 imports are 8,155 B and 10,112 B; package tests enforce dependency closure.
+  'One button': 8500,
+  'Form controls': 10500,
   'One Ionicons icon': 12000,
   'React button (component import)': 9500,
   'React button (barrel import)': 9500,

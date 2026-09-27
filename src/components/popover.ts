@@ -33,6 +33,7 @@ export class TPopover extends TerminalElement {
   disabled = false;
   placement: Placement = 'bottom';
   private cleanup?: () => void;
+  private listeningDocument?: Document;
   private opener?: HTMLElement;
   private outsidePointer = false;
   private onPointerDown = (event: PointerEvent) => {
@@ -72,7 +73,7 @@ export class TPopover extends TerminalElement {
   ];
   show() {
     if (!this.disabled) {
-      if (!this.open) this.opener = activeElement();
+      if (!this.open) this.opener = activeElement(this.ownerDocument);
       this.open = true;
     }
   }
@@ -84,25 +85,28 @@ export class TPopover extends TerminalElement {
   }
   connectedCallback() {
     super.connectedCallback();
-    document.addEventListener('pointerdown', this.onPointerDown, true);
+    this.listeningDocument = this.ownerDocument;
+    this.listeningDocument.addEventListener('pointerdown', this.onPointerDown, true);
+    this.requestUpdate();
   }
   disconnectedCallback() {
     this.open = false;
     this.cleanup?.();
     this.cleanup = undefined;
     this.opener = undefined;
-    document.removeEventListener('pointerdown', this.onPointerDown, true);
+    this.listeningDocument?.removeEventListener('pointerdown', this.onPointerDown, true);
+    this.listeningDocument = undefined;
     super.disconnectedCallback();
   }
   private containsFocus(panel: HTMLElement) {
-    let node: Node | null = activeElement() ?? null;
+    let node: Node | null = activeElement(this.ownerDocument) ?? null;
     while (node) {
       if (node === panel) return true;
       node =
-        node instanceof Element && node.assignedSlot
-          ? node.assignedSlot
-          : node instanceof ShadowRoot
-            ? node.host
+        node.nodeType === Node.ELEMENT_NODE && (node as Element).assignedSlot
+          ? (node as Element).assignedSlot
+          : 'host' in node
+            ? (node as ShadowRoot).host
             : node.parentNode;
     }
     return false;
@@ -110,7 +114,7 @@ export class TPopover extends TerminalElement {
   private beforeToggle(event: Event) {
     const panel = event.currentTarget as HTMLElement;
     if ((event as ToggleEvent).newState === 'open') {
-      this.opener ??= activeElement();
+      this.opener ??= activeElement(this.ownerDocument);
       this.outsidePointer = false;
       return;
     }
@@ -120,16 +124,17 @@ export class TPopover extends TerminalElement {
     this.outsidePointer = false;
     if (restore && opener?.isConnected)
       setTimeout(() => {
-        const active = activeElement();
+        const active = activeElement(this.ownerDocument);
         if (
           this.isConnected &&
           !panel.matches(':popover-open') &&
-          (!active || active === document.body || this.containsFocus(panel))
+          (!active || active === this.ownerDocument.body || this.containsFocus(panel))
         )
           opener.focus();
       }, 0);
   }
   protected updated(changed: PropertyValues) {
+    if (!this.isConnected) return;
     const panel = this.renderRoot.querySelector<HTMLElement>('[popover]')!;
     if (this.disabled && this.open) {
       this.open = false;

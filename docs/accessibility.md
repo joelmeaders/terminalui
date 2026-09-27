@@ -10,6 +10,8 @@ Manual NVDA and VoiceOver dock validation remains **Pending**. Test group and it
 
 ## Evidence and limits
 
+The 2026-09-26 library consistency review adds regressions for rating orientation, action sizes, stable Steps/Menu identity, calendar and number-field handler focus, initial date-range submission, and components adopted into same-origin embedded documents. Adoption checks cover document listeners, native control traversal, form submitters, scrolling ancestors, style preservation, and cleanup. These are automated browser contracts. Spoken output in embedded documents, NVDA, VoiceOver, physical touch, and real OS settings remain **Pending**. The dated source review and validation results are recorded in `docs/library-review.md`.
+
 The final dock run passed all 147 component cases across Chromium 153.0.8010.12, Firefox 155.0, and Playwright WebKit 26.6 on Windows. All 72 dock scans returned no axe violations or incomplete findings: six palettes, four states, and three engines. Reports are `dock-<theme>-<state>-axe-review.json`. The settings trigger retains its dialog popup and expanded state. Its optional `aria-controls` relation was removed because axe could not resolve that Shadow DOM reference; a regression now rejects unresolved ARIA relations. No rule was disabled.
 
 The full `npm run test:a11y` passed 1,346 cases with 13 documented skips. The full `npm run check` passed build, formatting, types, 232 framework examples, 1,472 browser cases with those 13 skips, 348 Storybook tests, 90 built-site checks, size checks, and the installed-package consumer. Actual 400% Chromium zoom passed for the catalog and all 57 component manuals in all four framework modes. The complete catalog measures 62,340 bytes gzip. A native dock measures 16,320 bytes; direct and selective-barrel React docks measure 16,921 and 16,933 bytes with React excluded. Installed-package checks confirm that these imports retain only the dock component, and that its native ordering preserves application-owned children.
@@ -364,7 +366,7 @@ Remaining coverage or exception:
 
 ### Forms and actions
 
-- Test all 18 form controls: input, textarea, select, multi-select, checkbox, switch, radio group, range, combobox, file input, password input, number input, segmented control, rating, tags input, color picker, date picker, and date-range picker. Confirm each label, value, required state, help message, error message, and disabled state is available without visual guessing.
+- Test all 19 form controls: input, textarea, select, multi-select, checkbox, switch, radio group, range, combobox, file input, password input, number input, segmented control, rating, tags input, color picker, date picker, date-range picker, and time picker. Confirm each label, value, required state, help message, error message, and disabled state is available without visual guessing.
 - Submit an empty required form. Correct each error, then submit again. Check the announced error, focus location, error clearing, and completion message. Test both browser constraints and application errors.
 - Toggle local disabled state and a disabled fieldset. Confirm disabled controls cannot receive unintended actions. Re-enable them and verify input, focus, and submission.
 - Test reset, Enter submission, external form association, submit-button values, keyboard file selection, and range adjustment. Check that state changes remain understandable with speech enabled.

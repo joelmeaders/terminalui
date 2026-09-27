@@ -147,6 +147,24 @@ That consumer exercises model-to-element writes, element input events, touched s
 Angular 22.1.7 requires TypeScript `>=6.0 <6.1`, as declared by its compiler peer dependency.
 Use a supported Node version from [Angular's compatibility reference](https://angular.dev/reference/versions).
 
+## Shared API terms
+
+Use the same terms when configuring related controls. Existing property names remain supported.
+
+| Term                           | Meaning and exceptions                                                                                                                                                                                                                                          |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `size`                         | Named appearance sizes are `small`, `medium`, and `large` for buttons, icon buttons, avatars, chips, spinners, and meters. Most default to medium. Meter defaults to small to preserve its compact track. Icon size is pixels; split-pane size is a percentage. |
+| `orientation`                  | Widget or pane direction is `horizontal` or `vertical`. Radio groups default to vertical; ratings and segmented controls default to horizontal. Stack uses flex `direction="row"` or `"column"`. Divider retains its `vertical` boolean.                        |
+| `value`                        | A scalar field value or selected item ID. Number and rating fields use strings. Tabs retain `active` for the selected tab ID.                                                                                                                                   |
+| `checked` / `values` / `files` | Boolean choice, multiple choices, or native file selection. The table and framework sections describe their model and submission types.                                                                                                                         |
+| `disabled` / `readonly`        | Disabled fields cannot be edited and do not submit. Readonly fields submit their value. Only controls with a meaningful readonly operation expose it; disabling a choice is not a readonly substitute.                                                          |
+| `emptyMessage` / `emptyText`   | Custom empty-state text. Combobox, menu, and multi-select use `emptyMessage`; table and timeline retain `emptyText`.                                                                                                                                            |
+| `placement`                    | Drawer uses logical start/end edges. Floating content and dock use documented physical edges. RTL does not change a physical dock snap target.                                                                                                                  |
+
+Replace array properties when their content changes. Give choices, steps, tabs, tree items, table rows, and dock items stable identifiers according to their component guide. Programmatic form-value updates do not emit user input events. Await `updateComplete` before reading the updated DOM or form state. A component must preserve a focus move that an application handler makes deliberately.
+
+When moving registered elements into another same-origin document, load the theme styles in that document too. The library restores its static shadow styles and uses the owning document for interactions and cleanup. Arbitrary application-owned constructed stylesheets may be dropped by the browser on adoption; the library does not recreate them. The adoption fallback honors the target document's `window.litNonce`. This is not a complete strict-CSP compatibility claim.
+
 ## Editor metadata and verification
 
 The build generates `custom-elements.json`, `catalog.json`, and `vscode.html-custom-data.json` in `dist`.

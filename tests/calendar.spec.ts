@@ -113,6 +113,90 @@ test('user selection emits one input, change, and t-change; programmatic changes
   expect(await calendar.evaluate((element: any) => element.events)).toHaveLength(3);
 });
 
+for (const eventName of ['input', 'change', 't-change', 't-month-change'])
+  for (const destination of ['outside', 'month action'])
+    test(`date selection preserves a ${eventName} handler focus move to ${destination}`, async ({
+      page,
+    }) => {
+      await mount(page);
+      const calendar = page.locator('t-calendar');
+      await calendar.evaluate(
+        (element, { eventName, destination }) => {
+          const outside = document.createElement('button');
+          outside.id = 'outside';
+          outside.textContent = 'Continue';
+          element.after(outside);
+          element.addEventListener(eventName, () => {
+            const target =
+              destination === 'outside'
+                ? outside
+                : element.shadowRoot!.querySelector<HTMLButtonElement>('[part=next]')!;
+            target.focus();
+          });
+        },
+        { eventName, destination },
+      );
+      const selected = eventName === 't-month-change' ? '2026-10-01' : '2026-09-25';
+      await calendar.locator(`[data-date="${selected}"]`).focus();
+      await page.keyboard.press('Enter');
+      await expect(calendar).toHaveJSProperty('value', selected);
+      await calendar.evaluate(
+        async (element: import('../src').TCalendar) => element.updateComplete,
+      );
+      await expect(
+        destination === 'outside' ? page.locator('#outside') : calendar.locator('[part=next]'),
+      ).toBeFocused();
+      await expect(calendar.locator('button[data-date][tabindex="0"]')).toHaveCount(1);
+    });
+
+for (const destination of ['outside', 'month action'])
+  test(`keyboard month navigation preserves a month handler focus move to ${destination}`, async ({
+    page,
+  }) => {
+    await mount(page);
+    const calendar = page.locator('t-calendar');
+    await calendar.evaluate((element, destination) => {
+      const outside = document.createElement('button');
+      outside.id = 'outside';
+      outside.textContent = 'Continue';
+      element.after(outside);
+      element.addEventListener('t-month-change', () => {
+        const target =
+          destination === 'outside'
+            ? outside
+            : element.shadowRoot!.querySelector<HTMLButtonElement>('[part=next]')!;
+        target.focus();
+      });
+    }, destination);
+    await calendar.locator('[data-date="2026-09-24"]').focus();
+    await page.keyboard.press('PageDown');
+    await expect(calendar.locator('#month-heading')).toHaveText('October 2026');
+    await expect(calendar).toHaveJSProperty('value', '2026-09-24');
+    await calendar.evaluate(async (element: import('../src').TCalendar) => element.updateComplete);
+    await expect(
+      destination === 'outside' ? page.locator('#outside') : calendar.locator('[part=next]'),
+    ).toBeFocused();
+  });
+
+for (const initial of ['2026-09-24', '2026-09-30'])
+  test(`batched day movements keep the latest requested focus from ${initial}`, async ({
+    page,
+  }) => {
+    await mount(page, `value="${initial}" month="2026-09"`);
+    const calendar = page.locator('t-calendar');
+    const day = calendar.locator(`[data-date="${initial}"]`);
+    await day.focus();
+    await day.evaluate((element) => {
+      for (const key of ['ArrowRight', 'ArrowLeft'])
+        element.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, composed: true }));
+    });
+    const destination = initial === '2026-09-24' ? '2026-09-23' : '2026-09-29';
+    await expect(calendar.locator(`[data-date="${destination}"]`)).toBeFocused();
+    await expect(calendar.locator('#month-heading')).toHaveText('September 2026');
+    await expect(calendar).toHaveJSProperty('value', initial);
+    await expect(calendar.locator('button[data-date][tabindex="0"]')).toHaveCount(1);
+  });
+
 test('an empty selection and an invalid date range keep the grid understandable', async ({
   page,
 }) => {

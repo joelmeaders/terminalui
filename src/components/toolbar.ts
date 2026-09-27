@@ -121,11 +121,13 @@ export class TToolbar extends TerminalElement {
     const previousIndex = this.actions.indexOf(this.focusedAction!);
     const found: HTMLElement[] = [];
     const slots = new Set<HTMLSlotElement>();
-    const visit = (element: Element) => {
-      if (!(element instanceof HTMLElement)) return;
-      if (element instanceof HTMLSlotElement) {
-        slots.add(element);
-        for (const child of element.assignedElements({ flatten: true })) visit(child);
+    const visit = (node: Element) => {
+      if (node.namespaceURI !== 'http://www.w3.org/1999/xhtml') return;
+      const element = node as HTMLElement;
+      if (element.localName === 'slot') {
+        const slot = element as HTMLSlotElement;
+        slots.add(slot);
+        for (const child of slot.assignedElements({ flatten: true })) visit(child);
         return;
       }
       if (element.matches('button,a[href]')) found.push(element);
@@ -151,7 +153,7 @@ export class TToolbar extends TerminalElement {
       if (!this.originals.has(element))
         this.originals.set(element, element.getAttribute('tabindex'));
     this.actions = found.filter((element) => this.isAvailable(element));
-    const active = activeElement(),
+    const active = activeElement(this.ownerDocument),
       toolbar = this.renderRoot.querySelector<HTMLElement>('[role=toolbar]'),
       lostAction = previousIndex >= 0 && !this.actions.includes(this.focusedAction!);
     if (lostAction) this.current = this.actions[Math.min(previousIndex, this.actions.length - 1)];
@@ -159,7 +161,7 @@ export class TToolbar extends TerminalElement {
     if (this.actions.includes(active!)) this.current = active;
     for (const element of found) element.tabIndex = element === this.current ? 0 : -1;
     this.empty = this.actions.length === 0;
-    if (lostAction || active === toolbar) {
+    if (this.ownerDocument.hasFocus() && (lostAction || active === toolbar)) {
       if (this.current) this.focusAction(this.current);
       else toolbar?.focus();
     }
@@ -179,8 +181,8 @@ export class TToolbar extends TerminalElement {
       const parent: Element | null =
         child.assignedSlot ??
         child.parentElement ??
-        (root instanceof ShadowRoot ? root.host : null);
-      if (parent instanceof HTMLDetailsElement && !parent.open) {
+        ('host' in root ? (root as ShadowRoot).host : null);
+      if (parent?.localName === 'details' && !(parent as HTMLDetailsElement).open) {
         const summary = Array.from(parent.children).find((item) => item.tagName === 'SUMMARY');
         if (child !== summary) return false;
       }
@@ -205,10 +207,11 @@ export class TToolbar extends TerminalElement {
   }
   private onFocusOut() {
     queueMicrotask(() => {
-      const active = activeElement();
+      const active = activeElement(this.ownerDocument);
       if (
         !this.actions.includes(active!) &&
-        (active !== document.body || (this.focusedAction && this.isAvailable(this.focusedAction)))
+        (active !== this.ownerDocument.body ||
+          (this.focusedAction && this.isAvailable(this.focusedAction)))
       )
         this.focusedAction = undefined;
     });

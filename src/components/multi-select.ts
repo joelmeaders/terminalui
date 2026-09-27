@@ -148,7 +148,9 @@ export class TMultiSelect extends FormControl {
     if (changed.has('options')) {
       const active = this.shadowRoot?.activeElement;
       const choice =
-        active instanceof HTMLInputElement && active.type === 'checkbox' ? active : undefined;
+        active?.localName === 'input' && (active as HTMLInputElement).type === 'checkbox'
+          ? (active as HTMLInputElement)
+          : undefined;
       const enabled = [
         ...this.renderRoot.querySelectorAll<HTMLInputElement>(
           'input[type=checkbox]:not(:disabled)',
@@ -157,7 +159,7 @@ export class TMultiSelect extends FormControl {
       this.focusedChoice = choice
         ? { element: choice, value: choice.value, index: enabled.indexOf(choice) }
         : undefined;
-      this.groupHadFocus = active instanceof HTMLFieldSetElement;
+      this.groupHadFocus = active?.localName === 'fieldset';
     }
     if (changed.has('value') && this.value !== this.serialized) {
       try {
@@ -186,15 +188,15 @@ export class TMultiSelect extends FormControl {
     const groupHadFocus = this.groupHadFocus;
     this.focusedChoice = undefined;
     this.groupHadFocus = false;
-    if ((!focused && !groupHadFocus) || this.isDisabled) return;
+    if ((!focused && !groupHadFocus) || this.isDisabled || !this.ownerDocument.hasFocus()) return;
     const group = this.renderRoot.querySelector<HTMLElement>('fieldset');
-    const current = activeElement();
+    const current = activeElement(this.ownerDocument);
     if (
       current &&
       current !== focused?.element &&
       current !== group &&
       current !== this &&
-      current !== document.body
+      current !== this.ownerDocument.body
     )
       return;
     const enabled = [

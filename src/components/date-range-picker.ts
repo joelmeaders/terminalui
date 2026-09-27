@@ -12,6 +12,8 @@ type RangeIssue = { field: 'start' | 'end' | 'both'; message: string; flags: Val
 /**
  * Form-associated ISO date range. The value is `start/end`, with each date in YYYY-MM-DD form.
  * The calendar keeps a draft until both dates are selected; closing it cancels the draft.
+ * Initial start and end serialize the submitted value when no value attribute or nonempty initial value is set.
+ * An explicit value attribute, including an empty value, takes precedence. Reset restores the initial interval.
  *
  * @slot trigger-icon - Decorative icon before the calendar button label.
  * @fires input - A user edited a date or completed a calendar selection. Read `event.target.value`.
@@ -161,8 +163,8 @@ export class TDateRangePicker extends FormControl {
     if (this.entryError) this.invalid = true;
   }
   protected willUpdate(changed: PropertyValues) {
-    if (changed.has('value')) {
-      if (this.value !== this.serialized) this.readValue(this.value);
+    if (changed.has('value') && (this.value !== this.serialized || this.hasAttribute('value'))) {
+      this.readValue(this.value);
     } else if (changed.has('start') || changed.has('end')) {
       this.value = this.serialized = this.serialize();
       this.entryError = '';

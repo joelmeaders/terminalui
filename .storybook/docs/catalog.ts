@@ -335,6 +335,7 @@ export const guides: Record<string, ComponentGuide> = {
     usage: [
       'Enter two YYYY-MM-DD dates, or open the calendar and choose a start followed by an end.',
       'value uses START/END, such as 2026-09-24/2026-10-01. FormData submits that one string under name.',
+      'Initial start/end attributes or properties also form an interval. An explicit value attribute (including empty), or a nonempty initial value property, takes precedence. Reset restores that initial configuration.',
       'Calendar choices stay in a draft until both days are selected. Escape cancels the draft. Choosing an earlier second day starts a new draft.',
       'required needs both dates. min and max bound each date; the end cannot precede the start.',
       'readonly keeps the submitted range without edits. disabled omits it from FormData.',
@@ -616,6 +617,7 @@ export const guides: Record<string, ComponentGuide> = {
     purpose: 'Make a compact action with a clear accessible name.',
     usage: [
       'Set name to a built-in or registered icon key and label to the action.',
+      'Use size="small|medium|large" for the same action-size terms as t-button. Medium follows the inherited density; small and large use fixed target sizes.',
       'pressed=null is a normal button. Use true or false for a toggle button and update state in the application.',
     ],
     accessibility: [
@@ -636,7 +638,7 @@ export const guides: Record<string, ComponentGuide> = {
     },
     [
       'Choose a supported native type and autocomplete value. Use t-textarea for multiple lines.',
-      'Use minlength, maxlength, pattern, or native type constraints. SetCustomValidity messages must be cleared when the value becomes valid.',
+      'Use minlength, maxlength, pattern, or native type constraints. setCustomValidity() messages must be cleared when the value becomes valid.',
     ],
   ),
   't-link': {
@@ -800,6 +802,7 @@ export const guides: Record<string, ComponentGuide> = {
     { name: 'rating', label: 'Mission rating', value: '4', max: 5, clearable: true },
     [
       'Use integer strings for selected values; an empty string means unrated. max is clamped to 1–10.',
+      'Use orientation="horizontal|vertical". Horizontal is the default; both layouts keep native radio keyboard and form behavior.',
       'clearable adds a named action. Clearing a required rating makes it invalid.',
       'Changing max keeps focus on the same value when possible, then the nearest available rating. A required rating becomes invalid if its selected value is removed.',
     ],
@@ -950,7 +953,7 @@ export const guides: Record<string, ComponentGuide> = {
   't-stack': {
     purpose: 'Arrange content in a row or column with shared spacing.',
     usage: [
-      'Set direction, align, justify, and wrap. Use --t-stack-gap to customize spacing.',
+      'Use direction="row|column", align="start|center|end|stretch", and justify="start|center|end|between". Set wrap for multiple lines. Use --t-stack-gap to customize spacing.',
       'Place any content in the default slot. A stack adds layout, not application semantics.',
     ],
     accessibility: [
@@ -968,6 +971,7 @@ export const guides: Record<string, ComponentGuide> = {
     purpose: 'Navigate a multi-step task with visible state.',
     usage: [
       'Items use id, label, and optional description/status/disabled. value selects the current ID.',
+      'Give each item a unique, stable ID. Live changes preserve the focused action by ID; unavailable actions recover to a visible step without moving outside or application-managed focus.',
       'The application owns panels, validation, and whether users can advance. Use pending, complete, or error status text.',
     ],
     accessibility: [
@@ -1000,7 +1004,7 @@ export const guides: Record<string, ComponentGuide> = {
     usage: [
       'Provide columns with key, label, and optional sortable. Each key reads a plain-text row value.',
       'Give rows stable unique identifiers through rowKey. Replace arrays when data changes.',
-      'Set filterable to show a search field. Query searches the displayed columns. PageSize enables local paging; page is one-based.',
+      'Set filterable to show a search field. Query searches the displayed columns. pageSize enables local paging; page is one-based.',
       'Sorting, filtering, and paging are local. The table does not fetch data, virtualize rows, or edit cells. Set loading, emptyText, or noResultsText for those states.',
     ],
     accessibility: [

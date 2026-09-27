@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectAxeReport } from './helpers/axe-evidence';
 import { writeFile } from 'node:fs/promises';
 import type { TTree, TreeItem } from '../src/components/tree';
 
@@ -217,14 +218,14 @@ test('menu exposes popup state without an unresolved ID reference', async ({ pag
   await expect(trigger).toHaveAttribute('aria-expanded', 'false');
   expect(await trigger.getAttribute('aria-controls')).toBeNull();
   const closed = await new AxeBuilder({ page }).include('t-menu').analyze();
-  expect(closed.violations).toEqual([]);
+  await expectAxeReport(closed, 'closed-menu-axe-review');
   expect(closed.incomplete.filter((result) => result.id === 'aria-valid-attr-value')).toEqual([]);
   await trigger.click();
   await expect(trigger).toHaveAttribute('aria-expanded', 'true');
   expect(await trigger.getAttribute('aria-controls')).toBeNull();
   await expect(page.locator('t-menu #menu')).toBeVisible();
   const open = await new AxeBuilder({ page }).include('t-menu').analyze();
-  expect(open.violations).toEqual([]);
+  await expectAxeReport(open, 'open-menu-axe-review');
   expect(open.incomplete.filter((result) => result.id === 'aria-valid-attr-value')).toEqual([]);
   await page.keyboard.press('Escape');
   await expect(trigger).toHaveAttribute('aria-expanded', 'false');
@@ -271,7 +272,7 @@ test('menu preserves a focused action through live option changes and recovers w
   });
   await expect(page.getByRole('menuitem', { name: 'Retry' })).toBeFocused();
   const axe = await new AxeBuilder({ page }).include('t-menu').analyze();
-  expect(axe.violations, JSON.stringify(axe.violations)).toEqual([]);
+  await expectAxeReport(axe);
   await page.keyboard.press('Escape');
   await expect(trigger).toBeFocused();
 });
@@ -527,7 +528,7 @@ test('tree exposes each expanded child group inside its named parent', async ({
   });
   if (results.incomplete.length)
     console.log('tree axe review items:', results.incomplete.map((item) => item.id).join(', '));
-  expect(results.violations).toEqual([]);
+  await expectAxeReport(results);
 });
 
 test('tree keeps focus near a live collapsed or removed branch without changing selection', async ({
@@ -614,5 +615,5 @@ test('new navigation and table surfaces pass automated accessibility checks', as
     document.querySelector('t-table')!.rows = [{ id: 1, name: 'Ada' }];
   });
   const results = await new AxeBuilder({ page }).include('#fixture').analyze();
-  expect(results.violations).toEqual([]);
+  await expectAxeReport(results);
 });

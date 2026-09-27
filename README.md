@@ -168,7 +168,7 @@ The build also creates TypeScript declarations, a Custom Elements Manifest, a co
 
 ## Forms and events
 
-All 18 form controls use `ElementInternals` to participate in HTML forms. They support FormData, browser validation, disabled fieldsets, and reset. Give each field a `name` for submission and a `label` for its internal native control. Reset restores the initial value or checked state and clears file selection. Set initial property values before the first render when using framework bindings. Tags and multi-select expose a `values` array and a JSON string `value`; FormData contains one entry per selected item under the same name. Multi-select uses labeled native checkboxes and can filter choices without clearing selection. Number and rating values are strings. Date-range values use one `START/END` ISO string.
+All 19 form controls use `ElementInternals` to participate in HTML forms. They support FormData, browser validation, disabled fieldsets, and reset. Give each field a `name` for submission and a `label` for its internal native control. Reset restores the initial value or checked state and clears file selection. Set initial property values before the first render when using framework bindings. Tags and multi-select expose a `values` array and a JSON string `value`; FormData contains one entry per selected item under the same name. Multi-select uses labeled native checkboxes and can filter choices without clearing selection. Number and rating values are strings. Date-range values use one `START/END` ISO string.
 
 Use Terminal Kit or native submit and reset buttons:
 
@@ -332,13 +332,13 @@ See [icon provider setup and licensing](docs/icons.md) for the other formats, se
 
 Controls use short state transitions. Overlays use finite entrance effects, while loading indicators can repeat during work. Device reduced-motion preferences disable these effects. Set `data-motion="off"` on a page or subtree to disable them explicitly, or `auto` to follow the device. Focus, closing, and form actions remain immediate. See [motion settings and tokens](docs/motion.md).
 
-The local size check measures about 8.0 KB gzip for one button and 9.9 KB for the original three form controls. Registration of all 57 components measures about 62.3 KB. A native dock import measures about 16.3 KB; its React wrapper measures about 16.9 KB with React itself excluded. One selected Ionicons example, its registry, and `t-icon` measure about 10.6 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS measures about 2.2 KB gzip.
+The local size check measures about 8.2 KB gzip for one button and 10.1 KB for the original three form controls. Registration of all 57 components measures about 63 KB. A native dock import measures about 16.5 KB; its React wrapper measures about 17.1 KB with React itself excluded. One selected Ionicons example, its registry, and `t-icon` measure about 10.8 KB. These figures include Lit and exclude theme CSS and fonts. Six-theme CSS measures about 2.2 KB gzip.
 
-A selective React button wrapper measures about 8.6 KB, excluding the shared React runtime. Import individual component subpaths to avoid registering the full catalog. Importing and using more exported APIs adds their code.
+A selective React button wrapper measures about 8.7 KB, excluding the shared React runtime. Import individual component subpaths to avoid registering the full catalog. Importing and using more exported APIs adds their code.
 
 The complete catalog size is reported without a fixed ceiling. Keep features and review growth for unnecessary complexity.
 
-Import guards remain 8,000 bytes for one native button and 10,000 for the original three form controls. The guard for one icon provider is 12,000 bytes. Both React button imports use a 9,500-byte guard. Review a guard when an intentional feature changes its import. The installed-package check also verifies the retained module graph, so small imports cannot retain unrelated components.
+Import guards are 8,500 bytes for one native button and 10,500 for the original three form controls. The document-adoption fixes added about 0.2 KB to those scenarios. The guard for one icon provider is 12,000 bytes. Both React button imports use a 9,500-byte guard. Review a guard when an intentional feature changes its import. The installed-package check also verifies the retained module graph, so small imports cannot retain unrelated components.
 
 ## Storybook and verification
 
@@ -358,7 +358,9 @@ npm run format:check
 
 `npm run check` runs the full validation sequence. No tests contact application backends or alter external data.
 
-The package check installs the tarball into an external temporary consumer. It checks strict NodeNext types, individual exports, Angular AOT compilation, and standalone registration. It also checks framework isolation and native and React button imports for unrelated components. The size check measures small imports separately from the complete catalog. CI configuration runs browser and package checks on Linux and production screenshot checks on Windows. A configured workflow does not establish a remote CI result.
+The [2026-09-26 library review](docs/library-review.md) records component uniformity, code and test findings, corrections, and remaining release gaps. It is a dated maintainer snapshot; Storybook remains the component manual.
+
+The package check installs the tarball into an external temporary consumer. It checks strict NodeNext types, individual exports, Angular AOT compilation, and standalone registration. It also checks framework isolation and the required dependency closure of every native and React component import. The size check measures small imports separately from the complete catalog. CI configuration runs browser and package checks on Linux and production screenshot checks on Windows. A configured workflow does not establish a remote CI result.
 
 Production tests compare saved screenshots for all six palettes, a mobile layout, a modal dialog, and selected display styles. Component-area references include the accessibility contrast corrections; the original `base-components` images remain as historical references. Browser tests cover nested overrides, texture boundaries, persistence, forced colors, and accessibility with effects enabled. The committed reference images use Playwright Chromium on Windows. Review intentional visual changes before regenerating references with `npx playwright test --config playwright.production.config.ts --update-snapshots`. Other operating systems need their own reviewed reference images.
 

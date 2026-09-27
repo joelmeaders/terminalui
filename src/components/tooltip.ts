@@ -13,6 +13,7 @@ export class TTooltip extends TerminalElement {
   placement: Placement = 'top';
   private open = false;
   private cleanup?: () => void;
+  private listeningDocument?: Document;
   private closeTimer?: ReturnType<typeof setTimeout>;
   private hovered = false;
   private clearCloseTimer() {
@@ -91,11 +92,11 @@ export class TTooltip extends TerminalElement {
     this.hovered = false;
     this.cleanup?.();
     this.cleanup = undefined;
-    document.removeEventListener('keydown', this.escape);
-    document.removeEventListener('pointermove', this.trackPointer, true);
+    this.removeDocumentListeners();
     super.disconnectedCallback();
   }
   protected updated(changed: PropertyValues) {
+    if (!this.isConnected) return;
     const panel = this.renderRoot.querySelector<HTMLElement>('#tip')!;
     if (this.open && !panel.matches(':popover-open')) panel.showPopover();
     if (!this.open && panel.matches(':popover-open')) panel.hidePopover();
@@ -106,14 +107,19 @@ export class TTooltip extends TerminalElement {
         panel,
         this.placement,
       );
-      document.addEventListener('keydown', this.escape);
-      document.addEventListener('pointermove', this.trackPointer, true);
+      this.listeningDocument = this.ownerDocument;
+      this.listeningDocument.addEventListener('keydown', this.escape);
+      this.listeningDocument.addEventListener('pointermove', this.trackPointer, true);
     } else if (!this.open) {
       this.cleanup?.();
       this.cleanup = undefined;
-      document.removeEventListener('keydown', this.escape);
-      document.removeEventListener('pointermove', this.trackPointer, true);
+      this.removeDocumentListeners();
     }
+  }
+  private removeDocumentListeners() {
+    this.listeningDocument?.removeEventListener('keydown', this.escape);
+    this.listeningDocument?.removeEventListener('pointermove', this.trackPointer, true);
+    this.listeningDocument = undefined;
   }
   render() {
     return html`<div

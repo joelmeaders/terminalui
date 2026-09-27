@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectAxeReport } from './helpers/axe-evidence';
 
 async function fixture(page: Page, markup: string) {
   await page.route('**/@vite/client', (route) =>
@@ -118,7 +119,7 @@ test('live options keep focus on the same choice or move it within the named gro
       .evaluate((form: HTMLFormElement) => new FormData(form).getAll('teams')),
   ).toEqual([]);
   const axe = await new AxeBuilder({ page }).include('t-multi-select').analyze();
-  expect(axe.violations, JSON.stringify(axe.violations)).toEqual([]);
+  await expectAxeReport(axe);
 });
 
 test('required and custom errors target the actual choices and clear on correction', async ({
@@ -171,7 +172,7 @@ test('an empty required choice group remains a focusable validation target', asy
   await expect(group).toHaveAccessibleDescription('Choose at least one option.');
   await expect(group).toHaveCSS('outline-width', '2px');
   const axe = await new AxeBuilder({ page }).include('t-multi-select').analyze();
-  expect(axe.violations, JSON.stringify(axe.violations)).toEqual([]);
+  await expectAxeReport(axe);
 });
 
 test('disabled and unavailable options do not submit; palettes have no axe violations', async ({

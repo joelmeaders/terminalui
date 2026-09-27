@@ -1,6 +1,7 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
+import { repeat } from 'lit/directives/repeat.js';
 import { baseStyles, TerminalElement } from '../internal/base';
-import { observeFloating } from '../internal/floating';
+import { observeFloating, recoverFocus } from '../internal/floating';
 import { inlineSlotStyles } from '../internal/slots';
 
 export interface MenuOption {
@@ -46,7 +47,9 @@ export class TMenu extends TerminalElement {
   private search = '';
   private searchTime = 0;
   private cleanup?: () => void;
+  private listeningDocument?: Document;
   private focusedOption?: { value: string; index: number };
+  private focusBeforeUpdate?: HTMLElement;
   private menuHadFocus = false;
   static styles = [
     baseStyles,
@@ -114,28 +117,33 @@ export class TMenu extends TerminalElement {
   connectedCallback() {
     super.connectedCallback();
     this.requestUpdate();
-    document.addEventListener('pointerdown', this.outside);
-    document.addEventListener('focusin', this.outside);
+    this.listeningDocument = this.ownerDocument;
+    this.listeningDocument.addEventListener('pointerdown', this.outside);
+    this.listeningDocument.addEventListener('focusin', this.outside);
   }
   disconnectedCallback() {
     this.open = false;
     super.disconnectedCallback();
     this.cleanup?.();
     this.cleanup = undefined;
-    document.removeEventListener('pointerdown', this.outside);
-    document.removeEventListener('focusin', this.outside);
+    this.listeningDocument?.removeEventListener('pointerdown', this.outside);
+    this.listeningDocument?.removeEventListener('focusin', this.outside);
+    this.listeningDocument = undefined;
+    this.focusBeforeUpdate = undefined;
   }
   protected willUpdate(changed: PropertyValues) {
     if (!changed.has('options') || !this.open) return;
     const active = this.shadowRoot?.activeElement;
     const panel = this.renderRoot.querySelector<HTMLElement>('#menu');
     this.menuHadFocus = active === panel || active?.getAttribute('role') === 'menuitem';
+    this.focusBeforeUpdate = this.menuHadFocus ? (active as HTMLElement) : undefined;
     const item = active?.getAttribute('role') === 'menuitem' ? (active as HTMLButtonElement) : null;
     this.focusedOption = item
       ? { value: item.dataset.value ?? '', index: this.buttons().indexOf(item) }
       : undefined;
   }
   protected updated(changed: PropertyValues) {
+    if (!this.isConnected) return;
     if (this.disabled && this.open) {
       this.open = false;
       return;
@@ -159,12 +167,14 @@ export class TMenu extends TerminalElement {
     else if (changed.has('options') && this.open && this.menuHadFocus) {
       const buttons = this.buttons();
       const match = buttons.find((button) => button.dataset.value === this.focusedOption?.value);
-      this.focusAction(
-        match ?? buttons[Math.min(this.focusedOption?.index ?? 0, buttons.length - 1)] ?? panel,
-      );
+      const target =
+        match ?? buttons[Math.min(this.focusedOption?.index ?? 0, buttons.length - 1)] ?? panel;
+      this.syncTabStops(target);
+      if (this.ownerDocument.hasFocus()) recoverFocus(this.focusBeforeUpdate, target);
     }
     this.menuHadFocus = false;
     this.focusedOption = undefined;
+    this.focusBeforeUpdate = undefined;
   }
   private buttons() {
     return [
@@ -276,7 +286,25 @@ export class TMenu extends TerminalElement {
         aria-label=${this.label}
         @keydown=${this.onKey}
       >
-        ${this.options.map((option) => (option.separator ? html`<div role="separator"></div>` : html`<button part="item" type="button" role="menuitem" data-value=${option.value} tabindex="-1" ?disabled=${option.disabled} @focus=${(event: FocusEvent) => this.syncTabStops(event.currentTarget as HTMLElement)} @click=${() => this.choose(option)}>${option.label}</button>`))}
+        ${repeat(
+          this.options,
+          (option) => option.value,
+          (option) =>
+            option.separator
+              ? html`<div role="separator"></div>`
+              : html`<button
+                  part="item"
+                  type="button"
+                  role="menuitem"
+                  data-value=${option.value}
+                  tabindex="-1"
+                  ?disabled=${option.disabled}
+                  @focus=${(event: FocusEvent) => this.syncTabStops(event.currentTarget as HTMLElement)}
+                  @click=${() => this.choose(option)}
+                >
+                  ${option.label}
+                </button>`,
+        )}
         ${hasActions ? nothing : html`<p class="empty" role="status">${this.emptyMessage}</p>`}
       </div>`;
   }

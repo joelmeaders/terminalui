@@ -2,6 +2,7 @@ import { css, html, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { containModalTab } from '../internal/modal-focus';
 import { ModalScrollController } from '../internal/modal-scroll';
+import { activeElement } from '../internal/floating';
 
 /**
  * Modal side panel built on a native dialog. Escape closes it and restores focus.
@@ -112,9 +113,7 @@ export class TDrawer extends TerminalElement {
     const dialog = this.renderRoot.querySelector('dialog')!;
     if (this.open && !dialog.open) {
       if (!this.returnFocus) {
-        let active = document.activeElement;
-        while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
-        if (active instanceof HTMLElement) this.returnFocus = active;
+        this.returnFocus = activeElement(this.ownerDocument);
       }
       this.scrollLock.acquire();
       dialog.showModal();

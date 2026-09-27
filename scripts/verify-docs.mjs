@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process';
 import { createServer } from 'node:http';
 import { build } from 'esbuild';
 import { parse, compileScript } from 'vue/compiler-sfc';
-import { chromium } from '@playwright/test';
+import { chromium, expect } from '@playwright/test';
 
 const out = resolve('test-results/documentation-examples');
 await mkdir(out, { recursive: true });
@@ -119,6 +119,23 @@ for (const component of components) {
   });
 }
 entries.push({ tag: 'typography', docsId: 'introduction-typography--docs' });
+// Keep the published recipes and their handlers intact. Only temporary consumer
+// copies expose the real framework model and setter to the browser verifier.
+const formProbe = '__terminalDocsFormProbe';
+const formTags = components
+  .filter((component) =>
+    component.members.some((member) => member.inheritedFrom?.name === 'FormControl'),
+  )
+  .map((component) => component.tagName)
+  .sort();
+assert.deepEqual(
+  entries
+    .filter(({ tag }) => guides[tag]?.form)
+    .map(({ tag }) => tag)
+    .sort(),
+  formTags,
+  'Every FormControl field needs a generated form model recipe.',
+);
 for (const { tag } of entries) {
   const renderExample = (framework) =>
     tag === 'typography' ? typographyExampleFor(framework) : exampleFor(tag, framework);
@@ -145,6 +162,20 @@ for (const { tag } of entries) {
     );
   }
   await writeFile(join(out, `${tag}.tsx`), reactExample);
+  if (formTags.includes(tag)) {
+    assert(
+      reactExample.includes('const [value, setValue] = useState'),
+      `${tag}: missing React model.`,
+    );
+    assert(reactExample.includes('\n  return ('), `${tag}: missing React render boundary.`);
+    await writeFile(
+      join(out, `${tag}.react.probe.tsx`),
+      reactExample.replace(
+        '\n  return (',
+        `\n  Object.assign(globalThis, { ${formProbe}: { read: () => value, set: setValue } });\n  return (`,
+      ),
+    );
+  }
   await writeFile(join(out, `${tag}.angular.ts`), renderExample('angular'));
   const sfc = renderExample('vue');
   const { descriptor, errors } = parse(sfc, {
@@ -158,6 +189,25 @@ for (const { tag } of entries) {
     templateOptions: { compilerOptions: { isCustomElement: (name) => name.startsWith('t-') } },
   });
   await writeFile(join(out, `${tag}.vue.ts`), compiled.content);
+  if (formTags.includes(tag)) {
+    assert(sfc.includes('const value = ref'), `${tag}: missing Vue model.`);
+    const probeSfc = sfc.replace(
+      '\n</script>',
+      `\nObject.assign(globalThis, { ${formProbe}: { read: () => value.value, set: (next: typeof value.value) => { value.value = next; } } });\n</script>`,
+    );
+    assert.notEqual(probeSfc, sfc, `${tag}: missing Vue setup boundary.`);
+    const { descriptor: probeDescriptor, errors: probeErrors } = parse(probeSfc, {
+      filename: `${tag}.probe.vue`,
+      templateParseOptions: { isCustomElement: (name) => name.startsWith('t-') },
+    });
+    assert.deepEqual(probeErrors, [], `${tag}: Vue probe SFC parse errors.`);
+    const probeCompiled = compileScript(probeDescriptor, {
+      id: `${tag}-probe`,
+      inlineTemplate: true,
+      templateOptions: { compilerOptions: { isCustomElement: (name) => name.startsWith('t-') } },
+    });
+    await writeFile(join(out, `${tag}.vue.probe.ts`), probeCompiled.content);
+  }
 }
 await writeFile(join(out, 'catalog.json'), JSON.stringify(entries, null, 2));
 await writeFile(join(out, 'example.css'), examples.exampleCss);
@@ -204,10 +254,17 @@ execFileSync(
 for (const framework of ['react', 'vue', 'angular']) {
   const ext = framework === 'react' ? 'tsx' : framework === 'vue' ? 'vue.ts' : 'angular.ts';
   const imports = entries
-    .map(
-      ({ tag }, i) =>
-        `import ${framework === 'vue' ? `Example${i}` : `{ Example as Example${i} }`} from './${framework === 'angular' ? 'angular-build/' : ''}${tag}.${framework === 'angular' ? 'angular.js' : ext}';`,
-    )
+    .map(({ tag }, i) => {
+      const suffix =
+        framework === 'angular'
+          ? 'angular.js'
+          : formTags.includes(tag)
+            ? framework === 'react'
+              ? 'react.probe.tsx'
+              : 'vue.probe.ts'
+            : ext;
+      return `import ${framework === 'vue' ? `Example${i}` : `{ Example as Example${i} }`} from './${framework === 'angular' ? 'angular-build/' : ''}${tag}.${suffix}';`;
+    })
     .join('\n');
   const map = entries.map(({ tag }, i) => `'${tag}': Example${i}`).join(',');
   const boot =
@@ -215,7 +272,7 @@ for (const framework of ['react', 'vue', 'angular']) {
       ? `import React from 'react'; import { createRoot } from 'react-dom/client'; createRoot(document.querySelector('#app')).render(React.createElement(Example));`
       : framework === 'vue'
         ? `import { createApp } from 'vue'; createApp(Example).mount('#app');`
-        : `import '@angular/compiler'; import { bootstrapApplication } from '@angular/platform-browser'; await bootstrapApplication(Example);`;
+        : `import '@angular/compiler'; import { bootstrapApplication } from '@angular/platform-browser'; const app = await bootstrapApplication(Example); const instance = app.components[0].instance; if (instance.control) Object.assign(globalThis, { ${formProbe}: { read: () => instance.control.value, set: (next) => instance.control.setValue(next) } });`;
   await build({
     stdin: {
       contents: `${framework === 'angular' ? "import '@angular/compiler';\n" : ''}${imports}\nimport '@terminal-kit/core/themes.css';\nimport '@terminal-kit/core/typography.css';\nconst Example = ({${map}})[new URLSearchParams(location.search).get('component')];\n${boot}`,
@@ -278,6 +335,193 @@ async function verifyWrappedChoice(host, role, label) {
     layout.width <= layout.available + 1 && !layout.clipped,
     `${role}: complete label must fit the row.`,
   );
+}
+const formEvidence = [];
+async function readFormProbe(page, tag, property) {
+  return page.evaluate(
+    async ({ tag, property, probeName }) => {
+      const element = document.querySelector(tag);
+      await element.updateComplete;
+      const normalize = (value) =>
+        value instanceof FileList
+          ? Array.from(value, ({ name, size, type }) => ({ name, size, type }))
+          : Array.isArray(value)
+            ? Array.from(value)
+            : value;
+      const root = element.shadowRoot;
+      const control = root.querySelector('input,select,textarea');
+      let native;
+      if (property === 'checked') native = control.checked;
+      else if (property === 'files')
+        native = control.files?.length ? normalize(control.files) : null;
+      else if (property === 'values')
+        native = [...root.querySelectorAll('input[type=checkbox]:checked')].map(
+          (input) => input.value,
+        );
+      else if (tag === 't-tags-input')
+        native = JSON.stringify(
+          [...root.querySelectorAll('[part=remove]')].map((button) => button.dataset.tag),
+        );
+      else if (tag === 't-date-range-picker')
+        native = `${root.querySelector('[part=start-input]').value}/${root.querySelector('[part=end-input]').value}`;
+      else if (['t-radio-group', 't-segmented-control', 't-rating'].includes(tag))
+        native = root.querySelector('input:checked')?.value ?? '';
+      else if (tag === 't-combobox')
+        native =
+          element.options.find(
+            (option) => option.value === element.value && option.label === control.value,
+          )?.value ?? '';
+      else native = control.value;
+      return {
+        model: normalize(globalThis[probeName].read()),
+        element: normalize(element[property]),
+        native,
+      };
+    },
+    { tag, property, probeName: formProbe },
+  );
+}
+async function verifyFormModel(page, base, framework, tag) {
+  const guide = guides[tag];
+  const property = guide.form;
+  const props = guide.example.props ?? {};
+  // Reload after the existing component scenario. Those scenarios intentionally
+  // change options and constraints. The model proof starts from the exact recipe.
+  await page.goto(`${base}/${framework}.html?component=${tag}`);
+  await page.waitForFunction((name) => !!globalThis[name], formProbe);
+  const host = page.locator(tag).first();
+  const initial =
+    property === 'files'
+      ? null
+      : property === 'checked'
+        ? (props.checked ?? false)
+        : property === 'values'
+          ? (props.values ?? [])
+          : tag === 't-tags-input'
+            ? JSON.stringify(props.values ?? [])
+            : (props.value ?? '');
+  const check = async (value, phase) => {
+    const expected = { model: value, element: value, native: value };
+    await expect
+      .poll(() => readFormProbe(page, tag, property), {
+        message: `${framework}/${tag}: ${phase} must reach the framework model, host, and native presentation.`,
+        timeout: 5000,
+      })
+      .toEqual(expected);
+    return expected;
+  };
+  const initialState = await check(initial, 'initial binding');
+  await host.evaluate((element) => {
+    element.documentationModelEvents = [];
+    for (const type of ['input', 'change'])
+      element.addEventListener(type, (event) => element.documentationModelEvents.push(event.type));
+  });
+  let userValue;
+  if (property === 'checked') {
+    await host.locator('input[type=checkbox]').click();
+    userValue = !initial;
+  } else if (property === 'files') {
+    const text = 'Selected by the documentation browser check.';
+    await host.locator('input[type=file]').setInputFiles({
+      name: 'docs-user.txt',
+      mimeType: 'text/plain',
+      buffer: Buffer.from(text),
+    });
+    userValue = [{ name: 'docs-user.txt', size: Buffer.byteLength(text), type: 'text/plain' }];
+  } else if (property === 'values') {
+    const option = props.options.find(
+      (option) => !option.disabled && !initial.includes(option.value),
+    );
+    assert(option, `${framework}/${tag}: recipe needs an unselected enabled choice.`);
+    await host.getByRole('checkbox', { name: option.label, exact: true }).check();
+    userValue = [...initial, option.value];
+  } else if (['t-radio-group', 't-segmented-control', 't-rating'].includes(tag)) {
+    const radios = host.locator('input[type=radio]');
+    const index = await radios.evaluateAll(
+      (inputs, initial) => inputs.findIndex((input) => !input.disabled && input.value !== initial),
+      initial,
+    );
+    assert(index >= 0, `${framework}/${tag}: recipe needs another enabled radio.`);
+    userValue = await radios.nth(index).inputValue();
+    await radios.nth(index).click();
+  } else if (tag === 't-select' || tag === 't-combobox') {
+    const option = props.options.find((option) => !option.disabled && option.value !== initial);
+    assert(option, `${framework}/${tag}: recipe needs another enabled option.`);
+    if (tag === 't-select') await host.locator('select').selectOption(option.value);
+    else {
+      await host.getByRole('combobox').fill(option.label);
+      await host.getByRole('option', { name: option.label, exact: true }).click();
+    }
+    userValue = option.value;
+  } else if (tag === 't-range') {
+    await host.locator('input').press('ArrowRight');
+    userValue = String(Number(initial) + Number(props.step ?? 1));
+  } else if (tag === 't-tags-input') {
+    await host.getByRole('textbox').fill('documentation-probe');
+    await host.getByRole('textbox').press('Enter');
+    userValue = JSON.stringify([...JSON.parse(initial), 'documentation-probe']);
+  } else if (tag === 't-date-range-picker') {
+    await host.getByRole('textbox', { name: 'Start date', exact: true }).fill('2026-09-25');
+    await host.getByRole('textbox', { name: 'End date', exact: true }).fill('2026-10-02');
+    userValue = '2026-09-25/2026-10-02';
+  } else {
+    const textValues = {
+      't-input': 'DOCUMENTED MODEL',
+      't-textarea': 'The framework model receives edited mission notes.',
+      't-password-input': 'documentation-password',
+      't-number-input': String(Number(initial) + 1),
+      't-color-picker': '#a6e88b',
+      't-date-picker': '2026-09-25',
+      't-time-picker': '10:45',
+    };
+    assert(Object.hasOwn(textValues, tag), `${framework}/${tag}: add a native model interaction.`);
+    userValue = textValues[tag];
+    await host.locator('input:not([type=color]),textarea').first().fill(userValue);
+  }
+  assert.notDeepEqual(userValue, initial, `${framework}/${tag}: user input must change the model.`);
+  const userState = await check(userValue, 'user interaction');
+  const eventCount = await host.evaluate((element) => element.documentationModelEvents.length);
+  assert(eventCount > 0, `${framework}/${tag}: native interaction must emit its real events.`);
+  let roundTripValue = initial;
+  if (property === 'files') {
+    // Chromium permits FileList assignment from DataTransfer. This proves the
+    // framework binding, not a physical OS picker or restored file permission.
+    const text = 'Assigned through the real framework model.';
+    await page.evaluate(
+      ({ name, text }) => {
+        const data = new DataTransfer();
+        data.items.add(new File([text], 'docs-model.txt', { type: 'text/plain' }));
+        globalThis[name].set(data.files);
+      },
+      { name: formProbe, text },
+    );
+    roundTripValue = [
+      { name: 'docs-model.txt', size: Buffer.byteLength(text), type: 'text/plain' },
+    ];
+  } else
+    await page.evaluate(({ name, value }) => globalThis[name].set(value), {
+      name: formProbe,
+      value: initial,
+    });
+  const roundTripState = await check(roundTripValue, 'model setter round trip');
+  if (property === 'files') {
+    await page.evaluate((name) => globalThis[name].set(null), formProbe);
+    await check(null, 'model file clearing');
+  }
+  assert.equal(
+    await host.evaluate((element) => element.documentationModelEvents.length),
+    eventCount,
+    `${framework}/${tag}: model writes must not emit user input/change events.`,
+  );
+  formEvidence.push({
+    framework,
+    tag,
+    property,
+    initial: initialState,
+    user: userState,
+    roundTrip: roundTripState,
+    fileClear: property === 'files' ? true : undefined,
+  });
 }
 try {
   const page = await browser.newPage();
@@ -1223,11 +1467,23 @@ try {
         );
       }
       assert.deepEqual(errors, [], `${framework}/${tag}: browser errors.`);
+      if (framework !== 'html' && guides[tag].form) {
+        await verifyFormModel(page, base, framework, tag);
+        assert.deepEqual(errors, [], `${framework}/${tag}: form model browser errors.`);
+      }
     }
   }
   console.log(
-    `Verified ${entries.length} guides, metadata coverage, React types, Angular AOT, Vue SFC compilation, and all ${entries.length * 4} examples rendered with their documented properties and slots in Chromium.`,
+    `Verified ${entries.length} guides, metadata coverage, React types, Angular AOT, Vue SFC compilation, and all ${entries.length * 4} examples rendered with their documented properties and slots in Chromium. Verified ${formEvidence.length} generated framework form models through user input and model-to-element round trips.`,
   );
+  assert.deepEqual(
+    formEvidence.map(({ framework, tag }) => `${framework}/${tag}`).sort(),
+    ['react', 'vue', 'angular']
+      .flatMap((framework) => formTags.map((tag) => `${framework}/${tag}`))
+      .sort(),
+    'Every React, Vue, and Angular form recipe needs model proof.',
+  );
+  await writeFile(join(out, 'form-model-evidence.json'), JSON.stringify(formEvidence, null, 2));
 } finally {
   await browser.close();
   await new Promise((resolve) => server.close(resolve));

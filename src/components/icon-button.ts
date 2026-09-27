@@ -19,6 +19,7 @@ export class TIconButton extends TerminalElement {
   disabled = false;
   /** Null means a regular action; true/false exposes a toggle button. */
   pressed: boolean | null = null;
+  /** Button size: small (32px), medium (the inherited control height), or large (50px). */
   size = 'medium';
   static styles = [
     baseStyles,
@@ -46,6 +47,10 @@ export class TIconButton extends TerminalElement {
       :host([size='small']) button {
         width: 32px;
         height: 32px;
+      }
+      :host([size='large']) button {
+        width: 50px;
+        height: 50px;
       }
     `,
   ];

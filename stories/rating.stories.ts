@@ -14,7 +14,9 @@ const meta = {
     required: false,
     disabled: false,
     error: '',
+    orientation: 'horizontal',
   },
+  argTypes: { orientation: { control: 'select', options: ['horizontal', 'vertical'] } },
   parameters: {
     docs: {
       description: {
@@ -32,6 +34,7 @@ const meta = {
       ?required=${a.required}
       ?disabled=${a.disabled}
       error=${a.error}
+      orientation=${a.orientation}
     ></t-rating>`,
 } satisfies Meta;
 export default meta;
@@ -48,6 +51,17 @@ export const Default: Story = {
   },
 };
 export const Selected: Story = { args: { value: '4' } };
+export const Vertical: Story = {
+  args: { orientation: 'vertical' },
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-rating')!;
+    await expect(host.shadowRoot!.querySelector('.options')).toHaveStyle({
+      flexDirection: 'column',
+    });
+    await userEvent.click(host.shadowRoot!.querySelector('input[value="3"]')!);
+    await expect(host.value).toBe('3');
+  },
+};
 export const Disabled: Story = { args: { value: '3', disabled: true } };
 export const Required: Story = { args: { required: true } };
 export const Invalid: Story = { args: { error: 'Select a rating before you continue.' } };

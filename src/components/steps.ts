@@ -1,5 +1,7 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
+import { repeat } from 'lit/directives/repeat.js';
 import { baseStyles, TerminalElement } from '../internal/base';
+import { recoverFocus } from '../internal/floating';
 
 export interface StepItem {
   id: string;
@@ -32,6 +34,7 @@ export class TSteps extends TerminalElement {
   label = 'Steps';
   /** Preferred layout. Horizontal steps wrap on narrow screens. */
   orientation: 'horizontal' | 'vertical' = 'horizontal';
+  private focusedStep?: { from: HTMLElement; id: string; index: number };
   static styles = [
     baseStyles,
     css`
@@ -97,8 +100,35 @@ export class TSteps extends TerminalElement {
     `,
   ];
   protected willUpdate(_changed: PropertyValues) {
+    const from = this.shadowRoot?.activeElement as HTMLElement | null;
+    const actions = [...this.renderRoot.querySelectorAll<HTMLButtonElement>('[part=step]')];
+    this.focusedStep =
+      from?.getAttribute('part') === 'step' || from?.localName === 'nav'
+        ? {
+            from,
+            id: from.dataset.stepId ?? '',
+            index: Math.max(0, actions.indexOf(from as HTMLButtonElement)),
+          }
+        : undefined;
     if (this.items.length && !this.items.some((item) => item.id === this.value))
       this.value = this.items.find((item) => !item.disabled)?.id ?? '';
+  }
+  protected updated() {
+    const focused = this.focusedStep;
+    this.focusedStep = undefined;
+    if (!focused || !this.ownerDocument.hasFocus()) return;
+    const enabled = [
+      ...this.renderRoot.querySelectorAll<HTMLButtonElement>('[part=step]:not(:disabled)'),
+    ];
+    const target =
+      enabled.find((button) => button.dataset.stepId === focused.id) ??
+      enabled[Math.min(focused.index, enabled.length - 1)] ??
+      this.renderRoot.querySelector<HTMLElement>('nav');
+    recoverFocus(focused.from, target);
+  }
+  disconnectedCallback() {
+    this.focusedStep = undefined;
+    super.disconnectedCallback();
   }
   private select(step: StepItem, index: number) {
     if (step.disabled) return;
@@ -106,14 +136,17 @@ export class TSteps extends TerminalElement {
     this.emit('t-select', { value: step.id, index, step });
   }
   render() {
-    return html`<nav part="nav" aria-label=${this.label}>
+    return html`<nav part="nav" aria-label=${this.label} tabindex="-1">
       <ol>
-        ${this.items.map(
+        ${repeat(
+          this.items,
+          (step) => step.id,
           (step, index) =>
             html`<li>
               <button
                 type="button"
                 part="step"
+                data-step-id=${step.id}
                 ?disabled=${step.disabled}
                 aria-current=${step.id === this.value ? 'step' : nothing}
                 @click=${() => this.select(step, index)}
@@ -131,6 +164,7 @@ export class TSteps extends TerminalElement {
             </li>`,
         )}
       </ol>
+      ${this.items.length ? nothing : html`<p role="status">No steps available.</p>`}
     </nav>`;
   }
 }

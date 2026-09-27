@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectAxeReport } from './helpers/axe-evidence';
 import type { TPopover, TToast } from '../src/index';
 
 async function mount(page: Page, content: string) {
@@ -81,7 +82,7 @@ test('toast timers pause on focus and hover, restart on updates, and return focu
 }) => {
   await mount(
     page,
-    `<button id="save">Save</button><t-toast id="toast" duration="1200"></t-toast>`,
+    `<button id="save">Save</button><t-toast id="toast" duration="1200" data-motion="off"></t-toast>`,
   );
   await page
     .locator('#save')
@@ -90,25 +91,29 @@ test('toast timers pause on focus and hover, restart on updates, and return focu
         document.querySelector<TToast>('#toast')!.show('Saved.', el as HTMLElement),
       ),
     );
+  await page.clock.install();
+  await page.clock.pauseAt(new Date(Date.now() + 1000));
   await page.locator('#save').click();
   const close = page.getByRole('button', { name: 'Dismiss notification' });
   await close.focus();
-  await page.waitForTimeout(1350);
+  await page.clock.runFor(1350);
   await expect(close).toBeVisible();
   await close.click();
   await expect(close).not.toBeVisible();
   await expect(page.locator('#save')).toBeFocused();
   await page.locator('#save').click();
   await page.locator('t-toast').hover();
-  await page.waitForTimeout(1350);
+  await page.clock.runFor(1350);
   await expect(close).toBeVisible();
   await page.mouse.move(380, 600);
-  await expect(close).not.toBeVisible({ timeout: 2500 });
+  await page.clock.runFor(1200);
+  await expect(close).not.toBeVisible();
   await page.locator('t-toast').evaluate((el: TToast) => {
     el.duration = 120;
     el.show('Fresh message');
   });
-  await expect(close).not.toBeVisible({ timeout: 1500 });
+  await page.clock.runFor(120);
+  await expect(close).not.toBeVisible();
 });
 
 test('primitives have meaningful names, reduced-motion fallbacks, and responsive layout', async ({
@@ -131,7 +136,48 @@ test('primitives have meaningful names, reduced-motion fallbacks, and responsive
     .locator('t-grid')
     .evaluate((el) => getComputedStyle(el.shadowRoot!.querySelector('div')!).gridTemplateColumns);
   expect(grid.trim().split(' ')).toHaveLength(1);
-  expect((await new AxeBuilder({ page }).include('#fixture').analyze()).violations).toEqual([]);
+  await expectAxeReport(await new AxeBuilder({ page }).include('#fixture').analyze());
+});
+
+test('icon button sizes preserve density, keyboard activation, and disabled behavior', async ({
+  page,
+}) => {
+  await mount(
+    page,
+    '<section data-density="compact"><t-icon-button label="Small settings" size="small"></t-icon-button><t-icon-button label="Settings"></t-icon-button><t-icon-button label="Large settings" size="large"></t-icon-button></section>',
+  );
+  const small = page.getByRole('button', { name: 'Small settings', exact: true });
+  const medium = page.getByRole('button', { name: 'Settings', exact: true });
+  const large = page.getByRole('button', { name: 'Large settings', exact: true });
+  for (const [button, size] of [
+    [small, '32px'],
+    [medium, '34px'],
+    [large, '50px'],
+  ] as const) {
+    await expect(button).toHaveCSS('width', size);
+    await expect(button).toHaveCSS('height', size);
+  }
+  await page.locator('section').evaluate((element) => {
+    element.dataset.density = 'comfortable';
+  });
+  await expect(medium).toHaveCSS('width', '42px');
+  await expect(small).toHaveCSS('width', '32px');
+  await expect(large).toHaveCSS('width', '50px');
+  await page.locator('t-icon-button[size=large]').evaluate((element) => {
+    (window as any).iconActivations = 0;
+    element.addEventListener('click', () => (window as any).iconActivations++);
+  });
+  await large.focus();
+  await page.keyboard.press('Enter');
+  await expect(large).toBeFocused();
+  expect(await page.evaluate(() => (window as any).iconActivations)).toBe(1);
+  await page.locator('t-icon-button[size=large]').evaluate((element: any) => {
+    element.disabled = true;
+  });
+  await expect(large).toBeDisabled();
+  await large.evaluate((element: HTMLButtonElement) => element.click());
+  expect(await page.evaluate(() => (window as any).iconActivations)).toBe(1);
+  await expectAxeReport(await new AxeBuilder({ page }).include('#fixture').analyze());
 });
 
 test('scanline preview uses visible palette stripes and resets to a clear surface', async ({

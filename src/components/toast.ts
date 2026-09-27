@@ -1,6 +1,6 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
-import { activeElement } from '../internal/floating';
+import { activeElement, recoverFocus } from '../internal/floating';
 import { optionalSlotStyles, syncSlot } from '../internal/slots';
 /**
  * Polite dismissible notification. Duration defaults to zero (persistent); timers pause on hover, focus, or hidden pages.
@@ -49,6 +49,7 @@ export class TToast extends TerminalElement {
   private paused = false;
   private hasMessageContent = false;
   private contentObserver = new MutationObserver(() => this.syncMessageContent());
+  private listeningDocument?: Document;
   private frame?: number;
   private nextPaint = 0;
   private timer?: ReturnType<typeof setTimeout>;
@@ -57,6 +58,7 @@ export class TToast extends TerminalElement {
   private hovered = false;
   private focused = false;
   private restoreFocus = false;
+  private closeFocus?: HTMLElement;
   private opener?: HTMLElement;
   private reason: 'dismiss' | 'timeout' | 'programmatic' = 'programmatic';
   // show() must restart even when no public property changes.
@@ -184,7 +186,8 @@ export class TToast extends TerminalElement {
       attributes: true,
       attributeFilter: ['slot'],
     });
-    document.addEventListener('visibilitychange', this.visibility);
+    this.listeningDocument = this.ownerDocument;
+    this.listeningDocument.addEventListener('visibilitychange', this.visibility);
     if (this.open) {
       this.restartRequested = true;
       this.requestUpdate();
@@ -196,21 +199,23 @@ export class TToast extends TerminalElement {
     this.timer = undefined;
     this.stopDisplay();
     this.hovered = this.focused = false;
-    document.removeEventListener('visibilitychange', this.visibility);
+    this.listeningDocument?.removeEventListener('visibilitychange', this.visibility);
+    this.listeningDocument = undefined;
+    this.closeFocus = undefined;
     super.disconnectedCallback();
   }
   private syncMessageContent() {
     // Formatting whitespace between named slots must not hide the message fallback.
     this.hasMessageContent = Array.from(this.childNodes).some((node) =>
-      node instanceof Element
-        ? !node.getAttribute('slot')
+      node.nodeType === Node.ELEMENT_NODE
+        ? !(node as Element).getAttribute('slot')
         : node.nodeType === Node.TEXT_NODE && !!node.textContent?.trim(),
     );
   }
   /** Restart on the next component update. Pass an opener for reliable focus return after pointer activation in Safari. */
   show(message?: string, opener?: HTMLElement) {
     if (message !== undefined) this.message = message;
-    this.opener = opener ?? activeElement();
+    this.opener = opener ?? activeElement(this.ownerDocument);
     this.open = true;
     this.restartRequested = true;
     this.requestUpdate();
@@ -223,6 +228,7 @@ export class TToast extends TerminalElement {
     // Hiding the notice can fire blur before updated() runs, notably in WebKit.
     if (changed.has('open') && !this.open) {
       this.restoreFocus = this.focused;
+      this.closeFocus = this.restoreFocus ? activeElement(this.ownerDocument) : undefined;
       clearTimeout(this.timer);
       this.timer = undefined;
       this.stopDisplay();
@@ -239,8 +245,10 @@ export class TToast extends TerminalElement {
   }
   protected updated(changed: PropertyValues) {
     if (changed.has('open') && !this.open) {
-      if (this.restoreFocus && this.opener?.isConnected) this.opener.focus();
+      if (this.restoreFocus && this.ownerDocument.hasFocus())
+        recoverFocus(this.closeFocus, this.opener);
       this.restoreFocus = false;
+      this.closeFocus = undefined;
       this.hovered = this.focused = false;
       if (changed.get('open') === true) this.emit('t-close', { reason: this.reason });
       this.reason = 'programmatic';
@@ -271,8 +279,8 @@ export class TToast extends TerminalElement {
     if (now >= this.nextPaint) {
       const left = this.timeLeft();
       const reduced =
-        matchMedia('(prefers-reduced-motion: reduce)').matches ||
-        getComputedStyle(this).getPropertyValue('--_t-motion-name').trim() === 'none';
+        (this.ownerDocument.defaultView ?? window).matchMedia('(prefers-reduced-motion: reduce)')
+          .matches || getComputedStyle(this).getPropertyValue('--_t-motion-name').trim() === 'none';
       this.displayedRemaining = left;
       this.nextPaint = now + (reduced ? 1000 : 32);
     }
@@ -302,11 +310,11 @@ export class TToast extends TerminalElement {
       !this.isConnected ||
       this.hovered ||
       this.focused ||
-      document.hidden ||
+      this.ownerDocument.hidden ||
       this.remaining <= 0 ||
       this.timer !== undefined
     ) {
-      this.paused = this.hovered || this.focused || document.hidden;
+      this.paused = this.hovered || this.focused || this.ownerDocument.hidden;
       return;
     }
     this.paused = false;
@@ -320,7 +328,7 @@ export class TToast extends TerminalElement {
     this.startDisplay();
   }
   private visibility = () => {
-    if (document.hidden) this.pause();
+    if (this.ownerDocument.hidden) this.pause();
     else this.resume();
   };
   render() {

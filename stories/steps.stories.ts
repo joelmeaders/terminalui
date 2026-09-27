@@ -38,6 +38,30 @@ export const Default: Story = {
 export const Vertical: Story = {
   render: () => html`<t-steps orientation="vertical" .items=${items} value="review"></t-steps>`,
 };
+export const Empty: Story = {
+  render: () => html`<t-steps label="Request steps"></t-steps>`,
+};
+export const LiveActions: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Stable item IDs preserve focused actions during insertion and reordering. Removing the last action leaves focus on the named navigation region. Application focus moves take precedence.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const steps = canvasElement.querySelector('t-steps')!;
+    const review = steps.shadowRoot!.querySelector<HTMLButtonElement>('[data-step-id="review"]')!;
+    review.focus();
+    steps.items = [{ id: 'prepare', label: 'Preparation' }, ...items];
+    await steps.updateComplete;
+    await expect(steps.shadowRoot!.activeElement).toBe(review);
+    steps.items = [];
+    await steps.updateComplete;
+    await expect(steps.shadowRoot!.activeElement).toBe(steps.shadowRoot!.querySelector('nav'));
+  },
+};
 export const LongLabels: Story = {
   render: () =>
     html`<div style="max-width:280px">

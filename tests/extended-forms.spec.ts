@@ -142,6 +142,53 @@ test('segmented choices and ratings use native radios, disabled skipping and cle
   await expect(page.getByRole('radio', { name: 'List', exact: true })).toBeChecked();
 });
 
+test('rating orientation changes layout without changing focus, events, or form behavior', async ({
+  page,
+}) => {
+  await fixture(
+    page,
+    '<button id="outside">Outside</button><form><t-rating label="Experience" name="rating" required value="2"></t-rating></form>',
+  );
+  const host = page.locator('t-rating');
+  const choices = host.locator('.options');
+  await expect(choices).toHaveCSS('flex-direction', 'row');
+  await expect(choices).toHaveCSS('gap', '16px');
+  await page.locator('#outside').focus();
+  await host.evaluate((element: any) => {
+    (window as any).ratingEvents = [];
+    for (const name of ['input', 'change'])
+      element.addEventListener(name, (event: Event) => {
+        (window as any).ratingEvents.push({ name: event.type, value: element.value });
+      });
+    element.orientation = 'vertical';
+  });
+  await expect(choices).toHaveCSS('flex-direction', 'column');
+  await expect(choices).toHaveCSS('gap', '8px');
+  await expect(page.locator('#outside')).toBeFocused();
+  await page.getByRole('radio', { name: '2 of 5 stars' }).focus();
+  await page.keyboard.press('ArrowDown');
+  const selected = page.getByRole('radio', { name: '3 of 5 stars' });
+  await expect(selected).toBeChecked();
+  await expect(selected).toBeFocused();
+  expect(await page.evaluate(() => (window as any).ratingEvents)).toEqual([
+    { name: 'input', value: '3' },
+    { name: 'change', value: '3' },
+  ]);
+  expect(
+    await page
+      .locator('form')
+      .evaluate((form: HTMLFormElement) => new FormData(form).get('rating')),
+  ).toBe('3');
+  await host.evaluate((element: any) => {
+    element.orientation = 'horizontal';
+  });
+  await expect(choices).toHaveCSS('flex-direction', 'row');
+  await expect(selected).toBeFocused();
+  expect(await page.evaluate(() => (window as any).ratingEvents)).toHaveLength(2);
+  await page.locator('form').evaluate((form: HTMLFormElement) => form.reset());
+  await expect(page.getByRole('radio', { name: '2 of 5 stars' })).toBeChecked();
+});
+
 test('tags support entry, removal, duplicate/max validation, repeated FormData and reset', async ({
   page,
 }) => {

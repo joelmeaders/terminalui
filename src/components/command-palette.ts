@@ -157,7 +157,7 @@ export class TCommandPalette extends TerminalElement {
   }
   /** Opens the modal, clears search, and remembers its focus return target. */
   show(opener?: HTMLElement) {
-    if (!this.open) this.opener = opener ?? activeElement();
+    if (!this.open) this.opener = opener ?? activeElement(this.ownerDocument);
     this.query = '';
     this.open = true;
   }
@@ -169,7 +169,7 @@ export class TCommandPalette extends TerminalElement {
     if (!this.isConnected) return;
     const dialog = this.renderRoot.querySelector('dialog')!;
     if (this.open && !dialog.open) {
-      this.opener ??= activeElement();
+      this.opener ??= activeElement(this.ownerDocument);
       this.scrollLock.acquire();
       dialog.showModal();
       this.renderRoot.querySelector('input')?.focus();

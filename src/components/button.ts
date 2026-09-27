@@ -50,7 +50,7 @@ export class TButton extends TerminalElement {
         if (event.defaultPrevented || this.isDisabled || !this.form) return;
         if (this.type === 'reset') this.form.reset();
         if (this.type !== 'submit') return;
-        const proxy = document.createElement('button');
+        const proxy = this.ownerDocument.createElement('button');
         proxy.type = 'submit';
         proxy.name = this.name;
         proxy.value = this.value;

@@ -12,14 +12,17 @@ const meta = {
     label: 'Settings',
     disabled: false,
     pressed: null as boolean | null,
+    size: 'medium',
     onClick: fn(),
   },
+  argTypes: { size: { control: 'select', options: ['small', 'medium', 'large'] } },
   render: (a) =>
     html`<t-icon-button
       name=${a.name}
       label=${a.label}
       ?disabled=${a.disabled}
       .pressed=${a.pressed}
+      size=${a.size}
       @click=${a.onClick}
     ></t-icon-button>`,
 } satisfies Meta;
@@ -34,6 +37,19 @@ export const Default: Story = {
   },
 };
 export const Disabled: Story = { args: { disabled: true } };
+export const Small: Story = { args: { size: 'small' } };
+export const Large: Story = {
+  args: { size: 'large' },
+  play: async ({ canvasElement, args }) => {
+    const button = canvasElement
+      .querySelector('t-icon-button')!
+      .shadowRoot!.querySelector('button')!;
+    await expect(button).toHaveStyle({ width: '50px', height: '50px' });
+    button.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
+};
 export const Toggle: Story = { args: { name: 'eye', label: 'Preview', pressed: true } };
 
 export const WithSlots: Story = {

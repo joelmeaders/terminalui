@@ -1,4 +1,4 @@
-import { css, LitElement } from 'lit';
+import { css, LitElement, supportsAdoptingStyleSheets } from 'lit';
 
 export const baseStyles = css`
   :host {
@@ -119,6 +119,42 @@ export const baseStyles = css`
 `;
 
 export class TerminalElement extends LitElement {
+  private adoptedStyles?: HTMLStyleElement;
+
+  protected createRenderRoot() {
+    if (this.ownerDocument === document || !supportsAdoptingStyleSheets)
+      return super.createRenderRoot();
+    const root =
+      this.shadowRoot ??
+      this.attachShadow((this.constructor as typeof LitElement).shadowRootOptions);
+    this.restoreAdoptedStyles(root);
+    this.renderOptions.renderBefore ??= root.firstChild;
+    return root;
+  }
+
+  protected adoptedCallback() {
+    // Browsers discard constructed sheets when a shadow host moves to another document.
+    if (this.shadowRoot && supportsAdoptingStyleSheets) this.restoreAdoptedStyles(this.shadowRoot);
+  }
+
+  private restoreAdoptedStyles(root: ShadowRoot) {
+    const style = (this.adoptedStyles ??= this.ownerDocument.createElement('style'));
+    const nonce = (this.ownerDocument.defaultView as (Window & { litNonce?: string }) | null)
+      ?.litNonce;
+    if (nonce !== undefined) style.setAttribute('nonce', nonce);
+    else style.removeAttribute('nonce');
+    if (!style.textContent)
+      style.textContent = (this.constructor as typeof LitElement).elementStyles
+        .map((sheet) =>
+          'cssText' in sheet
+            ? sheet.cssText
+            : Array.from(sheet.cssRules, (rule) => rule.cssText).join('\n'),
+        )
+        .join('\n');
+    // Stay outside Lit's render range, preserve application sheets, and reuse the node on later moves.
+    if (style.parentNode !== root) root.prepend(style);
+  }
+
   protected emit(name: string, detail?: unknown) {
     return this.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true }));
   }

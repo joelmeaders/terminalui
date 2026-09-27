@@ -183,6 +183,70 @@ test('programmatic values, malformed intervals, and reset do not emit user event
   );
 });
 
+for (const setup of ['attributes', 'properties'])
+  test(`initial ${setup} start and end serialize one form value and survive reset`, async ({
+    page,
+  }) => {
+    await mount(page, setup === 'attributes' ? 'start="2026-09-24" end="2026-10-01"' : '');
+    if (setup === 'properties')
+      await page.locator('form').evaluate(async (form) => {
+        const picker = document.createElement('t-date-range-picker');
+        picker.name = 'mission';
+        picker.label = 'Mission window';
+        picker.start = '2026-09-24';
+        picker.end = '2026-10-01';
+        form.querySelector('t-date-range-picker')!.replaceWith(picker);
+        await picker.updateComplete;
+      });
+    const picker = page.locator('t-date-range-picker');
+    await expect(picker).toHaveJSProperty('value', '2026-09-24/2026-10-01');
+    expect(
+      await page.locator('form').evaluate((form) => [...new FormData(form as HTMLFormElement)]),
+    ).toEqual([['mission', '2026-09-24/2026-10-01']]);
+    await picker.evaluate((element: import('../src').TDateRangePicker) => {
+      element.dataset.events = '0';
+      for (const eventName of ['input', 'change', 't-change'])
+        element.addEventListener(eventName, () => {
+          element.dataset.events = String(Number(element.dataset.events) + 1);
+        });
+      element.start = '2026-10-02';
+      element.end = '2026-10-07';
+    });
+    await expect(picker).toHaveJSProperty('value', '2026-10-02/2026-10-07');
+    await page.locator('form').evaluate((form) => (form as HTMLFormElement).reset());
+    await expect(picker.getByRole('textbox', { name: 'Start date' })).toHaveValue('2026-09-24');
+    await expect(picker.getByRole('textbox', { name: 'End date' })).toHaveValue('2026-10-01');
+    expect(
+      await page.locator('form').evaluate((form) => [...new FormData(form as HTMLFormElement)]),
+    ).toEqual([['mission', '2026-09-24/2026-10-01']]);
+    await expect(picker).toHaveAttribute('data-events', '0');
+  });
+
+for (const value of ['2026-11-02/2026-11-07', ''])
+  test(`an explicit initial value ${value || '(empty)'} takes precedence over start and end`, async ({
+    page,
+  }) => {
+    await mount(page, `start="2026-09-24" end="2026-10-01" value="${value}"`);
+    const picker = page.locator('t-date-range-picker');
+    const [start, end] = value ? value.split('/') : ['', ''];
+    await expect(picker.getByRole('textbox', { name: 'Start date' })).toHaveValue(start);
+    await expect(picker.getByRole('textbox', { name: 'End date' })).toHaveValue(end);
+    expect(
+      await page
+        .locator('form')
+        .evaluate((form) => new FormData(form as HTMLFormElement).get('mission')),
+    ).toBe(value);
+    await picker.evaluate((element: import('../src').TDateRangePicker) => {
+      element.start = '2026-10-02';
+      element.end = '2026-10-07';
+    });
+    await expect(picker).toHaveJSProperty('value', '2026-10-02/2026-10-07');
+    await page.locator('form').evaluate((form) => (form as HTMLFormElement).reset());
+    await expect(picker).toHaveJSProperty('value', value);
+    await expect(picker.getByRole('textbox', { name: 'Start date' })).toHaveValue(start);
+    await expect(picker.getByRole('textbox', { name: 'End date' })).toHaveValue(end);
+  });
+
 test('readonly and disabled states preserve or omit the form value as expected', async ({
   page,
 }) => {

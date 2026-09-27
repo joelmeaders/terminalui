@@ -204,48 +204,81 @@ assert(
   ),
   'Core bundle must exclude optional image effects.',
 );
-for (const [entry, symbol, component] of [
-  ['react/button', 'TButton', 'button'],
-  ['react', 'TButton', 'button'],
-  ['react/dock', 'TDock', 'dock'],
-  ['react', 'TDock', 'dock'],
-]) {
-  const result = await build({
-    absWorkingDir: consumer,
-    stdin: {
-      contents: `import { ${symbol} } from '@terminal-kit/core/${entry}'; globalThis.exampleComponent = ${symbol};`,
-      resolveDir: consumer,
-    },
-    bundle: true,
-    minify: true,
-    format: 'esm',
-    target: 'es2022',
-    external: ['react', 'react-dom'],
-    write: false,
-    metafile: true,
-  });
-  const included = Object.values(result.metafile.outputs)
-    .flatMap((output) => Object.entries(output.inputs))
-    .filter(([, data]) => data.bytesInOutput > 0)
-    .map(([file]) => file.replaceAll('\\', '/'));
-  assert.deepEqual(
-    included
-      .filter((file) => file.includes('@terminal-kit/core/dist/components/'))
-      .map((file) => file.split('/').at(-1)),
-    [`${component}.js`],
-    `${entry}/${symbol}: must not retain unrelated components.`,
-  );
-  assert.deepEqual(
-    included
-      .filter((file) => file.includes('@terminal-kit/core/dist/adapters/react/'))
-      .map((file) => file.split('/').at(-1)),
-    [`${component}.js`],
-    `${entry}/${symbol}: must not retain unrelated wrappers.`,
-  );
-  assert(
-    !included.some((file) => file.endsWith('/dist/index.js')),
-    `${entry}: must not include the catalog.`,
-  );
+// Keep allowed dependencies explicit so an accidental import cannot redefine the expectation.
+const componentDependencies = {
+  'copy-button': ['icon'],
+  'date-picker': ['calendar', 'dialog'],
+  'date-range-picker': ['calendar', 'dialog'],
+  'empty-state': ['icon'],
+  'icon-button': ['icon'],
+  'number-input': ['input'],
+  'password-input': ['input'],
+  rating: ['radio-group'],
+  'segmented-control': ['radio-group'],
+  switch: ['checkbox'],
+  'time-picker': ['dialog'],
+};
+for (const { name: symbol, tagName } of catalog) {
+  const component = tagName.slice(2);
+  const expected = [component, ...(componentDependencies[component] ?? [])]
+    .map((name) => `${name}.js`)
+    .sort();
+  for (const entry of [`components/${component}`, `react/${component}`, 'react']) {
+    const isReact = !entry.startsWith('components/');
+    const result = await build({
+      absWorkingDir: consumer,
+      stdin: {
+        contents: `import { ${symbol} } from '@terminal-kit/core/${entry}'; globalThis.exampleComponent = ${symbol};`,
+        resolveDir: consumer,
+      },
+      bundle: true,
+      minify: true,
+      format: 'esm',
+      target: 'es2022',
+      external: ['react', 'react-dom'],
+      write: false,
+      metafile: true,
+    });
+    const included = Object.values(result.metafile.outputs)
+      .flatMap((output) => Object.entries(output.inputs))
+      .filter(([, data]) => data.bytesInOutput > 0)
+      .map(([file]) => file.replaceAll('\\', '/'));
+    assert.deepEqual(
+      included
+        .filter((file) => file.includes('@terminal-kit/core/dist/components/'))
+        .map((file) => file.split('/').at(-1))
+        .sort(),
+      expected,
+      `${entry}/${symbol}: must not retain unrelated components.`,
+    );
+    assert.deepEqual(
+      included
+        .filter((file) => file.includes('@terminal-kit/core/dist/adapters/react/'))
+        .map((file) => file.split('/').at(-1))
+        .sort(),
+      isReact ? [`${component}.js`] : [],
+      `${entry}/${symbol}: must not retain unrelated wrappers.`,
+    );
+    assert(
+      !included.some((file) => file.endsWith('/dist/index.js')),
+      `${entry}: must not include the catalog.`,
+    );
+    assert(
+      !included.some((file) =>
+        /node_modules\/(?:vue|@angular|ionicons|lucide|@fortawesome|@iconify(?:-json)?)(?:\/|$)/.test(
+          file,
+        ),
+      ),
+      `${entry}/${symbol}: must not retain unrelated frameworks or icon providers.`,
+    );
+    if (!isReact)
+      assert(
+        !included.some((file) =>
+          /node_modules\/(?:react|react-dom|@lit\/react)(?:\/|$)/.test(file),
+        ),
+        `${entry}/${symbol}: native imports must not retain React.`,
+      );
+  }
 }
 const reactImports = catalog
   .map(
@@ -593,6 +626,6 @@ try {
   await browser.close();
 }
 console.log(
-  `Verified external npm install, native and React button/dock isolation, installed dock ordering and content identity, all ${catalog.length} element exports, React subpaths and compatible barrel wrappers, custom event payload contracts, NodeNext types, icon registry, provider isolation, Angular AOT consumer with array-valued multi-select and six other form bindings, standalone registration, native typography CSS, and ${noticeDirectories.length} exact provider notices.`,
+  `Verified external npm install, all ${catalog.length} native and React import dependency closures (including React barrel selections), installed dock ordering and content identity, element exports, React subpaths and compatible barrel wrappers, custom event payload contracts, NodeNext types, icon registry, provider isolation, Angular AOT consumer with array-valued multi-select and six other form bindings, standalone registration, native typography CSS, and ${noticeDirectories.length} exact provider notices.`,
 );
 console.log(`Consumer artifacts: ${consumer}`);

@@ -55,7 +55,7 @@ export class TCard extends TerminalElement {
       </div>`;
   }
 }
-customElements.define('t-card', TCard);
+if (!customElements.get('t-card')) customElements.define('t-card', TCard);
 declare global {
   interface HTMLElementTagNameMap {
     't-card': TCard;

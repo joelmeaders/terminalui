@@ -78,7 +78,7 @@ export class TProgress extends TerminalElement {
       ><progress part="progress" id="progress" max=${max} value=${value ?? nothing}></progress>`;
   }
 }
-customElements.define('t-progress', TProgress);
+if (!customElements.get('t-progress')) customElements.define('t-progress', TProgress);
 declare global {
   interface HTMLElementTagNameMap {
     't-progress': TProgress;

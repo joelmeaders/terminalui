@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectAxeReport } from './helpers/axe-evidence';
 
 async function fixture(page: Page, markup: string) {
   // Other workers can edit source while this fixture runs. Keep Vite reloads
@@ -334,13 +335,11 @@ test('new form controls expose labels and pass automated accessibility checks', 
     element.options = [{ value: 'a', label: 'Alpha' }];
   });
   await page.getByRole('combobox').focus();
-  expect(
-    (
-      await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
-        .analyze()
-    ).violations,
-  ).toEqual([]);
+  await expectAxeReport(
+    await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+      .analyze(),
+  );
 });
 
 test('own disabled toggles recover across controls and preserve ancestor disabling', async ({

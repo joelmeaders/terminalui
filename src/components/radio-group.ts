@@ -75,7 +75,9 @@ export class TRadioGroup extends FormControl {
   protected willUpdate(_changed: PropertyValues) {
     const active = this.shadowRoot?.activeElement;
     const choice =
-      active instanceof HTMLInputElement && active.type === 'radio' ? active : undefined;
+      active?.localName === 'input' && (active as HTMLInputElement).type === 'radio'
+        ? (active as HTMLInputElement)
+        : undefined;
     this.focusedChoice = choice
       ? {
           element: choice,
@@ -85,7 +87,7 @@ export class TRadioGroup extends FormControl {
           ].indexOf(choice),
         }
       : undefined;
-    this.groupHadFocus = active instanceof HTMLFieldSetElement;
+    this.groupHadFocus = active?.localName === 'fieldset';
   }
   protected updated(changed: PropertyValues) {
     super.updated(changed);
@@ -93,15 +95,15 @@ export class TRadioGroup extends FormControl {
     const groupHadFocus = this.groupHadFocus;
     this.focusedChoice = undefined;
     this.groupHadFocus = false;
-    if ((!focused && !groupHadFocus) || this.isDisabled) return;
+    if ((!focused && !groupHadFocus) || this.isDisabled || !this.ownerDocument.hasFocus()) return;
     const group = this.renderRoot.querySelector<HTMLElement>('fieldset');
-    const current = activeElement();
+    const current = activeElement(this.ownerDocument);
     if (
       current &&
       current !== focused?.element &&
       current !== group &&
       current !== this &&
-      current !== document.body
+      current !== this.ownerDocument.body
     )
       return;
     const enabled = [...this.renderRoot.querySelectorAll<HTMLInputElement>('input:not(:disabled)')];

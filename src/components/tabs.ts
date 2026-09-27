@@ -222,7 +222,7 @@ export class TTabs extends TerminalElement {
       ${this.tabs.map((tab, i) => html`<div part="panel" role="tabpanel" id=${`panel-${i}`} aria-labelledby=${`tab-${i}`} tabindex="0" ?hidden=${this.active !== tab.id}><slot name=${tab.id}></slot></div>`)}`;
   }
 }
-customElements.define('t-tabs', TTabs);
+if (!customElements.get('t-tabs')) customElements.define('t-tabs', TTabs);
 declare global {
   interface HTMLElementTagNameMap {
     't-tabs': TTabs;

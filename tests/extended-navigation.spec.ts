@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectAxeReport } from './helpers/axe-evidence';
 import { writeFile } from 'node:fs/promises';
 
 async function fixture(page: Page, markup: string) {
@@ -271,7 +272,7 @@ test('toolbar keeps focus inside when live actions disappear or become disabled'
   await page.locator('t-toolbar t-button#six').evaluate((element) => element.remove());
   await expect(page.getByRole('button', { name: 'Five' })).toBeFocused();
   const axe = await new AxeBuilder({ page }).include('t-toolbar').analyze();
-  expect(axe.violations, JSON.stringify(axe.violations)).toEqual([]);
+  await expectAxeReport(axe);
 });
 
 test('native toolbar actions keep readable text in every palette', async ({ page }) => {
@@ -317,7 +318,7 @@ test('native toolbar actions keep readable text in every palette', async ({ page
       `${theme} native link`,
     ).toBeGreaterThanOrEqual(4.5);
     const axe = await new AxeBuilder({ page }).include('t-toolbar').analyze();
-    expect(axe.violations, `${theme}: ${JSON.stringify(axe.violations)}`).toEqual([]);
+    await expectAxeReport(axe, `${theme}-axe-review`);
   }
 });
 
@@ -397,7 +398,7 @@ test('split pane keeps its separator name with the primary pane and honors expli
   await split.evaluate((element) => element.removeAttribute('label'));
   await expect(page.getByRole('separator', { name: 'Projects' })).toBeVisible();
   const axe = await new AxeBuilder({ page }).include('t-split-pane').analyze();
-  expect(axe.violations, JSON.stringify(axe.violations)).toEqual([]);
+  await expectAxeReport(axe);
   expect(axe.incomplete, JSON.stringify(axe.incomplete)).toEqual([]);
 });
 
@@ -458,7 +459,7 @@ test('split pane removes zero-size panes from focus order and restores them', as
   );
   expect((await secondary.boundingBox())!.height).toBeGreaterThan(layoutHeight - 50);
   const axe = await new AxeBuilder({ page }).include('t-split-pane').analyze();
-  expect(axe.violations, JSON.stringify(axe.violations)).toEqual([]);
+  await expectAxeReport(axe);
   expect(axe.incomplete, JSON.stringify(axe.incomplete)).toEqual([]);
   await page.keyboard.press('Enter');
   await expect(separator).toHaveAttribute('aria-valuenow', '50');

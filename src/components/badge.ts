@@ -56,7 +56,7 @@ export class TBadge extends TerminalElement {
     ></span>`;
   }
 }
-customElements.define('t-badge', TBadge);
+if (!customElements.get('t-badge')) customElements.define('t-badge', TBadge);
 declare global {
   interface HTMLElementTagNameMap {
     't-badge': TBadge;

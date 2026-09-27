@@ -16,12 +16,12 @@ The Angular build uses TypeScript 6.0 and Angular compiler 22.1.
 6. Run `npm pack` to create a local installable tarball.
 
 The external package test installs the tarball outside this repository. It verifies the license, all component exports, and strict NodeNext type resolution.
-It also verifies all 57 React wrapper subpaths, their compatibility with the existing barrel, and retained bundle modules for a single native or React button and dock. It tests optional adapter imports, compiles an Angular AOT consumer, and checks standalone browser registration.
+It also verifies all 57 React wrapper subpaths, their compatibility with the existing barrel, and retained bundle modules and required dependency closures for every native and React component, including named imports from the React barrel. It tests optional adapter imports, compiles an Angular AOT consumer, and checks standalone browser registration.
 The test preserves its temporary consumer path in the output for inspection.
 
 The runtime package depends only on Lit. Framework peers are optional and remain outside the core and standalone bundles.
 The standalone bundle includes Lit. Report the complete catalog size without a fixed ceiling. Preserve features and use measurements to find unnecessary code.
-The separate button and original three-control form scenarios retain 8 KB and 10 KB gzip budgets.
+The separate button and original three-control form scenarios use 8.5 KB and 10.5 KB gzip guards. The 2026-09-26 document-adoption and form fixes raised measured imports from 7,968 to 8,155 bytes and from 9,904 to 10,112 bytes. This is reviewed shared behavior; all component dependency closures remain independently checked from the installed package.
 The React button scenarios use a 9,500-byte gzip guard for both direct and named barrel imports. They include Lit and the React adapter, but exclude the shared React runtime. Review these guards when features change; preserve features and use measurements to identify unnecessary code or unrelated retained modules.
 These budgets exclude theme CSS and fonts. Run `npm run size` for current measurements.
 

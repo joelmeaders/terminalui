@@ -64,10 +64,13 @@ export class ModalScrollController implements ReactiveController {
     const elements = new Set([document.documentElement, document.body]);
     let parent: Element | null = this.host;
     while (parent) {
-      if (parent instanceof HTMLElement && !elements.has(parent)) {
-        const style = getComputedStyle(parent);
-        if (locks.has(parent) || /auto|scroll/.test(`${style.overflowX} ${style.overflowY}`))
-          elements.add(parent);
+      if (parent.namespaceURI === 'http://www.w3.org/1999/xhtml') {
+        const element = parent as HTMLElement;
+        if (!elements.has(element)) {
+          const style = getComputedStyle(element);
+          if (locks.has(element) || /auto|scroll/.test(`${style.overflowX} ${style.overflowY}`))
+            elements.add(element);
+        }
       }
       parent =
         parent.assignedSlot ??

@@ -89,7 +89,7 @@ export class TAlert extends TerminalElement {
         </div>`;
   }
 }
-customElements.define('t-alert', TAlert);
+if (!customElements.get('t-alert')) customElements.define('t-alert', TAlert);
 declare global {
   interface HTMLElementTagNameMap {
     't-alert': TAlert;

@@ -2,6 +2,7 @@ import { css, html, type PropertyValues } from 'lit';
 import { baseStyles, TerminalElement } from '../internal/base';
 import { containModalTab } from '../internal/modal-focus';
 import { ModalScrollController } from '../internal/modal-scroll';
+import { activeElement } from '../internal/floating';
 /**
  * Modal native dialog with Escape and focus return. Emits t-close.
  * @slot - Body.
@@ -91,9 +92,7 @@ export class TDialog extends TerminalElement {
     const dialog = this.renderRoot.querySelector('dialog')!;
     if (this.open && !dialog.open) {
       if (!this.returnFocus) {
-        let active = document.activeElement;
-        while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
-        if (active instanceof HTMLElement) this.returnFocus = active;
+        this.returnFocus = activeElement(this.ownerDocument);
       }
       this.scrollLock.acquire();
       dialog.showModal();
@@ -129,7 +128,7 @@ export class TDialog extends TerminalElement {
     </dialog>`;
   }
 }
-customElements.define('t-dialog', TDialog);
+if (!customElements.get('t-dialog')) customElements.define('t-dialog', TDialog);
 declare global {
   interface HTMLElementTagNameMap {
     't-dialog': TDialog;
