@@ -4,7 +4,9 @@ A browser component library built with Lit. All 57 components share six terminal
 
 ## License
 
-Terminal Kit uses the [PolyForm Perimeter License 1.0.1](LICENSE). This is a **source-available license, not an OSI open source license**. It allows use, changes, and distribution for purposes that do not compete with Terminal Kit. A noncompeting website or application may use the components. The license bars products marketed as substitutes for Terminal Kit, including kit forks, even when offered for free. Read the license text for the exact terms. Third-party icon assets keep their own licenses. See [icon credits](docs/icons.md).
+Terminal Kit uses the custom [Terminal Kit Free Distribution License 1.0](LICENSE). It permits free redistribution of the kit, forks, modified components, and derived themes. Games, websites, and other applications may use it and charge for their own product. Selling the kit or its derivatives as reusable components, themes, or another toolkit product is prohibited. Distributed derivatives keep the same free-distribution terms.
+
+This is a **source-available license, not an OSI open source license**. The custom terms are a draft for legal review before publication. The repository remains private and unpublished. See [license guidance and examples](docs/licensing.md). Third-party assets keep their own licenses in [icon credits](docs/icons.md).
 
 ## Run locally
 

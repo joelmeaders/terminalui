@@ -1,6 +1,6 @@
 # Release preparation
 
-This repository remains private and unpublished. Terminal Kit uses the [PolyForm Perimeter License 1.0.1](../LICENSE), a source-available license that bars competing products. It is not an OSI open source license. Third-party icon assets retain their own terms in [icon credits](icons.md).
+This repository remains private and unpublished. Terminal Kit uses the custom [Terminal Kit Free Distribution License 1.0](../LICENSE). The draft permits free kit derivatives and paid applications. It prohibits charging for the kit or its derivatives as reusable toolkit products. It is a source-available license, not an OSI open source license. Third-party assets retain their own terms in [icon credits](icons.md).
 No workflow publishes a package. A public release needs an owner-approved package name, registry, and version.
 
 ## Local verification
@@ -36,5 +36,6 @@ The workflow files require a connected repository before remote CI results exist
 
 An owner must approve the registry identity and legal distribution details before publication.
 Confirm that the license reflects the copyright holders' intended terms. Select a release version and remove `private` only after that decision.
+Obtain legal review of the custom draft and confirm contributor authority before publication. Review the application/toolkit boundary, mandatory bundles, service fees, derived themes, patent grant, and continuing rights in [license guidance](licensing.md). Earlier grants under other licenses remain separate. The project policy is to keep future Terminal Kit releases under the free-distribution terms and to offer no paid toolkit license exception.
 Review the complete tarball and rerun all checks for that version. Publish only with explicit release authorization.
 This preparation does not create a registry release, Git tag, deployment, or publishing credential.
