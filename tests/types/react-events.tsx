@@ -1,34 +1,34 @@
 import type { ComponentProps } from 'react';
-import type * as Barrel from '@terminal-kit/core/react';
-import { TAccordion } from '@terminal-kit/core/react/accordion';
-import { TAlert } from '@terminal-kit/core/react/alert';
-import { TCalendar } from '@terminal-kit/core/react/calendar';
-import { TChip } from '@terminal-kit/core/react/chip';
-import { TCommandPalette } from '@terminal-kit/core/react/command-palette';
-import { TCopyButton } from '@terminal-kit/core/react/copy-button';
-import { TDatePicker } from '@terminal-kit/core/react/date-picker';
-import { TDateRangePicker } from '@terminal-kit/core/react/date-range-picker';
-import { TDialog } from '@terminal-kit/core/react/dialog';
-import { TDrawer } from '@terminal-kit/core/react/drawer';
-import { TDock } from '@terminal-kit/core/react/dock';
-import { TPagination } from '@terminal-kit/core/react/pagination';
-import { TPasswordInput } from '@terminal-kit/core/react/password-input';
-import { TPopover } from '@terminal-kit/core/react/popover';
-import { TSplitPane } from '@terminal-kit/core/react/split-pane';
-import { TSteps } from '@terminal-kit/core/react/steps';
-import { TTable } from '@terminal-kit/core/react/table';
-import { TTabs } from '@terminal-kit/core/react/tabs';
-import { TTimePicker } from '@terminal-kit/core/react/time-picker';
-import { TToast } from '@terminal-kit/core/react/toast';
-import { TTree } from '@terminal-kit/core/react/tree';
-import { TMenu } from '@terminal-kit/core/react/menu';
-import type { TInput } from '@terminal-kit/core/react/input';
-import type { MenuOption } from '@terminal-kit/core/components/menu';
-import type { CommandItem } from '@terminal-kit/core/components/command-palette';
-import type { TreeItem } from '@terminal-kit/core/components/tree';
-import type { StepItem } from '@terminal-kit/core/components/steps';
-import type { SplitPaneChange } from '@terminal-kit/core/components/split-pane';
-import type { DockChange, DockEditChange } from '@terminal-kit/core/components/dock';
+import type * as Barrel from '@joelmeaders/terminalui/react';
+import { TAccordion } from '@joelmeaders/terminalui/react/accordion';
+import { TAlert } from '@joelmeaders/terminalui/react/alert';
+import { TCalendar } from '@joelmeaders/terminalui/react/calendar';
+import { TChip } from '@joelmeaders/terminalui/react/chip';
+import { TCommandPalette } from '@joelmeaders/terminalui/react/command-palette';
+import { TCopyButton } from '@joelmeaders/terminalui/react/copy-button';
+import { TDatePicker } from '@joelmeaders/terminalui/react/date-picker';
+import { TDateRangePicker } from '@joelmeaders/terminalui/react/date-range-picker';
+import { TDialog } from '@joelmeaders/terminalui/react/dialog';
+import { TDrawer } from '@joelmeaders/terminalui/react/drawer';
+import { TDock } from '@joelmeaders/terminalui/react/dock';
+import { TPagination } from '@joelmeaders/terminalui/react/pagination';
+import { TPasswordInput } from '@joelmeaders/terminalui/react/password-input';
+import { TPopover } from '@joelmeaders/terminalui/react/popover';
+import { TSplitPane } from '@joelmeaders/terminalui/react/split-pane';
+import { TSteps } from '@joelmeaders/terminalui/react/steps';
+import { TTable } from '@joelmeaders/terminalui/react/table';
+import { TTabs } from '@joelmeaders/terminalui/react/tabs';
+import { TTimePicker } from '@joelmeaders/terminalui/react/time-picker';
+import { TToast } from '@joelmeaders/terminalui/react/toast';
+import { TTree } from '@joelmeaders/terminalui/react/tree';
+import { TMenu } from '@joelmeaders/terminalui/react/menu';
+import type { TInput } from '@joelmeaders/terminalui/react/input';
+import type { MenuOption } from '@joelmeaders/terminalui/components/menu';
+import type { CommandItem } from '@joelmeaders/terminalui/components/command-palette';
+import type { TreeItem } from '@joelmeaders/terminalui/components/tree';
+import type { StepItem } from '@joelmeaders/terminalui/components/steps';
+import type { SplitPaneChange } from '@joelmeaders/terminalui/components/split-pane';
+import type { DockChange, DockEditChange } from '@joelmeaders/terminalui/components/dock';
 
 // Equality detects unknown, any, widened unions, and missing payload fields.
 type Equal<A, B> =
@@ -247,7 +247,7 @@ export function TypedMenuExample() {
         const value: string = event.detail.value;
         const option: MenuOption = event.detail.option;
         // @ts-expect-error: Event details must reject misspelled payload fields.
-        event.detail.misspelled;
+        void event.detail.misspelled;
         return option.label + value;
       }}
     />

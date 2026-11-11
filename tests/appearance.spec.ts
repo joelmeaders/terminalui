@@ -66,8 +66,7 @@ test('appearance settings inherit through shadow roots and support local resets 
   await expect
     .poll(() =>
       page.locator('t-checkbox input').evaluate((el) => {
-        const track = getComputedStyle(el),
-          thumb = getComputedStyle(el, '::before');
+        const thumb = getComputedStyle(el, '::before');
         return parseFloat(thumb.left) + parseFloat(thumb.width) <= el.clientWidth;
       }),
     )

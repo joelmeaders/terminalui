@@ -1,12 +1,19 @@
 # Framework integration
 
 The core uses Lit and browser custom elements. The package also offers optional adapters for frameworks.
-The npm package is not published. Until an owner approves a public release, install a local tarball. A tarball is an archive containing the package.
+Install `@joelmeaders/terminalui` from GitHub Packages. First sign in with your GitHub username and a classic personal access token with `read:packages` permission:
+
+```sh
+npm login --scope=@joelmeaders --auth-type=legacy --registry=https://npm.pkg.github.com
+npm install @joelmeaders/terminalui
+```
+
+For local development, you can also install a tarball, an archive containing the package:
 
 ```sh
 npm run build
 npm pack
-npm install /path/to/terminal-kit-core-0.1.0.tgz
+npm install /path/to/joelmeaders-terminalui-0.1.0.tgz
 ```
 
 Import the theme stylesheet once. Apply `data-theme="amber"` to `html` or a parent container.
@@ -26,23 +33,23 @@ No package manager, framework, or import map is required in the browser.
 </form>
 ```
 
-With a bundler, use `import '@terminal-kit/core/components/input'` for individual elements.
-Use `import '@terminal-kit/core'` for the entire catalog. Both imports include element registration.
+With a bundler, use `import '@joelmeaders/terminalui/components/input'` for individual elements.
+Use `import '@joelmeaders/terminalui'` for the entire catalog. Both imports include element registration.
 Set object and array properties with JavaScript. A boolean HTML attribute is true when it is present. For example, `disabled="false"` still disables a control.
 
 ## React 19
 
-Install `react` and `@lit/react`. Import typed wrappers from per-component paths such as `@terminal-kit/core/react/input`.
+Install `react` and `@lit/react`. Import typed wrappers from per-component paths such as `@joelmeaders/terminalui/react/input`.
 Each path includes that wrapper and the elements it needs. The wrapper passes properties, refs, children, and native event listeners to the element.
-The existing `@terminal-kit/core/react` barrel remains compatible. Bundlers that honor package side-effect metadata can also remove its unused wrappers.
-Per-component paths keep the module graph focused in development and native ESM as well. Use `@terminal-kit/core` when you need to register the complete element catalog.
+The existing `@joelmeaders/terminalui/react` barrel remains compatible. Bundlers that honor package side-effect metadata can also remove its unused wrappers.
+Per-component paths keep the module graph focused in development and native ESM as well. Use `@joelmeaders/terminalui` when you need to register the complete element catalog.
 The official [Lit React adapter](https://lit.dev/docs/frameworks/react/) supplies this behavior.
 
 ```tsx
 import { useState } from 'react';
-import { TInput } from '@terminal-kit/core/react/input';
-import type { TInput as InputElement } from '@terminal-kit/core/components/input';
-import '@terminal-kit/core/themes.css';
+import { TInput } from '@joelmeaders/terminalui/react/input';
+import type { TInput as InputElement } from '@joelmeaders/terminalui/components/input';
+import '@joelmeaders/terminalui/themes.css';
 
 export function Settings() {
   const [name, setName] = useState('Operator');
@@ -60,7 +67,7 @@ Use `checked` for checkbox and switch state. Use `onTSelect`, `onTChange`, `onTC
 Custom event handlers infer the types of the event data described in the component guide. Nested menu options, tree items, commands, numeric values, and literal states retain their types. Events without a payload have `detail: null`. Native `input` and `change` handlers receive `Event`; read the value from their typed element target.
 
 ```tsx
-import { TMenu } from '@terminal-kit/core/react/menu';
+import { TMenu } from '@joelmeaders/terminalui/react/menu';
 
 export function FileActions() {
   return (
@@ -90,9 +97,9 @@ Register the required component imports. In Vue's compiler configuration, identi
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useTerminalModel } from '@terminal-kit/core/vue';
-import { TInput } from '@terminal-kit/core/components/input';
-import '@terminal-kit/core/themes.css';
+import { useTerminalModel } from '@joelmeaders/terminalui/vue';
+import { TInput } from '@joelmeaders/terminalui/components/input';
+import '@joelmeaders/terminalui/themes.css';
 const element = ref<TInput | null>(null);
 const name = ref('Operator');
 useTerminalModel(element, name, 'value');
@@ -107,15 +114,15 @@ Use `.prop` for array/object values such as options, columns, and rows.
 
 ## Angular 22
 
-Import `TerminalValueAccessor` from `@terminal-kit/core/angular`, your forms module, and `CUSTOM_ELEMENTS_SCHEMA`.
+Import `TerminalValueAccessor` from `@joelmeaders/terminalui/angular`, your forms module, and `CUSTOM_ELEMENTS_SCHEMA`.
 The adapter uses Angular partial compilation. An Angular AOT consumer can link it through normal Angular tooling.
 The package check compiles an external consumer with `ngc` and verifies generated component definitions.
 
 ```ts
 import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { TerminalValueAccessor } from '@terminal-kit/core/angular';
-import '@terminal-kit/core/components/input';
+import { TerminalValueAccessor } from '@joelmeaders/terminalui/angular';
+import '@joelmeaders/terminalui/components/input';
 
 @Component({
   selector: 'app-settings',
@@ -170,7 +177,7 @@ The build generates `custom-elements.json`, `catalog.json`, and `vscode.html-cus
 Storybook reads the manifest for component metadata. Configure VS Code with:
 
 ```json
-{ "html.customData": ["./node_modules/@terminal-kit/core/dist/vscode.html-custom-data.json"] }
+{ "html.customData": ["./node_modules/@joelmeaders/terminalui/dist/vscode.html-custom-data.json"] }
 ```
 
 Run `npm run build` after component API changes. The metadata and React exports derive from the component source.

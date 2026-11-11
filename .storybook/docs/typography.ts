@@ -68,8 +68,8 @@ export function typographyExampleFor(framework: Framework): string {
 <style>\n${exampleCss}\n</style>
 ${content}`;
   if (framework === 'react')
-    return `import '@terminal-kit/core/themes.css';
-import '@terminal-kit/core/typography.css';
+    return `import '@joelmeaders/terminalui/themes.css';
+import '@joelmeaders/terminalui/typography.css';
 import './example.css';
 
 export function Example() {
@@ -77,16 +77,16 @@ export function Example() {
 }`;
   if (framework === 'vue')
     return `<script setup lang="ts">
-import '@terminal-kit/core/themes.css';
-import '@terminal-kit/core/typography.css';
+import '@joelmeaders/terminalui/themes.css';
+import '@joelmeaders/terminalui/typography.css';
 </script>
 
 <template>\n${content}\n</template>
 
 <style>\n${exampleCss}\n</style>`;
   return `// In src/styles.css, before other styles:
-// @import '@terminal-kit/core/themes.css';
-// @import '@terminal-kit/core/typography.css';
+// @import '@joelmeaders/terminalui/themes.css';
+// @import '@joelmeaders/terminalui/typography.css';
 import { Component } from '@angular/core';
 
 @Component({

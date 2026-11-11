@@ -292,7 +292,7 @@ function FrameworkSetup({ framework }: { framework: Framework }) {
             Load the shared theme in the application entry point or global stylesheet, not in
             component-scoped styles:
           </p>
-          <Source code="import '@terminal-kit/core/themes.css';" language="typescript" />
+          <Source code="import '@joelmeaders/terminalui/themes.css';" language="typescript" />
         </>
       )}
     </details>

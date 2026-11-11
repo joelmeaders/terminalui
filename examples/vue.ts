@@ -1,12 +1,12 @@
 import { createApp, h, ref } from 'vue';
-import { useTerminalModel } from '@terminal-kit/core/vue';
-import '@terminal-kit/core/components/input';
-import '@terminal-kit/core/components/button';
-import '@terminal-kit/core/components/checkbox';
-import '@terminal-kit/core/themes.css';
+import { useTerminalModel } from '@joelmeaders/terminalui/vue';
+import '@joelmeaders/terminalui/components/input';
+import '@joelmeaders/terminalui/components/button';
+import '@joelmeaders/terminalui/components/checkbox';
+import '@joelmeaders/terminalui/themes.css';
 import './shared.css';
-import type { TInput } from '@terminal-kit/core/components/input';
-import type { TCheckbox } from '@terminal-kit/core/components/checkbox';
+import type { TInput } from '@joelmeaders/terminalui/components/input';
+import type { TCheckbox } from '@joelmeaders/terminalui/components/checkbox';
 createApp({
   setup() {
     const value = ref('Initial');

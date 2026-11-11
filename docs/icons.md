@@ -5,9 +5,9 @@
 When possible, register icons before your application displays them. Registration also updates icons already on the page when their names match. Use names such as `app:save` or `lucide:camera` to avoid duplicate names. These names are registry keys, not remote addresses.
 
 ```ts
-import { registerIcon, unregisterIcon } from '@terminal-kit/core/icons';
-import '@terminal-kit/core/components/icon';
-import '@terminal-kit/core/components/icon-button';
+import { registerIcon, unregisterIcon } from '@joelmeaders/terminalui/icons';
+import '@joelmeaders/terminalui/components/icon';
+import '@joelmeaders/terminalui/components/icon-button';
 
 registerIcon('app:check', {
   width: 24,
@@ -47,7 +47,7 @@ Ionicons publishes SVG data and a separate web component. Import the icon data w
 
 ```ts
 import { homeOutline } from 'ionicons/icons';
-import { registerIcon } from '@terminal-kit/core/icons';
+import { registerIcon } from '@joelmeaders/terminalui/icons';
 
 registerIcon('ion:home-outline', homeOutline);
 ```
@@ -60,7 +60,7 @@ Import individual definitions from a Free SVG package. No Font Awesome DOM repla
 
 ```ts
 import { faHouse } from '@fortawesome/free-solid-svg-icons';
-import { registerFontAwesomeIcon } from '@terminal-kit/core/icons';
+import { registerFontAwesomeIcon } from '@joelmeaders/terminalui/icons';
 
 registerFontAwesomeIcon('fa:house', faHouse);
 ```
@@ -75,7 +75,7 @@ Use the vanilla package's icon nodes, not React or Vue component functions.
 
 ```ts
 import { Camera } from 'lucide';
-import { registerLucideIcon } from '@terminal-kit/core/icons';
+import { registerLucideIcon } from '@joelmeaders/terminalui/icons';
 
 registerLucideIcon('lucide:camera', Camera);
 ```
@@ -90,7 +90,7 @@ This example uses Vite's `?raw` loader. Other bundlers need their equivalent tex
 
 ```ts
 import checkSvg from 'bootstrap-icons/icons/check.svg?raw';
-import { registerIcon } from '@terminal-kit/core/icons';
+import { registerIcon } from '@joelmeaders/terminalui/icons';
 
 registerIcon('bi:check', checkSvg);
 ```
@@ -105,7 +105,7 @@ For a small local set:
 
 ```ts
 import selectedIcons from './generated/app-icons.json';
-import { registerIconSet } from '@terminal-kit/core/icons';
+import { registerIconSet } from '@joelmeaders/terminalui/icons';
 
 registerIconSet(selectedIcons, ['check', 'arrow-right']);
 // With prefix "bi", the names become "bi:check" and "bi:arrow-right".

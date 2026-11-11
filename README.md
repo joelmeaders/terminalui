@@ -6,7 +6,20 @@ Storybook is the component guide. It shows how to use each component, lets you t
 
 ## License
 
-Terminal Kit uses the [MIT License](LICENSE). The GitHub repository is private. The npm package is not published. See [license guidance](docs/licensing.md). Third-party assets keep their own licenses in [icon credits](docs/icons.md).
+Terminal Kit uses the [MIT License](LICENSE). The source is public on [GitHub](https://github.com/joelmeaders/terminalui). See [license guidance](docs/licensing.md). Third-party assets keep their own licenses in [icon credits](docs/icons.md).
+
+Read the live [Storybook guide](https://joelmeaders.github.io/terminalui/). Changes to `main` deploy after the GitHub Actions checks pass.
+
+## Install from GitHub Packages
+
+The package name is `@joelmeaders/terminalui`. GitHub Packages requires authentication even for public packages. Use your GitHub username and a classic personal access token with `read:packages` permission when npm asks you to sign in:
+
+```sh
+npm login --scope=@joelmeaders --auth-type=legacy --registry=https://npm.pkg.github.com
+npm install @joelmeaders/terminalui
+```
+
+Keep tokens out of project files and Git commits. You can also install a local package archive as described below.
 
 ## Run locally
 
@@ -50,8 +63,8 @@ With individual imports, register both Button and Icon. Field slots also accept 
 Import the optional CSS layer for native headings, paragraphs, anchors, lists, quotes, code, and inline text. It adds about 1.4 kB gzip and no JavaScript:
 
 ```js
-import '@terminal-kit/core/themes.css';
-import '@terminal-kit/core/typography.css';
+import '@joelmeaders/terminalui/themes.css';
+import '@joelmeaders/terminalui/typography.css';
 ```
 
 ```html
@@ -159,12 +172,12 @@ The browser bundle includes Lit. You can use it without an import map or a build
 For a bundler, import individual components and the theme CSS:
 
 ```ts
-import '@terminal-kit/core/components/input';
-import '@terminal-kit/core/components/button';
-import '@terminal-kit/core/themes.css';
+import '@joelmeaders/terminalui/components/input';
+import '@joelmeaders/terminalui/components/button';
+import '@joelmeaders/terminalui/themes.css';
 ```
 
-The npm package is not published. Its current version is `0.1.0`. To install it in another repository, run `npm pack` here. This creates a tarball, an archive of the package. Then run `npm install /path/to/terminal-kit-core-0.1.0.tgz` in the other repository. Importing the package root registers all 57 elements. Individual imports include only their component dependencies. Use one distribution path per page. Do not load the standalone bundle and ESM package together.
+The current version is `0.1.0`. To install a local copy in another repository, run `npm pack` here. This creates a tarball, an archive of the package. Then run `npm install /path/to/joelmeaders-terminalui-0.1.0.tgz` in the other repository. Importing the package root registers all 57 elements. Individual imports include only their component dependencies. Use one distribution path per page. Do not load the standalone bundle and ESM package together.
 
 The build also creates TypeScript declarations, a Custom Elements Manifest, a component catalog, and VS Code HTML metadata. Storybook reads the generated manifest. See [framework integration](docs/frameworks.md) for editor configuration and [release preparation](docs/releasing.md) for package verification and publication boundaries.
 
@@ -240,11 +253,11 @@ Run `npm run build`, then `npm run dev` to try these examples:
 
 The examples consume the built package. Browser tests check property updates, input events, checked state, disabled state, and application reset. Angular tests also check touched state. Framework dependencies are optional peers and development dependencies. They remain outside the core and standalone bundles.
 
-React 19 uses per-component typed wrappers such as `@terminal-kit/core/react/input`, generated for every catalog element with `@lit/react`. These imports include only the chosen wrapper and its element dependencies. The existing `@terminal-kit/core/react` barrel remains compatible and supports removal of unused wrappers in bundlers that honor package side-effect metadata. The wrappers forward properties, refs, and native events. Custom events use names such as `onTSelect` and `onTClose`.
+React 19 uses per-component typed wrappers such as `@joelmeaders/terminalui/react/input`, generated for every catalog element with `@lit/react`. These imports include only the chosen wrapper and its element dependencies. The existing `@joelmeaders/terminalui/react` barrel remains compatible and supports removal of unused wrappers in bundlers that honor package side-effect metadata. The wrappers forward properties, refs, and native events. Custom events use names such as `onTSelect` and `onTClose`.
 
-Vue 3 uses `useTerminalModel` from `@terminal-kit/core/vue` to bind typed refs to element properties and events. For Vue SFC templates, configure `isCustomElement` for tags starting with `t-`. Use property binding for arrays and objects.
+Vue 3 uses `useTerminalModel` from `@joelmeaders/terminalui/vue` to bind typed refs to element properties and events. For Vue SFC templates, configure `isCustomElement` for tags starting with `t-`. Use property binding for arrays and objects.
 
-Angular 22 uses `CUSTOM_ELEMENTS_SCHEMA` and the compiled `TerminalValueAccessor` from `@terminal-kit/core/angular`. The accessor supports reactive and template-driven bindings for all 16 controls. The package check compiles an external Angular AOT consumer. The included Vite application uses JIT for its application template. Angular validators and browser validation remain separate concerns. See [framework integration](docs/frameworks.md) for complete setup and examples.
+Angular 22 uses `CUSTOM_ELEMENTS_SCHEMA` and the compiled `TerminalValueAccessor` from `@joelmeaders/terminalui/angular`. The accessor supports reactive and template-driven bindings for all 16 controls. The package check compiles an external Angular AOT consumer. The included Vite application uses JIT for its application template. Angular validators and browser validation remain separate concerns. See [framework integration](docs/frameworks.md) for complete setup and examples.
 
 ## Themes and styling
 
@@ -322,8 +335,8 @@ The demo exposes **Bold lines** beside the palettes and **Display effects** belo
 Use built-in icons or register selected icons from Ionicons, Font Awesome Free, Lucide, Bootstrap Icons, Tabler, Heroicons, and Material Symbols. The registry accepts SVG, Ionicons data URIs, Font Awesome definitions, Lucide nodes, and Iconify sets. It validates static SVG and rejects scripts, external resources, and animation elements. It performs no network loading. Provider packages are optional consumer dependencies; the core does not include those packs.
 
 ```ts
-import '@terminal-kit/core/components/icon';
-import { registerIcon } from '@terminal-kit/core/icons';
+import '@joelmeaders/terminalui/components/icon';
+import { registerIcon } from '@joelmeaders/terminalui/icons';
 import { rocketOutline } from 'ionicons/icons';
 
 registerIcon('ion:rocket', rocketOutline);
@@ -379,4 +392,4 @@ Accessibility requirements are part of [AGENTS.md](AGENTS.md). The [accessibilit
 - Tooltips provide short, noninteractive help. Tooltips and popovers use viewport-aware placement with flipping and bounds adjustment during scrolling and resizing. Use a popover for interactive content.
 - Tables support local sorting, filtering, paging, loading, empty states, and row selection. The library does not provide a virtualized data grid, cell editing, or a rich-text editor.
 - The theme choice in the demo persists locally. The component package itself does not write to storage.
-- Version `0.1.0` remains private and unpublished. Release checks and CI configuration are included, but publication still needs an approved package name, registry identity, version, and explicit release authorization. See [release preparation](docs/releasing.md).
+- GitHub Actions publishes version tags such as `v0.1.0` to GitHub Packages after the checks pass. See [release preparation](docs/releasing.md).

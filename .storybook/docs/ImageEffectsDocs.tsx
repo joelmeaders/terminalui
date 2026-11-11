@@ -17,10 +17,10 @@ const examples = {
   const effect = mountAscii(document.querySelector('#portrait'));
   // Call effect.destroy() when this view is removed.
 </script>`,
-  angular: `// Add @import '@terminal-kit/core/themes.css'; and
-// @import '@terminal-kit/core/image-effects.css'; to src/styles.css.
+  angular: `// Add @import '@joelmeaders/terminalui/themes.css'; and
+// @import '@joelmeaders/terminalui/image-effects.css'; to src/styles.css.
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
-import { mountAscii, type ImageEffectController, type AsciiOptions } from '@terminal-kit/core/image-ascii';
+import { mountAscii, type ImageEffectController, type AsciiOptions } from '@joelmeaders/terminalui/image-ascii';
 
 @Component({
   selector: 'app-portrait',
@@ -37,9 +37,9 @@ export class Portrait implements AfterViewInit, OnDestroy {
 }`,
   vue: `<script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue';
-import '@terminal-kit/core/themes.css';
-import '@terminal-kit/core/image-effects.css';
-import { mountAscii } from '@terminal-kit/core/image-ascii';
+import '@joelmeaders/terminalui/themes.css';
+import '@joelmeaders/terminalui/image-effects.css';
+import { mountAscii } from '@joelmeaders/terminalui/image-ascii';
 
 const portrait = ref<HTMLImageElement | null>(null);
 let effect: ReturnType<typeof mountAscii> | undefined;
@@ -52,9 +52,9 @@ onBeforeUnmount(() => effect?.destroy());
   </span>
 </template>`,
   react: `import { useEffect, useRef } from 'react';
-import '@terminal-kit/core/themes.css';
-import '@terminal-kit/core/image-effects.css';
-import { mountAscii } from '@terminal-kit/core/image-ascii';
+import '@joelmeaders/terminalui/themes.css';
+import '@joelmeaders/terminalui/image-effects.css';
+import { mountAscii } from '@joelmeaders/terminalui/image-ascii';
 
 export function Portrait() {
   const image = useRef<HTMLImageElement>(null);

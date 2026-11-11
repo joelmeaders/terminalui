@@ -1,7 +1,7 @@
 # Release preparation
 
-The GitHub repository is private. The npm package is not published. Terminal Kit uses the [MIT License](../LICENSE). Third-party assets retain their own terms in [icon credits](icons.md).
-No workflow publishes a package. A public release needs an owner-approved package name, registry, and version.
+The [GitHub repository](https://github.com/joelmeaders/terminalui) is public. Terminal Kit uses the [MIT License](../LICENSE). Third-party assets retain their own terms in [icon credits](icons.md).
+The package name is `@joelmeaders/terminalui`. Version tags publish to GitHub Packages after CI passes.
 
 ## Local verification
 
@@ -27,15 +27,18 @@ These budgets exclude theme CSS and fonts. Run `npm run size` for current measur
 
 ## CI
 
-Linux CI runs formatting, types, behavior in three browsers, Storybook interactions, package installation, size, and site builds.
+Linux CI runs Oxlint, Prettier, types, behavior in three browsers, Storybook interactions, package installation, size, and site builds. Run `npm run lint` and `npm run format:check` locally for the same lint and format checks.
 Windows CI runs production screenshot comparisons against Windows baselines.
 Do not regenerate baselines to hide a defect. Review intended visual changes before accepting new images.
-The workflow files require a connected repository before remote CI results exist.
+On `main`, both jobs must pass before the built Storybook deploys to [GitHub Pages](https://joelmeaders.github.io/terminalui/). Pull requests run the checks without publishing.
 
-## Public release decision
+## Publish a version
 
-An owner must approve the registry identity and legal distribution details before publication.
-Confirm that the license reflects the copyright holders' intended terms. Select a release version and remove `private` only after that decision.
-Confirm contributor authority and review the [license guidance](licensing.md) before publication. Earlier grants under other licenses remain separate.
-Review the complete tarball and rerun all checks for that version. Publish only with explicit release authorization.
-This preparation does not create a registry release, Git tag, deployment, or publishing credential.
+1. Update the version in `package.json` and `package-lock.json`.
+2. Run `npm run check` and inspect `npm pack --dry-run`.
+3. Commit the version change and merge it into `main`.
+4. Create and push a matching version tag, such as `v0.1.0`.
+
+The tag workflow runs both CI jobs again. The publish job checks that the tag matches the package version and belongs to `main` history. It then builds and publishes with the repository's `GITHUB_TOKEN`. No stored npm publishing token is needed.
+
+Publish each version only once. To release another change, increase the version and create a new tag. GitHub Packages requires a GitHub login and `read:packages` token for installation, even when the package is public. See [framework setup](frameworks.md).

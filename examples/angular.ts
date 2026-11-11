@@ -2,11 +2,11 @@ import '@angular/compiler';
 import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { TerminalValueAccessor } from '@terminal-kit/core/angular';
-import '@terminal-kit/core/components/input';
-import '@terminal-kit/core/components/button';
-import '@terminal-kit/core/components/checkbox';
-import '@terminal-kit/core/themes.css';
+import { TerminalValueAccessor } from '@joelmeaders/terminalui/angular';
+import '@joelmeaders/terminalui/components/input';
+import '@joelmeaders/terminalui/components/button';
+import '@joelmeaders/terminalui/components/checkbox';
+import '@joelmeaders/terminalui/themes.css';
 import './shared.css';
 class AngularExample {
   name = new FormControl('Initial', { nonNullable: true });

@@ -1,11 +1,11 @@
 import { createElement as h, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { TInput } from '@terminal-kit/core/react/input';
-import { TButton } from '@terminal-kit/core/react/button';
-import { TCheckbox } from '@terminal-kit/core/react/checkbox';
-import '@terminal-kit/core/themes.css';
+import { TInput } from '@joelmeaders/terminalui/react/input';
+import { TButton } from '@joelmeaders/terminalui/react/button';
+import { TCheckbox } from '@joelmeaders/terminalui/react/checkbox';
+import '@joelmeaders/terminalui/themes.css';
 import './shared.css';
-import type { TInput as TInputElement } from '@terminal-kit/core/components/input';
+import type { TInput as TInputElement } from '@joelmeaders/terminalui/components/input';
 function Example() {
   const input = useRef<TInputElement | null>(null);
   const [value, setValue] = useState('Initial');

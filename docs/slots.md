@@ -33,9 +33,9 @@ Card, Dialog, Drawer, Empty State, Popover, and the layout components retain the
 Import both components when using individual entry points. Use registered provider icons in exactly the same slots. The Icon manual explains provider imports and registration.
 
 ```js
-import '@terminal-kit/core/components/button';
-import '@terminal-kit/core/components/icon';
-import '@terminal-kit/core/themes.css';
+import '@joelmeaders/terminalui/components/button';
+import '@joelmeaders/terminalui/components/icon';
+import '@joelmeaders/terminalui/themes.css';
 ```
 
 Keep the visible action label. A `t-icon` without `label` is decorative and does not repeat that label. For raw SVGs, use `aria-hidden="true"` and `focusable="false"`. Put the slot attribute on an element that is a direct child of the component. To group several items in one slot, put them inside one element and add the slot attribute to that element.
@@ -54,9 +54,9 @@ This example assumes a bundler and the package's shared theme CSS. Importing Ico
 ```
 
 ```js
-import '@terminal-kit/core/components/input';
-import '@terminal-kit/core/components/icon-button';
-import '@terminal-kit/core/themes.css';
+import '@joelmeaders/terminalui/components/input';
+import '@joelmeaders/terminalui/components/icon-button';
+import '@joelmeaders/terminalui/themes.css';
 
 const input = document.querySelector('#query');
 input.querySelector('[slot="end"]').addEventListener('click', () => {

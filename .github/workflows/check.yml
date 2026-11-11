@@ -1,8 +1,19 @@
 name: Library checks
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: library-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   behavior:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -10,8 +21,9 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run lint
       - run: npm run format:check
+      - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run build
       - run: npm run typecheck
       - run: npm run test:docs
@@ -20,13 +32,64 @@ jobs:
       - run: npm run test:package
       - run: npm run size
       - run: npm run build:site
+      - name: Upload Storybook for Pages
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: storybook-static
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: linux-test-results
           path: test-results
+  pages:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: [behavior, windows-visual]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - uses: actions/deploy-pages@v4
+        id: deployment
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [behavior, windows-visual]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: '@joelmeaders'
+      - name: Verify release tag and main history
+        run: |
+          node --input-type=module -e "import fs from 'node:fs'; import assert from 'node:assert/strict'; const pkg = JSON.parse(fs.readFileSync('package.json')); assert.equal(process.env.GITHUB_REF_NAME, 'v' + pkg.version);"
+          git merge-base --is-ancestor HEAD origin/main
+      - run: npm ci
+      - run: npm run build
+      - name: Publish and verify the package version
+        run: |
+          npm publish --ignore-scripts
+          npm view "@joelmeaders/terminalui@${GITHUB_REF_NAME#v}" version
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   windows-visual:
     runs-on: windows-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

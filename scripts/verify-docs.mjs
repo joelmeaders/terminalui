@@ -153,11 +153,11 @@ for (const { tag } of entries) {
   }
   if (tag !== 'typography') {
     assert(
-      reactExample.includes(`from '@terminal-kit/core/react/${tag.slice(2)}'`),
+      reactExample.includes(`from '@joelmeaders/terminalui/react/${tag.slice(2)}'`),
       `${tag}: React examples must import their component wrapper directly.`,
     );
     assert(
-      !reactExample.includes("from '@terminal-kit/core/react'"),
+      !reactExample.includes("from '@joelmeaders/terminalui/react'"),
       `${tag}: React examples must not import the complete wrapper barrel.`,
     );
   }
@@ -275,7 +275,7 @@ for (const framework of ['react', 'vue', 'angular']) {
         : `import '@angular/compiler'; import { bootstrapApplication } from '@angular/platform-browser'; const app = await bootstrapApplication(Example); const instance = app.components[0].instance; if (instance.control) Object.assign(globalThis, { ${formProbe}: { read: () => instance.control.value, set: (next) => instance.control.setValue(next) } });`;
   await build({
     stdin: {
-      contents: `${framework === 'angular' ? "import '@angular/compiler';\n" : ''}${imports}\nimport '@terminal-kit/core/themes.css';\nimport '@terminal-kit/core/typography.css';\nconst Example = ({${map}})[new URLSearchParams(location.search).get('component')];\n${boot}`,
+      contents: `${framework === 'angular' ? "import '@angular/compiler';\n" : ''}${imports}\nimport '@joelmeaders/terminalui/themes.css';\nimport '@joelmeaders/terminalui/typography.css';\nconst Example = ({${map}})[new URLSearchParams(location.search).get('component')];\n${boot}`,
       resolveDir: out,
       loader: 'ts',
     },

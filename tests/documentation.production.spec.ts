@@ -455,7 +455,7 @@ test('global framework selection changes code and survives navigation and reload
   await expect(frame.locator('.tk-docs-tag')).toHaveText('<t-icon>');
   await expect(select).toHaveValue('react');
   await expect(frame.getByTestId('framework-example')).toContainText(
-    "from '@terminal-kit/core/react/icon'",
+    "from '@joelmeaders/terminalui/react/icon'",
   );
   await page.reload();
   await expect(select).toHaveValue('react');
@@ -500,7 +500,7 @@ test('slot API tables and the shared composition guide work in built documentati
       .locator('details')
       .filter({ has: page.getByText('Composing with slots and icons', { exact: true }) });
     await expect(guide).toHaveAttribute('open', '');
-    await expect(guide).toContainText('@terminal-kit/core/components/icon');
+    await expect(guide).toContainText('@joelmeaders/terminalui/components/icon');
     await expect(guide).toContainText('slot="start"');
     await expect(guide).toContainText('read-only');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
@@ -528,7 +528,7 @@ test('both icon docs include complete registration and import instructions', asy
       'ionicons/icons',
       'registerFontAwesomeIcon',
       'registerLucideIcon',
-      '@terminal-kit/core/icons',
+      '@joelmeaders/terminalui/icons',
     ]) {
       await expect(guide).toContainText(text);
     }

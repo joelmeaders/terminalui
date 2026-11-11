@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "no-unused-expressions": ["warn", { "allowTernary": true }],
+    "no-empty-pattern": ["warn", { "allowObjectPatternsAsParameters": true }]
+  }
+}

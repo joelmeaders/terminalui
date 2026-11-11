@@ -230,7 +230,7 @@ for (const disabled of [false, true])
     await page
       .locator('#split')
       .evaluate(async (split: import('../src/components/split-pane').TSplitPane) => {
-        for (const wrapper of [...split.children]) {
+        for (const wrapper of Array.from(split.children)) {
           const button = wrapper.querySelector('button')!;
           button.slot = wrapper.getAttribute('slot')!;
           split.append(button);
