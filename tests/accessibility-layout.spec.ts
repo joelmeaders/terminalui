@@ -484,36 +484,20 @@ test('modal close and footer actions stay visible and unobscured with enlarged t
     ]) {
       await button.focus();
       await expect(button).toBeFocused();
-      const visibility = () =>
-        button.evaluate((element) => {
-          const box = element.getBoundingClientRect();
-          let hit = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2);
-          while (hit?.shadowRoot) {
-            const next = hit.shadowRoot.elementFromPoint(
-              box.x + box.width / 2,
-              box.y + box.height / 2,
-            );
-            if (!next || next === hit) break;
-            hit = next;
-          }
-          return {
-            visible:
-              box.x >= 0 &&
-              box.y >= 0 &&
-              box.right <= innerWidth &&
-              box.bottom <= innerHeight &&
-              (hit === element || element.contains(hit)),
-            box: { x: box.x, y: box.y, right: box.right, bottom: box.bottom },
-            hit: hit?.outerHTML.slice(0, 120),
-            target: element.outerHTML.slice(0, 120),
-          };
-        });
+      // The browser retargets hit tests across slots and shadow roots. Use the
+      // pointer actionability check, then verify the entire control fits.
+      await button.click({ trial: true });
       await expect
-        .poll(async () => {
-          const result = await visibility();
-          if (!result.visible) console.log('Obscured modal action', tag, result);
-          return result;
-        })
+        .poll(() =>
+          button.evaluate((element) => {
+            const box = element.getBoundingClientRect();
+            return {
+              visible:
+                box.x >= 0 && box.y >= 0 && box.right <= innerWidth && box.bottom <= innerHeight,
+              box: { x: box.x, y: box.y, right: box.right, bottom: box.bottom },
+            };
+          }),
+        )
         .toMatchObject({ visible: true });
     }
     await page.keyboard.press('Escape');
