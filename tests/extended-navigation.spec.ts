@@ -612,6 +612,10 @@ for (const [mode, scenario] of [
     expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize()!.width);
     await page.getByRole('combobox', { name: 'Search commands' }).fill('mission');
     await expect(page.getByRole('option')).toHaveCount(1);
+    // Measure the final colors, not a frame of the entrance fade.
+    await dialog.evaluate((element) =>
+      Promise.all(element.getAnimations().map((animation) => animation.finished)),
+    );
     const modalAxe = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
       .analyze();
