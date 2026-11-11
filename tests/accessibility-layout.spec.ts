@@ -484,9 +484,6 @@ test('modal close and footer actions stay visible and unobscured with enlarged t
     ]) {
       await button.focus();
       await expect(button).toBeFocused();
-      // The browser retargets hit tests across slots and shadow roots. Use the
-      // pointer actionability check, then verify the entire control fits.
-      await button.click({ trial: true });
       await expect
         .poll(() =>
           button.evaluate((element) => {
@@ -499,6 +496,10 @@ test('modal close and footer actions stay visible and unobscured with enlarged t
           }),
         )
         .toMatchObject({ visible: true });
+      // Preserve the focused bounds check before pointer checks can scroll.
+      // Native actionability handles hit-test retargeting across slots.
+      await button.click({ trial: true });
+      await expect(button).toBeFocused();
     }
     await page.keyboard.press('Escape');
     await expect(modal).not.toBeVisible();
