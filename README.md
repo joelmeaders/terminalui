@@ -177,7 +177,7 @@ import '@joelmeaders/terminalui/components/button';
 import '@joelmeaders/terminalui/themes.css';
 ```
 
-The current version is `0.1.0`. To install a local copy in another repository, run `npm pack` here. This creates a tarball, an archive of the package. Then run `npm install /path/to/joelmeaders-terminalui-0.1.0.tgz` in the other repository. Importing the package root registers all 57 elements. Individual imports include only their component dependencies. Use one distribution path per page. Do not load the standalone bundle and ESM package together.
+The current version is `0.1.1`. To install a local copy in another repository, run `npm pack` here. This creates a tarball, an archive of the package. Then run `npm install /path/to/joelmeaders-terminalui-0.1.1.tgz` in the other repository. Importing the package root registers all 57 elements. Individual imports include only their component dependencies. Use one distribution path per page. Do not load the standalone bundle and ESM package together.
 
 The build also creates TypeScript declarations, a Custom Elements Manifest, a component catalog, and VS Code HTML metadata. Storybook reads the generated manifest. See [framework integration](docs/frameworks.md) for editor configuration and [release preparation](docs/releasing.md) for package verification and publication boundaries.
 
@@ -392,4 +392,4 @@ Accessibility requirements are part of [AGENTS.md](AGENTS.md). The [accessibilit
 - Tooltips provide short, noninteractive help. Tooltips and popovers use viewport-aware placement with flipping and bounds adjustment during scrolling and resizing. Use a popover for interactive content.
 - Tables support local sorting, filtering, paging, loading, empty states, and row selection. The library does not provide a virtualized data grid, cell editing, or a rich-text editor.
 - The theme choice in the demo persists locally. The component package itself does not write to storage.
-- GitHub Actions publishes version tags such as `v0.1.0` to GitHub Packages after the checks pass. See [release preparation](docs/releasing.md).
+- GitHub Actions publishes version tags such as `v0.1.1` to GitHub Packages after the checks pass. See [release preparation](docs/releasing.md).

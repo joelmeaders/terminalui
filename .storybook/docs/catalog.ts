@@ -142,6 +142,7 @@ export const guides: Record<string, ComponentGuide> = {
     ],
     accessibility: [
       'Use urgent only for an interruption that must be announced immediately. Include text that explains the status.',
+      'Keep the dismiss action readable and keyboard reachable when text is enlarged.',
     ],
     example: {
       props: { variant: 'success', dismissible: true },

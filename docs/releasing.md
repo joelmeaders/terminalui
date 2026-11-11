@@ -28,17 +28,17 @@ These budgets exclude theme CSS and fonts. Run `npm run size` for current measur
 ## CI
 
 Linux CI runs Oxlint, Prettier, types, behavior in three browsers, Storybook interactions, package installation, size, and site builds. Run `npm run lint` and `npm run format:check` locally for the same lint and format checks.
-Windows CI runs production screenshot comparisons against Windows baselines.
+Windows CI runs component visual checks in all three browsers and production screenshot comparisons against Windows baselines.
 Do not regenerate baselines to hide a defect. Review intended visual changes before accepting new images.
-On `main`, both jobs must pass before the built Storybook deploys to [GitHub Pages](https://joelmeaders.github.io/terminalui/). Pull requests run the checks without publishing.
+On `main`, all browser jobs and the Windows job must pass before the built Storybook deploys to [GitHub Pages](https://joelmeaders.github.io/terminalui/). Pull requests run the checks without publishing.
 
 ## Publish a version
 
 1. Update the version in `package.json` and `package-lock.json`.
 2. Run `npm run check` and inspect `npm pack --dry-run`.
 3. Commit the version change and merge it into `main`.
-4. Create and push a matching version tag, such as `v0.1.0`.
+4. Create and push a matching version tag, such as `v0.1.1`.
 
-The tag workflow runs both CI jobs again. The publish job checks that the tag matches the package version and belongs to `main` history. It then builds and publishes with the repository's `GITHUB_TOKEN`. No stored npm publishing token is needed.
+The tag workflow runs all checks again. The publish job checks that the tag matches the package version and belongs to `main` history. It then builds and publishes with the repository's `GITHUB_TOKEN`. No stored npm publishing token is needed.
 
 Publish each version only once. To release another change, increase the version and create a new tag. GitHub Packages requires a GitHub login and `read:packages` token for installation, even when the package is public. See [framework setup](frameworks.md).

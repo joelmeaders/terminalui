@@ -14,6 +14,10 @@ jobs:
   behavior:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,24 +27,29 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run format:check
-      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
       - run: npm run build
       - run: npm run typecheck
       - run: npm run test:docs
-      - run: npm run test:behavior
+        if: matrix.browser == 'chromium'
+      - run: npm run test:behavior -- --project=${{ matrix.browser }} --workers=2
       - run: npm run test:stories
+        if: matrix.browser == 'chromium'
       - run: npm run test:package
+        if: matrix.browser == 'chromium'
       - run: npm run size
+        if: matrix.browser == 'chromium'
       - run: npm run build:site
+        if: matrix.browser == 'chromium'
       - name: Upload Storybook for Pages
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        if: matrix.browser == 'chromium' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v4
         with:
           path: storybook-static
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: linux-test-results
+          name: linux-${{ matrix.browser }}-test-results
           path: test-results
   pages:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
@@ -85,6 +94,7 @@ jobs:
         run: |
           npm publish --ignore-scripts
           npm view "@joelmeaders/terminalui@${GITHUB_REF_NAME#v}" version
+          npm install --ignore-scripts --no-audit --no-fund --prefix "$RUNNER_TEMP/terminalui-install" "@joelmeaders/terminalui@${GITHUB_REF_NAME#v}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   windows-visual:
@@ -97,8 +107,9 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npx playwright install chromium
+      - run: npx playwright install chromium firefox webkit
       - run: npm run build
+      - run: npm test -- --grep "screenshot|visual"
       - run: npm run test:production
       - uses: actions/upload-artifact@v4
         if: always()

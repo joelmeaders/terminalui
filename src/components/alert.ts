@@ -54,6 +54,8 @@ export class TAlert extends TerminalElement {
       }
       button {
         border: 0;
+        /* Keep enlarged glyphs inside the control across font metrics. */
+        padding: 0.15em 6px;
         color: var(--t-text);
         background: transparent;
         min-width: 24px;

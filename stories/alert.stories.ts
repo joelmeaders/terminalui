@@ -40,6 +40,15 @@ export const Dismissible: Story = {
   },
 };
 
+export const EnlargedDismissAction: Story = {
+  args: { dismissible: true },
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('t-alert')!;
+    await host.updateComplete;
+    host.shadowRoot!.querySelector('button')!.style.fontSize = '36px';
+  },
+};
+
 export const WithSlots: Story = {
   render: () =>
     html`<t-alert variant="success" dismissible

@@ -108,7 +108,7 @@ Consumer event spies and browser-boundary mocks are useful here. Clipboard denia
 
 ## Missing considerations and priorities
 
-The license finding in the table is historical. The owner later selected the MIT License.
+The license and release findings in the table are historical. The owner later selected MIT, made the repository public, and added automated Pages and package publishing.
 
 | Priority                               | Gap                                                                                                                                                                       | Concrete next step                                                                                                                                                                |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

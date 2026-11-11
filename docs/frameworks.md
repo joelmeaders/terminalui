@@ -13,7 +13,7 @@ For local development, you can also install a tarball, an archive containing the
 ```sh
 npm run build
 npm pack
-npm install /path/to/joelmeaders-terminalui-0.1.0.tgz
+npm install /path/to/joelmeaders-terminalui-0.1.1.tgz
 ```
 
 Import the theme stylesheet once. Apply `data-theme="amber"` to `html` or a parent container.

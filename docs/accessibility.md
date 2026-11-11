@@ -432,6 +432,10 @@ Use a physical touch device to operate compact controls, menus, tabs, pagination
 
 ## Manual evidence register
 
+The 2026-11-11 Linux release checks found that the Alert dismiss symbol could exceed its button box with simulated 200% text enlargement. Font-relative padding now leaves room for the glyph. The focused regression failed before the fix in Linux Chromium and Firefox, then passed in Chromium, Firefox, and WebKit. The existing enlarged catalog and narrow modal focus checks also passed in the isolated Linux run.
+
+This is automated evidence from the Playwright 1.63.0 Ubuntu 24.04 image. The full Linux accessibility run passed 1,497 tests and skipped 12. The skips remain coverage gaps. Actual browser zoom and screen-reader speech are separate checks. Manual NVDA and VoiceOver results for this scenario remain pending.
+
 The 2026-11-11 modernization review added native shadow-root focus delegation to form controls. Automated regressions check external HTML label activation and forward/reverse Tab order for Input, Textarea, and Select in Chromium, Firefox, and WebKit. These checks do not establish screen-reader announcements. Manual external-label checks with Windows/NVDA and macOS/VoiceOver remain pending, with browser and assistive-technology versions unrecorded.
 
 The 2026-09-26 Start here manual guide passed keyboard disclosure, evidence-table scrolling, and page reflow checks at 320 CSS pixels and actual 400% Chromium zoom. The guide reads this document directly. Its two scans returned no axe violations and retained `color-contrast` incomplete findings for partially clipped evidence-table cells. Reports are `welcome-manual-axe-review.json`. These remain review items. A separate visual review checked the collapsed guide at 320 CSS pixels without browser zoom. The automated zoom check does not establish visual review or screen-reader speech.
