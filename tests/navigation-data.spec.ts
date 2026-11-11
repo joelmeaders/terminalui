@@ -224,6 +224,12 @@ test('menu exposes popup state without an unresolved ID reference', async ({ pag
   await expect(trigger).toHaveAttribute('aria-expanded', 'true');
   expect(await trigger.getAttribute('aria-controls')).toBeNull();
   await expect(page.locator('t-menu #menu')).toBeVisible();
+  // Contrast is a property of the final colors, not the entrance fade.
+  await page
+    .locator('t-menu #menu')
+    .evaluate((element) =>
+      Promise.all(element.getAnimations().map((animation) => animation.finished)),
+    );
   const open = await new AxeBuilder({ page }).include('t-menu').analyze();
   await expectAxeReport(open, 'open-menu-axe-review');
   expect(open.incomplete.filter((result) => result.id === 'aria-valid-attr-value')).toEqual([]);
