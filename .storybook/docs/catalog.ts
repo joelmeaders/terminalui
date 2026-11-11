@@ -38,6 +38,7 @@ const selectEvent = {
 };
 const fieldAccess = [
   'Use a visible label. Help and error text are associated with the native field inside its shadow root.',
+  'An external HTML label can focus the field through its for attribute. Keep the label property to name the native control inside the shadow root.',
   'Provide name for form submission. Set error for application feedback and use native validity or framework validators for rules.',
 ];
 const field = (

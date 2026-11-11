@@ -78,6 +78,7 @@ export const fieldStyles = [
 
 export abstract class FormControl extends TerminalElement {
   static formAssociated = true;
+  static shadowRootOptions = { ...TerminalElement.shadowRootOptions, delegatesFocus: true };
   static properties: PropertyDeclarations = {
     name: { reflect: true },
     value: {},

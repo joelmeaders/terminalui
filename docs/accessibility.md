@@ -432,6 +432,8 @@ Use a physical touch device to operate compact controls, menus, tabs, pagination
 
 ## Manual evidence register
 
+The 2026-11-11 modernization review added native shadow-root focus delegation to form controls. Automated regressions check external HTML label activation and forward/reverse Tab order for Input, Textarea, and Select in Chromium, Firefox, and WebKit. These checks do not establish screen-reader announcements. Manual external-label checks with Windows/NVDA and macOS/VoiceOver remain pending, with browser and assistive-technology versions unrecorded.
+
 The 2026-09-26 Start here manual guide passed keyboard disclosure, evidence-table scrolling, and page reflow checks at 320 CSS pixels and actual 400% Chromium zoom. The guide reads this document directly. Its two scans returned no axe violations and retained `color-contrast` incomplete findings for partially clipped evidence-table cells. Reports are `welcome-manual-axe-review.json`. These remain review items. A separate visual review checked the collapsed guide at 320 CSS pixels without browser zoom. The automated zoom check does not establish visual review or screen-reader speech.
 
 ### Automated review items from 2026-09-23

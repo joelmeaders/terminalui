@@ -131,6 +131,7 @@ test('calendar completes a range once and marks its endpoints and intervening da
 });
 
 test('same-day range and earlier second choice remain keyboard operable', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-09-24T12:00:00'));
   await mount(page, '');
   const picker = page.locator('t-date-range-picker');
   await picker.getByRole('button', { name: 'Choose date range' }).click();

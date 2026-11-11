@@ -476,9 +476,11 @@ test('combobox closes on disable and disconnect, then reopens after reconnect', 
     element.disabled = true;
   });
   await expect(panel).not.toBeVisible();
+  await expect(input).not.toBeFocused();
   await page.locator('t-combobox').evaluate((element: any) => {
     element.disabled = false;
   });
+  await expect(input).toBeEnabled();
   await input.focus();
   await expect(panel).toBeVisible();
   await page.locator('t-combobox').evaluate((element: any) => {

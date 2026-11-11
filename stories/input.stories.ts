@@ -49,6 +49,11 @@ export const Default: Story = {
   },
 };
 export const Required: Story = { args: { required: true } };
+export const ExternalLabel: Story = {
+  render: () =>
+    html`<label for="callsign-field">Edit callsign</label>
+      <t-input id="callsign-field" label="Callsign"></t-input>`,
+};
 export const WithAction: Story = {
   render: () =>
     html`<t-input label="Search archive" type="search" value="Survey">

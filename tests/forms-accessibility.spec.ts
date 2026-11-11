@@ -12,6 +12,22 @@ async function fixture(page: Page, markup: string) {
   }, markup);
 }
 
+for (const tag of ['input', 'textarea', 'select']) {
+  test(`external labels focus t-${tag} without adding a keyboard stop`, async ({ page }) => {
+    await fixture(
+      page,
+      `<label for="field">Edit field</label><t-${tag} id="field" label="Field"></t-${tag}><button>Next</button>`,
+    );
+    const control = page.locator(`t-${tag}`).locator('input,textarea,select');
+    await page.getByText('Edit field', { exact: true }).click();
+    await expect(control).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await expect(control).toBeFocused();
+  });
+}
+
 test('all form controls expose one persistent description for asynchronous and custom errors', async ({
   page,
 }) => {
