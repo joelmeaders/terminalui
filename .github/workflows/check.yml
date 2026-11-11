@@ -8,7 +8,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: library-${{ github.ref }}
+  group: library-checks-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   behavior:
