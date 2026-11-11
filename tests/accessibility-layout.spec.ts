@@ -508,7 +508,13 @@ test('modal close and footer actions stay visible and unobscured with enlarged t
             target: element.outerHTML.slice(0, 120),
           };
         });
-      await expect.poll(visibility).toMatchObject({ visible: true });
+      await expect
+        .poll(async () => {
+          const result = await visibility();
+          if (!result.visible) console.log('Obscured modal action', tag, result);
+          return result;
+        })
+        .toMatchObject({ visible: true });
     }
     await page.keyboard.press('Escape');
     await expect(modal).not.toBeVisible();
