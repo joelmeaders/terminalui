@@ -25,7 +25,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Searchable single select. Set options to {value, label, disabled?} objects. Arrow keys skip disabled choices. Enter selects, Escape closes, and Tab leaves the field. Only an enabled option submits. Unmatched text fails validation. Replace options when asynchronous data arrives. loading announces progress; no network requests are made. Parts: input, listbox, option.',
+          'Searchable single select. Set options to {value, label, disabled?} objects. Arrow keys skip disabled choices. Enter selects, Escape closes, and Tab leaves the field. Only an enabled option submits. Unmatched text fails validation. Replace options when asynchronous data arrives. loading announces progress. The component makes no network requests. Parts: input, listbox, option.',
       },
     },
   },

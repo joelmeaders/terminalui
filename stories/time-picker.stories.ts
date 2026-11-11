@@ -22,7 +22,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'A form-associated 24-hour time field. Type HH:mm or use the native hour and minute choices in its modal. Required and min/max values validate the submitted string. Cancel and Escape discard a draft; Use time emits input, change, and t-change when the value changes.',
+          'A form-associated 24-hour time field. Type HH:mm or use the native hour and minute choices in its modal. Required and min/max values validate the submitted string. Cancel and Escape discard a draft. Use time emits input, change, and t-change when the value changes.',
       },
     },
   },

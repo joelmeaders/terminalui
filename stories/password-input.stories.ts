@@ -20,7 +20,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Password field with a named Show/Hide action. Preserves the input selection and focus during pointer activation. Keyboard activation keeps focus on the action. Inherits input constraints, autocomplete, native FormData and reset. revealed controls visibility; reset hides the value. Emits standard input/change plus t-visibility-change with {revealed}.',
+          'Password field with a named Show/Hide action. Preserves the input selection and focus during pointer activation. Keyboard activation keeps focus on the action. Inherits input constraints, autocomplete, native FormData and reset. revealed controls visibility. Reset hides the value. Emits standard input/change plus t-visibility-change with {revealed}.',
       },
     },
   },

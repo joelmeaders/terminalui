@@ -1,6 +1,6 @@
 # Slots and icons
 
-Slots place your content inside a component while you keep ownership of that content and its event handlers. Use the same `slot="name"` attribute in HTML, Angular, Vue, and React. The global framework selector shows complete integration examples above.
+A slot is a place where you can put your own content inside a component. Your application still owns that content and its event handlers. Use the same `slot="name"` attribute in HTML, Angular, Vue, and React. The global framework selector shows complete examples above.
 
 ## Choose the slot
 
@@ -38,9 +38,9 @@ import '@terminal-kit/core/components/icon';
 import '@terminal-kit/core/themes.css';
 ```
 
-Keep the visible action label. A `t-icon` without `label` is decorative and does not repeat that label. For raw SVGs, use `aria-hidden="true"` and `focusable="false"`. Put a slot attribute on the direct child of the component. To group several nodes, put them inside one element with the slot attribute.
+Keep the visible action label. A `t-icon` without `label` is decorative and does not repeat that label. For raw SVGs, use `aria-hidden="true"` and `focusable="false"`. Put the slot attribute on an element that is a direct child of the component. To group several items in one slot, put them inside one element and add the slot attribute to that element.
 
-For an action with only an icon, use `t-icon-button` and give it a specific `label`. Do not put buttons, links, or other interactive controls inside a Button, Link, Badge, Accordion summary, Menu trigger, or Popover trigger slot.
+For an action with only an icon, use `t-icon-button`. Give it a specific `label`. Do not put buttons, links, or other interactive controls inside a Button, Link, Badge, Accordion summary, Menu trigger, or Popover trigger slot.
 
 ## An input action
 
@@ -66,9 +66,9 @@ input.querySelector('[slot="end"]').addEventListener('click', () => {
 });
 ```
 
-The native field keeps its own label, help, validation, and form value. Affixes do not become part of the field's accessible name. Include essential units in `label` or `help`, even when you also show a unit in a slot.
+The native field keeps its own label, help, validation, and form value. Content beside the field does not become part of its accessible name, the name assistive technology announces. Include essential units in `label` or `help`, even when you also show a unit in a slot.
 
-Input actions have their own keyboard stop. A disabled field or disabled fieldset makes its affix slots inert. The component does not overwrite your action's disabled property. A read-only field can still offer a copy or help action. Your handler must respect read-only state if it would change the value.
+Input actions have their own place in the keyboard tab order. A disabled field or disabled fieldset makes its affix slots inert, so their actions cannot be used. The component does not overwrite your action's disabled property. A read-only field can still offer a copy or help action. Your handler must respect read-only state if it would change the value.
 
 Use short affixes and named buttons. Keep larger content outside the control. The `control` CSS part styles the shared field frame. Existing `input` and `select` parts still address the native element.
 
@@ -81,7 +81,7 @@ Use short affixes and named buttons. Keep larger content outside the control. Th
 </t-toast>
 ```
 
-The application owns the Undo action and the operation it reverses. Handle the action's `click`, complete the operation, then call `notice.close()` when appropriate. The Toast story includes a working local example.
+The application owns the Undo action and the operation it reverses. Handle the action's `click` and complete the operation. Then call `notice.close()` when appropriate. The Toast story includes a working local example.
 
 Default-slot content replaces the `message` property. Formatting whitespace between named slots does not hide the message. Changes to that content are detected, including text updates and removal.
 

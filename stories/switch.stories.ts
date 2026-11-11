@@ -11,7 +11,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Native checkbox with switch presentation and the switch role. The checked property controls state. A checked switch submits its value (default on); an unchecked switch submits nothing. Supports required, reset, and disabled fieldsets. Emits composed input/change events. CSS part: input.',
+          'Native checkbox with switch presentation and the switch role. The checked property controls state. A checked switch submits its value (default on). An unchecked switch submits nothing. Supports required, reset, and disabled fieldsets. Emits composed input/change events. CSS part: input.',
       },
     },
   },

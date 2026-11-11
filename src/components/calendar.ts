@@ -36,7 +36,7 @@ const today = () => {
 
 /**
  * Inline calendar for selecting one ISO date. Use a form control for native date entry and submission.
- * The seven-column grid has one day in the tab order; arrow, Home/End, and Page keys move that focus.
+ * The seven-column grid has one day in the tab order. Arrow, Home/End, and Page keys move that focus.
  * Range mode marks the days between rangeStart and rangeEnd. Selection events still report one chosen day.
  *
  * @fires input - User selected a date. Read `event.target.value`.

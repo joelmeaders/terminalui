@@ -1,12 +1,12 @@
 # Terminal Kit
 
-A browser component library built with Lit. All 57 components share six terminal-inspired palettes and work in plain HTML, React, Vue, and Angular. Storybook contains API notes, interactive controls, component states, and browser interaction tests. The package includes typed framework adapters, generated editor metadata, optional icon providers, and an installable local tarball.
+Terminal Kit is a library of 57 browser components built with Lit. They share six terminal-inspired color palettes. Use them with plain HTML, React, Vue, or Angular.
+
+Storybook is the component guide. It shows how to use each component, lets you try its controls, and includes browser interaction tests. The package also includes typed framework adapters, editor metadata, and optional icon providers. You can install it from a local tarball.
 
 ## License
 
-Terminal Kit uses the custom [Terminal Kit Free Distribution License 1.0](LICENSE). It permits free redistribution of the kit, forks, modified components, and derived themes. Games, websites, and other applications may use it and charge for their own product. Selling the kit or its derivatives as reusable components, themes, or another toolkit product is prohibited. Distributed derivatives keep the same free-distribution terms.
-
-This is a **source-available license, not an OSI open source license**. The custom terms are a draft for legal review before publication. The repository remains private and unpublished. See [license guidance and examples](docs/licensing.md). Third-party assets keep their own licenses in [icon credits](docs/icons.md).
+Terminal Kit uses the [MIT License](LICENSE). The GitHub repository is private. The npm package is not published. See [license guidance](docs/licensing.md). Third-party assets keep their own licenses in [icon credits](docs/icons.md).
 
 ## Run locally
 
@@ -27,13 +27,13 @@ npm run storybook
 
 Storybook is at **http://127.0.0.1:6006**. The workbench's documentation links point there during development.
 
-Every component's Docs page includes project setup, a complete starting example, live controls, API tables, styling hooks, accessibility guidance, and state examples. Choose **HTML / JS / CSS**, **Angular**, **Vue**, or **React** with the global framework selector. The selection follows you between pages and is included in shareable Storybook URLs. Live previews use the shared Web Component; the selector changes setup and integration code.
+Every component's Docs page includes setup, a complete example, live controls, API tables, styling hooks, accessibility guidance, and state examples. Use the global framework selector to choose **HTML / JS / CSS**, **Angular**, **Vue**, or **React**. Your selection stays active between pages and appears in shareable Storybook URLs. Live previews use the same Web Component. The selector changes the setup and integration code.
 
 The Icon and Icon Button pages include built-in names, registration, individual provider imports, and custom SVG examples. Storybook reuses the guides in `docs/` and generates API tables from source metadata. See [documentation maintenance](docs/documentation.md) for the shared recipes and verification workflow.
 
 ### Slots and icons
 
-Use `start` and `end` slots for icons beside button/link labels, disclosure triggers, badges, chips, and single-line fields. Alert accepts an `icon` slot. Toast accepts `icon` and `actions` slots. Each component's Storybook page lists its slots and shows composition examples for the selected framework.
+A slot is a place where you can put your own content inside a component. Use `start` and `end` slots for icons beside button/link labels, disclosure triggers, badges, chips, and single-line fields. Alert accepts an `icon` slot. Toast accepts `icon` and `actions` slots. Each component's Storybook page lists its slots and shows composition examples for the selected framework.
 
 ```html
 <t-button>
@@ -154,7 +154,7 @@ Serve this markup over HTTP:
 </section>
 ```
 
-The browser bundle includes Lit. It needs no import map or consumer build step. See [examples/plain.html](examples/plain.html) for a working form.
+The browser bundle includes Lit. You can use it without an import map or a build step in your application. See [examples/plain.html](examples/plain.html) for a working form.
 
 For a bundler, import individual components and the theme CSS:
 
@@ -164,13 +164,13 @@ import '@terminal-kit/core/components/button';
 import '@terminal-kit/core/themes.css';
 ```
 
-The package remains private and unpublished at version `0.1.0`. To install it in another repository, run `npm pack` here, then `npm install /path/to/terminal-kit-core-0.1.0.tgz` there. Importing the package root registers all 57 elements. Individual imports include only their component dependencies. Use one distribution path per page: do not load the standalone bundle and ESM package together.
+The npm package is not published. Its current version is `0.1.0`. To install it in another repository, run `npm pack` here. This creates a tarball, an archive of the package. Then run `npm install /path/to/terminal-kit-core-0.1.0.tgz` in the other repository. Importing the package root registers all 57 elements. Individual imports include only their component dependencies. Use one distribution path per page. Do not load the standalone bundle and ESM package together.
 
 The build also creates TypeScript declarations, a Custom Elements Manifest, a component catalog, and VS Code HTML metadata. Storybook reads the generated manifest. See [framework integration](docs/frameworks.md) for editor configuration and [release preparation](docs/releasing.md) for package verification and publication boundaries.
 
 ## Forms and events
 
-All 19 form controls use `ElementInternals` to participate in HTML forms. They support FormData, browser validation, disabled fieldsets, and reset. Give each field a `name` for submission and a `label` for its internal native control. Reset restores the initial value or checked state and clears file selection. Set initial property values before the first render when using framework bindings. Tags and multi-select expose a `values` array and a JSON string `value`; FormData contains one entry per selected item under the same name. Multi-select uses labeled native checkboxes and can filter choices without clearing selection. Number and rating values are strings. Date-range values use one `START/END` ISO string.
+All 19 form controls work with HTML forms through `ElementInternals`. This means they support FormData, browser validation, disabled fieldsets, and reset. Give each field a `name` for submission and a `label` for its internal native control. Reset restores the initial value or checked state and clears file selection. Set initial property values before the first render when using framework bindings. Tags and multi-select expose a `values` array and a JSON string `value`. FormData contains one entry per selected item under the same name. Multi-select uses labeled native checkboxes and can filter choices without clearing selection. Number and rating values are strings. Date-range values use one `START/END` ISO string.
 
 Use Terminal Kit or native submit and reset buttons:
 
@@ -184,9 +184,9 @@ Use Terminal Kit or native submit and reset buttons:
 
 `t-button` defaults to `type="button"`. Set `type="submit"` or `type="reset"` for form actions. Its `form` attribute can target an external form. Submission runs validation and includes the activated submit button's name and value. Enter in `t-input` follows the form's first submit button, including disabled-button blocking.
 
-Fields emit bubbling, composed `input` and `change` events. Read `event.target.value`, `event.target.checked`, or `event.target.files`. Range values are strings. Programmatic property changes update the display without emitting an input event. Await `element.updateComplete` when a script must read the updated DOM or form state immediately after setting properties. Use `setCustomValidity()`, `checkValidity()`, and `reportValidity()` for browser validation.
+Fields emit `input` and `change` events. These events bubble and cross the shadow boundary, so listeners outside the component can receive them. Read `event.target.value`, `event.target.checked`, or `event.target.files`. Range values are strings. Programmatic property changes update the display without emitting an input event. Await `element.updateComplete` when a script must read the updated DOM or form state immediately after setting properties. Use `setCustomValidity()`, `checkValidity()`, and `reportValidity()` for browser validation.
 
-React custom event handlers infer their documented payloads. For example, `TMenu`'s `onTSelect` provides `event.detail.value` as a string and `event.detail.option` as `MenuOption`. Native input/change events remain `Event`. See [framework integration](docs/frameworks.md) for typed examples.
+React custom event handlers infer their documented payload types, so you can read the event data without a type cast. For example, `TMenu`'s `onTSelect` provides `event.detail.value` as a string and `event.detail.option` as `MenuOption`. Native input/change events remain `Event`. See [framework integration](docs/frameworks.md) for typed examples.
 
 Set arrays such as `options`, `tabs`, `items`, `columns`, and `rows` as JavaScript properties. Pass new arrays when changing their contents. Slot names must match unique tab IDs.
 

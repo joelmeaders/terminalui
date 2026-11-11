@@ -40,7 +40,7 @@ for (const directory of noticeDirectories) {
 }
 assert(!pack.files.some((file) => file.path.startsWith('src/')));
 const pkg = JSON.parse(await readFile('package.json', 'utf8'));
-assert.equal(pkg.license, 'SEE LICENSE IN LICENSE');
+assert.equal(pkg.license, 'MIT');
 assert.deepEqual(
   Object.keys(pkg.dependencies),
   ['lit'],

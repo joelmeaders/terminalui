@@ -25,7 +25,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Labeled native checkboxes with optional filtering. Set the `options` array and read `values`. Each selected value submits a separate FormData entry under `name`. The `value` string is a JSON array for attributes and form state restoration. Replace the options array for live updates; focus follows a surviving value or moves to an available choice. An empty required list focuses its named group when submitted.',
+          'Labeled native checkboxes with optional filtering. Set the `options` array and read `values`. Each selected value submits a separate FormData entry under `name`. The `value` string is a JSON array for attributes and form state restoration. Replace the options array for live updates. Focus follows a surviving value or moves to an available choice. An empty required list focuses its named group when submitted.',
       },
     },
   },

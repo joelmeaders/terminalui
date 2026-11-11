@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Native description list for term/value pairs. Set `items` to `{ term, value }[]`; values render as plain text. Pairs use two columns and stack below a 400px container width. The default slot accepts additional native `dt` / `dd` pairs, optionally grouped in a `div`, for rich content.',
+          'Native description list for term/value pairs. Set `items` to `{ term, value }[]`. Values render as plain text. Pairs use two columns and stack below a 400px container width. The default slot accepts additional native `dt` / `dd` pairs, optionally grouped in a `div`, for rich content.',
       },
     },
   },

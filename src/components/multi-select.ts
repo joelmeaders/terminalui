@@ -6,7 +6,7 @@ import type { SelectOption } from './select';
 
 /**
  * Choose several options with native checkboxes. Each choice submits a FormData entry under name.
- * The values property is a string array; value is its JSON string form for attribute and state restoration.
+ * The values property is a string array. The value property is its JSON string form for attribute and state restoration.
  * Replacing options preserves focus by choice value. An empty required list focuses its named group on validation.
  *
  * @fires input - A user changed the values array.

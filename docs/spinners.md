@@ -26,8 +26,8 @@ Styles use CSS animation without JavaScript timers or external images. They inhe
 
 The cursors blink once per 1.2-second cycle. Pixel and block styles use discrete steps. All styles stop under `data-motion="off"` or the device's reduced-motion preference. A visible static shape remains, including for cursors. A nested `data-motion="auto"` region can restore motion only when the device permits it. Use the Storybook motion toolbar to compare these states.
 
-Give each spinner a task-specific `label`. The label stays in one polite status region. Animated shapes are hidden from assistive technology and never change the announcement on each frame. Include visible loading text when users need to know which task is pending. Set `aria-busy` on the application region being updated, then remove the spinner and clear that state when work finishes. Do not use indefinite animation as the only evidence of progress. Use `t-progress` when a measured completion value is available.
+Give each spinner a task-specific `label`. The label stays in one polite status region. Animated shapes are hidden from assistive technology and never change the announcement on each frame. Include visible loading text when users need to know which task is pending. Set `aria-busy` on the application region being updated. When work finishes, remove the spinner and clear that state. Do not use indefinite animation as the only evidence of progress. Use `t-progress` when a measured completion value is available.
 
-If adjacent status text already announces the same task, hide the duplicate spinner with `aria-hidden="true"`. Applications control whether work has finished; an animation cycle is not a completion event.
+If adjacent status text already announces the same task, hide the duplicate spinner with `aria-hidden="true"`. Applications control whether work has finished. An animation cycle is not a completion event.
 
 In the workbench, choose **Spinner style** under **Loading & empty states**. The arrow also exposes an **Arrow positions** setting. Storybook includes individual styles, modern and terminal galleries, motion-off states, and nested motion regions.

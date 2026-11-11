@@ -1,7 +1,7 @@
 # Framework integration
 
-The core uses Lit and browser custom elements. Framework adapters are optional package exports.
-The local package remains private and unpublished. Install a tarball until an owner approves a public release.
+The core uses Lit and browser custom elements. The package also offers optional adapters for frameworks.
+The npm package is not published. Until an owner approves a public release, install a local tarball. A tarball is an archive containing the package.
 
 ```sh
 npm run build
@@ -10,8 +10,7 @@ npm install /path/to/terminal-kit-core-0.1.0.tgz
 ```
 
 Import the theme stylesheet once. Apply `data-theme="amber"` to `html` or a parent container.
-Import component modules before rendering their elements. Do not mix the standalone bundle with component imports on one page.
-Both formats register the same element names.
+Import component modules before rendering their elements. Choose either the standalone bundle or component imports for a page. Both register the same element names, so do not use them together.
 
 ## Plain HTML
 
@@ -29,12 +28,12 @@ No package manager, framework, or import map is required in the browser.
 
 With a bundler, use `import '@terminal-kit/core/components/input'` for individual elements.
 Use `import '@terminal-kit/core'` for the entire catalog. Both imports include element registration.
-Object and array properties require JavaScript assignment. Boolean HTML attributes use presence, so `disabled="false"` still disables a control.
+Set object and array properties with JavaScript. A boolean HTML attribute is true when it is present. For example, `disabled="false"` still disables a control.
 
 ## React 19
 
 Install `react` and `@lit/react`. Import typed wrappers from per-component paths such as `@terminal-kit/core/react/input`.
-Each path includes that wrapper and its required element dependencies. It forwards element properties, refs, children, and native event listeners.
+Each path includes that wrapper and the elements it needs. The wrapper passes properties, refs, children, and native event listeners to the element.
 The existing `@terminal-kit/core/react` barrel remains compatible. Bundlers that honor package side-effect metadata can also remove its unused wrappers.
 Per-component paths keep the module graph focused in development and native ESM as well. Use `@terminal-kit/core` when you need to register the complete element catalog.
 The official [Lit React adapter](https://lit.dev/docs/frameworks/react/) supplies this behavior.
@@ -58,7 +57,7 @@ export function Settings() {
 ```
 
 Use `checked` for checkbox and switch state. Use `onTSelect`, `onTChange`, `onTClose`, and similar names for `t-*` events.
-Custom event handlers infer the component's documented payload. Nested menu options, tree items, commands, numeric values, and literal states retain their types. Events without a payload have `detail: null`. Native `input` and `change` handlers receive `Event`; read the value from their typed element target.
+Custom event handlers infer the types of the event data described in the component guide. Nested menu options, tree items, commands, numeric values, and literal states retain their types. Events without a payload have `detail: null`. Native `input` and `change` handlers receive `Event`; read the value from their typed element target.
 
 ```tsx
 import { TMenu } from '@terminal-kit/core/react/menu';
@@ -77,7 +76,7 @@ export function FileActions() {
 }
 ```
 
-These bindings do not provide React server rendering or hydration. Render this library in a browser client boundary.
+These bindings do not support React server rendering or hydration. Render this library inside a browser client boundary.
 The examples assume a client bundler that accepts CSS imports, such as Vite. With Vite and TypeScript, include `vite/client` in your application's types so local CSS imports are recognized.
 
 ## Vue 3
@@ -130,7 +129,7 @@ export class Settings {
 }
 ```
 
-The accessor supports `formControl`, `formControlName`, and `ngModel` for all nineteen form controls.
+The accessor connects all nineteen form controls to Angular forms. It supports `formControl`, `formControlName`, and `ngModel`.
 Input, textarea, select, radio, range, combobox, password input, number input, segmented control, rating, tags input, color picker, date picker, date-range picker, and time picker use string values.
 Checkboxes and switches use booleans. File inputs use `FileList | null`. Multi-select uses a `string[]` model and submits repeated entries under its form name.
 Number inputs and ratings use numeric strings, not JavaScript numbers. Tags use a JSON array string, such as `'["alpha","beta"]'`.

@@ -24,7 +24,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Type two YYYY-MM-DD dates or choose a start and end in one modal calendar. The form value is a slash-separated interval, such as 2026-09-24/2026-10-01. Calendar choices remain a draft until both days are selected; Escape cancels the draft. Bounds, date order, required state, and form reset use native form behavior.',
+          'Type two YYYY-MM-DD dates or choose a start and end in one modal calendar. The form value is a slash-separated interval, such as 2026-09-24/2026-10-01. Calendar choices remain a draft until both days are selected. Escape cancels the draft. Bounds, date order, required state, and form reset use native form behavior.',
       },
     },
   },

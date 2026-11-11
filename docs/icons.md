@@ -1,8 +1,8 @@
 # Icons and provider data
 
-`t-icon` and `t-icon-button` use the same local registry. The core includes its built-in icons and depends only on Lit. Provider packages are optional application or build dependencies. The registry makes no network requests and does not download an icon when it sees a provider prefix.
+`t-icon` and `t-icon-button` use the same local registry, a list of icons stored by name. The core includes built-in icons and depends only on Lit. Packages from other icon providers are optional dependencies for your application or build. The registry makes no network requests. It does not download an icon when it sees a provider prefix.
 
-Register icons before rendering the application when possible. Registration also updates mounted icons with the matching name. Use names such as `app:save` or `lucide:camera` to avoid collisions. These are registry keys, not remote addresses.
+When possible, register icons before your application displays them. Registration also updates icons already on the page when their names match. Use names such as `app:save` or `lucide:camera` to avoid duplicate names. These names are registry keys, not remote addresses.
 
 ```ts
 import { registerIcon, unregisterIcon } from '@terminal-kit/core/icons';
@@ -23,7 +23,7 @@ registerIcon('app:check', {
 <t-icon-button name="app:check" label="Confirm changes"></t-icon-button>
 ```
 
-Give meaningful standalone icons a `label`. Leave decorative icons unlabeled when adjacent text already conveys their meaning. Give every icon-only button an action label. Provider metadata does not supply application-specific accessible names. Manual assistive-technology checks remain separate from DOM assertions, as described in [accessibility evaluation](accessibility.md).
+Give meaningful standalone icons a `label`. Leave decorative icons unlabeled when adjacent text already conveys their meaning. Give every icon-only button an action label. Provider metadata does not supply the accessible name, or name announced by assistive technology, that your application needs. Manual assistive-technology checks remain separate from DOM assertions, as described in [accessibility evaluation](accessibility.md).
 
 ## Registry API
 
@@ -35,7 +35,7 @@ Give meaningful standalone icons a `label`. Leave decorative icons unlabeled whe
 | `registerIconSet(set, names?)`              | Iconify JSON and optional unprefixed icon names             | Registers selected entries as `prefix:name`, including supported alias transformations   |
 | `unregisterIcon(name)`                      | Registered name                                             | Removes that registration and updates matching mounted elements to their normal fallback |
 
-Registrations snapshot the supplied data. Mutating the original object does not update an icon. Register the updated definition again. Raw SVG is filtered during registration. Use reviewed static vector assets and inspect the result, especially when a source uses SVG features beyond simple paths and shapes. This API is not a general document renderer or a file-upload sanitizer.
+Registration makes a copy of the supplied data. Changing the original object does not update an icon. Register the updated definition again. Raw SVG is filtered during registration. Use reviewed static vector assets and inspect the result, especially when a source uses SVG features beyond simple paths and shapes. This API is not a general document renderer or a file-upload sanitizer.
 
 The object form contains SVG child markup in `body`. Width and height describe the coordinate system and default to 16. Left and top describe a nonzero coordinate origin and default to zero. Supply dimensions explicitly for data from another coordinate system. Use `currentColor` for icons that should follow the component's text color. Raw SVG should include its original `viewBox`, fill, and stroke attributes.
 
@@ -161,7 +161,7 @@ Provider research was checked on 2026-09-23. Pin package versions and preserve t
 
 Maintain an application attribution file or credits page listing each included provider, exact package version, source URL, license, and modifications. Copy the relevant license and copyright notices into the distributed application. For Font Awesome icon data, retain the CC BY attribution information and identify changes. For Apache assets, retain applicable license and notice information. Keep Lucide's Feather notices when they apply. These steps should follow the actual installed licenses rather than a blanket “all icons are MIT” statement.
 
-Keep icon attribution when an optimizer strips SVG comments. Review brand and trademark usage separately from the artwork license. Registry registration does not transfer ownership or change license terms. Terminal Kit uses the [PolyForm Perimeter License 1.0.1](../LICENSE); the third-party icon licenses listed above remain separate.
+Keep icon attribution when an optimizer strips SVG comments. Review brand and trademark usage separately from the artwork license. Registry registration does not transfer ownership or change license terms. Terminal Kit uses the [MIT License](../LICENSE). The third-party icon licenses listed above remain separate.
 
 The demonstration includes three Ionicons, Font Awesome Free solid/regular/brand samples, two Lucide icons, and selected Iconify data. Its pinned package versions, selected names, conversion notes, and upstream license copies are recorded here:
 

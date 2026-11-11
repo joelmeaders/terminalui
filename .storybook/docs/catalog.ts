@@ -37,9 +37,9 @@ const selectEvent = {
   description: 'Read the selected identifier from event.detail.value.',
 };
 const fieldAccess = [
-  'Use a visible label. Help and error text are associated with the native field inside its shadow root.',
+  'Use a visible label. Help and error text are linked to the native field inside the shadow root.',
   'An external HTML label can focus the field through its for attribute. Keep the label property to name the native control inside the shadow root.',
-  'Provide name for form submission. Set error for application feedback and use native validity or framework validators for rules.',
+  'Set name to include the field in form submission. Set error to show application feedback. Use native validity or framework validators for rules.',
 ];
 const field = (
   purpose: string,
@@ -48,7 +48,7 @@ const field = (
   extra: Partial<ComponentGuide> = {},
 ): ComponentGuide => ({
   purpose,
-  usage: ['Participates in native forms, disabled fieldsets, validation, and reset.', ...usage],
+  usage: ['Works with HTML forms, including disabled fieldsets, validation, and reset.', ...usage],
   accessibility: fieldAccess,
   example: { props },
   event: valueEvent,
@@ -59,7 +59,7 @@ export const guides: Record<string, ComponentGuide> = {
   't-dock': {
     purpose: 'Arrange application controls in one adjustable row or column.',
     usage: [
-      'Place elements in the default slot. Native controls and existing components keep their own values, events, and keyboard behavior. Wrap plain text in an element.',
+      'Put elements in the default slot, the place for content without a slot name. Native controls and existing components keep their own values, events, and keyboard behavior. Wrap plain text in an element.',
       'The dock styles its own editor and separators. Style native child controls in your application CSS, with readable colors and sizes that fit the available strip.',
       'Use orientation="horizontal" or "vertical". align accepts start, end, center, or justify. Justify distributes space between items without stretching their controls. The strip scrolls instead of wrapping.',
       'Give each item a unique data-dock-id or id and a useful data-dock-label. Supply order as an array of those identifiers. Missing items append in child order. Reordering changes rendered slot order without moving application-owned child elements.',
@@ -71,7 +71,7 @@ export const guides: Record<string, ComponentGuide> = {
       'disabled affects dock editing controls. Set disabled on application controls separately when their actions are unavailable. The dock restores its owned slot and separator attributes when items leave or it disconnects.',
     ],
     accessibility: [
-      'Give the group a useful label and each interactive child its own accessible name. The dock uses normal Tab order and does not intercept text-field or composite-widget keys.',
+      'Give the group a useful label. Give each interactive child its own accessible name, which assistive technology can announce. The dock uses normal Tab order and does not intercept text-field or composite-widget keys.',
       'Every drag action has a native click and keyboard alternative. The move handle uses physical arrow directions for edge snapping; the resize handle uses left/right for width and up/down for height. Shift multiplies the size step by ten.',
       'Focused content retains its identity after reordering. Unavailable items recover to a visible item handle during editing or the Edit control. Disabled editing uses the named group. Outside focus and application-handler focus changes remain intact.',
       'The item strip remains one row or column at small sizes. Use its native scrolling to reach overflow content. Keep critical controls available elsewhere when a fixed dock can cover application content.',
@@ -138,7 +138,7 @@ export const guides: Record<string, ComponentGuide> = {
     purpose: 'Keep relevant feedback beside the task it explains.',
     usage: [
       'Choose info, success, warning, or danger. Put the message in the default slot.',
-      'Use dismissible for optional notices. A dismissal hides this instance; remove or replace it when your application no longer needs it.',
+      'Use dismissible for optional notices. A dismissal hides this instance. Remove or replace it when your application no longer needs it.',
     ],
     accessibility: [
       'Use urgent only for an interruption that must be announced immediately. Include text that explains the status.',

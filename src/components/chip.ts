@@ -3,7 +3,7 @@ import { baseStyles, TerminalElement } from '../internal/base';
 import { optionalSlotStyles, syncSlot } from '../internal/slots';
 
 /**
- * Compact text token. A selectable chip uses a native toggle button; a removable chip has a separate named action.
+ * Compact text token. A selectable chip uses a native toggle button. A removable chip has a separate named action.
  * Removal is a request. The application removes the chip and moves focus to a logical next control.
  *
  * @slot start - Decorative icon before the label. It is hidden from assistive technology.

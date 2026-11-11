@@ -25,7 +25,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'A compact filter or token with separate selection and removal actions. Selection uses a native pressed button. Removal emits t-remove; the application removes the element and moves focus to a logical next control. Decorative icons use start and end slots.',
+          'A compact filter or token with separate selection and removal actions. Selection uses a native pressed button. Removal emits t-remove. The application removes the element and moves focus to a logical next control. Decorative icons use start and end slots.',
       },
     },
   },

@@ -23,7 +23,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Single-select hierarchy. Set `items` to `{ id, label, disabled?, children? }[]` with globally unique IDs. `expandedIds` and `value` are properties; replace arrays to update them. Arrow keys navigate and expand/collapse, Home/End move to endpoints, typeahead finds labels, and Enter/Space selects. Asterisk expands siblings. Disabled rows are skipped. `t-select` emits `{ value, item }`; `t-toggle` emits `{ id, expanded, expandedIds }`. Selection does not follow focus. This component does not load remote children, virtualize, or provide drag-and-drop.',
+          'Single-select hierarchy. Set `items` to `{ id, label, disabled?, children? }[]` with globally unique IDs. `expandedIds` and `value` are properties. Replace arrays to update them. Arrow keys navigate and expand/collapse, Home/End move to endpoints, typeahead finds labels, and Enter/Space selects. Asterisk expands siblings. Disabled rows are skipped. `t-select` emits `{ value, item }`; `t-toggle` emits `{ id, expanded, expandedIds }`. Selection does not follow focus. This component does not load remote children, virtualize, or provide drag-and-drop.',
       },
     },
   },
