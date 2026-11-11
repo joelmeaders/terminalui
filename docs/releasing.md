@@ -37,7 +37,7 @@ On `main`, all browser jobs and the Windows job must pass before the built Story
 1. Update the version in `package.json` and `package-lock.json`.
 2. Run `npm run check` and inspect `npm pack --dry-run`.
 3. Commit the version change and merge it into `main`.
-4. Create and push a matching version tag, such as `v0.1.2`.
+4. Create and push a matching version tag, such as `v0.1.3`.
 
 The tag workflow runs all checks again. The publish job checks that the tag matches the package version and belongs to `main` history. It then builds and publishes with the repository's `GITHUB_TOKEN`. No stored npm publishing token is needed.
 
