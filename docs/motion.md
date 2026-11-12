@@ -1,6 +1,6 @@
 # Motion preferences
 
-Terminal Kit uses CSS transitions for control feedback and finite entry effects for overlays. Motion communicates a state change. It does not add flicker or decorative rotation. Repeating motion is limited to working-state indicators, including busy spinners and indeterminate progress stripes.
+Hullframe uses CSS transitions for control feedback and finite entry effects for overlays. Motion communicates a state change. It does not add flicker or decorative rotation. Repeating motion is limited to working-state indicators, including busy spinners and indeterminate progress stripes.
 
 Palette foregrounds, control backgrounds, and control borders change together without a color transition. This keeps controls readable while an application switches palettes. Other control feedback, such as shadow, filter, and transform effects, can still use the motion tokens.
 
@@ -44,7 +44,7 @@ Override durations or easing for an application theme. Keep transitions brief an
 }
 ```
 
-The tokens control Terminal Kit effects. They do not automatically disable animation in third-party widgets or application styles. Application-owned animation must honor the same user preference.
+The tokens control Hullframe effects. They do not automatically disable animation in third-party widgets or application styles. Application-owned animation must honor the same user preference.
 
 ## Behavior when motion is off
 

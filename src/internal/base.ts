@@ -118,7 +118,7 @@ export const baseStyles = css`
   }
 `;
 
-export class TerminalElement extends LitElement {
+export class HullframeElement extends LitElement {
   private adoptedStyles?: HTMLStyleElement;
 
   protected createRenderRoot() {

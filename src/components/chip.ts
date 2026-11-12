@@ -1,5 +1,5 @@
 import { css, html } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { optionalSlotStyles, syncSlot } from '../internal/slots';
 
 /**
@@ -15,7 +15,7 @@ import { optionalSlotStyles, syncSlot } from '../internal/slots';
  * @csspart label - Visible token label.
  * @csspart remove - Native removal button, present when removable.
  */
-export class TChip extends TerminalElement {
+export class TChip extends HullframeElement {
   static properties = {
     label: {},
     variant: { reflect: true },

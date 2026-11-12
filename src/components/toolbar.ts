@@ -1,5 +1,5 @@
 import { css, html } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { activeElement } from '../internal/floating';
 
 const actionChanges: MutationObserverInit = {
@@ -30,7 +30,7 @@ const actionChanges: MutationObserverInit = {
  *
  * @csspart toolbar - Toolbar container.
  */
-export class TToolbar extends TerminalElement {
+export class TToolbar extends HullframeElement {
   static properties = { label: {}, orientation: { reflect: true }, empty: { state: true } };
   /** Accessible toolbar name. */
   label = 'Actions';

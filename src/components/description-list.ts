@@ -1,5 +1,5 @@
 import { css, html } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 
 export interface DescriptionItem {
   term: string;
@@ -16,7 +16,7 @@ export interface DescriptionItem {
  *
  * @csspart value - Description.
  */
-export class TDescriptionList extends TerminalElement {
+export class TDescriptionList extends HullframeElement {
   static properties = { items: { attribute: false } };
   /** Plain-text terms and values. Replace the array to update entries. */
   items: DescriptionItem[] = [];

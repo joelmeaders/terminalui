@@ -93,8 +93,8 @@ jobs:
       - name: Publish and verify the package version
         run: |
           npm publish --ignore-scripts
-          npm view "@joelmeaders/terminalui@${GITHUB_REF_NAME#v}" version
-          npm install --ignore-scripts --no-audit --no-fund --prefix "$RUNNER_TEMP/terminalui-install" "@joelmeaders/terminalui@${GITHUB_REF_NAME#v}"
+          npm view "@joelmeaders/hullframe@${GITHUB_REF_NAME#v}" version
+          npm install --ignore-scripts --no-audit --no-fund --prefix "$RUNNER_TEMP/hullframe-install" "@joelmeaders/hullframe@${GITHUB_REF_NAME#v}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   windows-visual:

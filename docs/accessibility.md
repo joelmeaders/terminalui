@@ -1,6 +1,6 @@
 # Accessibility evaluation
 
-Terminal Kit targets WCAG 2.2 Level AA for its 57 browser components and shipped themes. This is an engineering target, not a conformance claim. Component checks cannot establish conformance for an application that uses the library. Application content, labels, navigation, validation, timing, and workflows also require evaluation. Use the [WCAG 2.2 standard](https://www.w3.org/TR/WCAG22/) as the normative reference.
+Hullframe targets WCAG 2.2 Level AA for its 57 browser components and shipped themes. This is an engineering target, not a conformance claim. Component checks cannot establish conformance for an application that uses the library. Application content, labels, navigation, validation, timing, and workflows also require evaluation. Use the [WCAG 2.2 standard](https://www.w3.org/TR/WCAG22/) as the normative reference.
 
 The 2026-09-26 Dock addition uses a named group with native Tab order. Its single row or column accepts existing custom elements and native controls. Editing requires an explicit action. Each drag handle also opens a native settings alternative with Enter or Space. Users can reorder with buttons, select a physical edge, and enter both dimensions. Move and resize handles also support arrow keys. Native `hr` elements retain separator semantics. Private slots change the rendered order without moving application-owned elements or resetting their state.
 

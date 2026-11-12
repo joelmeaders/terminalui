@@ -1,6 +1,6 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { activeElement } from '../internal/floating';
 import { containModalTab } from '../internal/modal-focus';
 import { ModalScrollController } from '../internal/modal-scroll';
@@ -26,7 +26,7 @@ export interface CommandItem {
  *
  * @csspart option - Command option.
  */
-export class TCommandPalette extends TerminalElement {
+export class TCommandPalette extends HullframeElement {
   static properties = {
     commands: { attribute: false },
     open: { type: Boolean, reflect: true },

@@ -1,6 +1,6 @@
 import { css, html, nothing, type PropertyValues, type TemplateResult } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 
 export interface TreeItem {
   id: string;
@@ -32,7 +32,7 @@ interface VisibleItem {
  * @csspart group - Expanded child group owned by its parent item.
  * @cssprop --t-tree-indent - Preferred indentation per depth level. Defaults to 20px. The shared step shrinks when nesting would use more than 40% of the row width.
  */
-export class TTree extends TerminalElement {
+export class TTree extends HullframeElement {
   static properties = {
     label: {},
     items: { attribute: false },

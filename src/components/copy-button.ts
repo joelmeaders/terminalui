@@ -1,5 +1,5 @@
 import { css, html } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import './icon';
 /**
  * Copy explicit text to the clipboard after user activation.
@@ -12,7 +12,7 @@ import './icon';
  *
  * @csspart status - Visible clipboard completion or failure message.
  */
-export class TCopyButton extends TerminalElement {
+export class TCopyButton extends HullframeElement {
   static properties = {
     value: {},
     label: {},

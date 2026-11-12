@@ -23,24 +23,28 @@ let scanlines = 'off';
 let motion = 'auto';
 let formMessage = '';
 let saved = false;
-try {
-  const prefs = JSON.parse(localStorage.getItem('terminal-kit') || '{}');
-  theme = themes.some((t) => t.id === prefs.theme) ? prefs.theme : 'amber';
-  compact = !!prefs.compact;
-  motion = prefs.motion === 'off' ? 'off' : 'auto';
-  lines = prefs.lines === 'bold' ? 'bold' : 'standard';
-  glow = ['off', 'subtle', 'strong'].includes(prefs.glow)
-    ? prefs.glow
-    : prefs.effects
-      ? 'subtle'
-      : 'off';
-  scanlines = ['off', 'subtle', 'pronounced'].includes(prefs.scanlines)
-    ? prefs.scanlines
-    : prefs.effects
-      ? 'subtle'
-      : 'off';
-} catch {
-  /* Storage is optional. */
+for (const key of ['hullframe', 'terminal-kit']) {
+  try {
+    const prefs = JSON.parse(localStorage.getItem(key) || 'null');
+    if (!prefs || typeof prefs !== 'object' || Array.isArray(prefs)) continue;
+    theme = themes.some((t) => t.id === prefs.theme) ? prefs.theme : 'amber';
+    compact = !!prefs.compact;
+    motion = prefs.motion === 'off' ? 'off' : 'auto';
+    lines = prefs.lines === 'bold' ? 'bold' : 'standard';
+    glow = ['off', 'subtle', 'strong'].includes(prefs.glow)
+      ? prefs.glow
+      : prefs.effects
+        ? 'subtle'
+        : 'off';
+    scanlines = ['off', 'subtle', 'pronounced'].includes(prefs.scanlines)
+      ? prefs.scanlines
+      : prefs.effects
+        ? 'subtle'
+        : 'off';
+    break;
+  } catch {
+    /* Storage is optional. Try legacy preferences if the new entry is invalid. */
+  }
 }
 const options = [
   { value: '', label: 'Select a destination' },
@@ -64,7 +68,7 @@ function preferences() {
   root.dataset.motion = motion;
   try {
     localStorage.setItem(
-      'terminal-kit',
+      'hullframe',
       JSON.stringify({ theme, compact, lines, glow, scanlines, motion }),
     );
   } catch {
@@ -90,9 +94,9 @@ function draw() {
   render(
     html`
       <header class="masthead">
-        <a class="brand" href="#" aria-label="Terminal Kit home"
-          ><span class="brand-mark" aria-hidden="true">T<span>_</span></span
-          ><span>TERMINAL<span class="brand-sub">INTERFACE SYSTEM / 001</span></span></a
+        <a class="brand" href="#" aria-label="Hullframe home"
+          ><span class="brand-mark" aria-hidden="true">H<span>_</span></span
+          ><span>HULLFRAME<span class="brand-sub">INTERFACE SYSTEM / 001</span></span></a
         >
         <nav class="top-nav" aria-label="Main">
           <a href="#workbench" class="active">Workbench</a><a href="#themes">Themes</a
@@ -130,7 +134,7 @@ function draw() {
           <section class="hero" aria-labelledby="hero-title">
             <div class="hero-copy">
               <div class="eyebrow">
-                <span class="status-dot"></span> TERMINAL KIT / COMPONENT WORKBENCH
+                <span class="status-dot"></span> HULLFRAME / COMPONENT WORKBENCH
               </div>
               <h1 id="hero-title">Built for the web.<br /><span>Tuned to another era.</span></h1>
               <p>
@@ -430,7 +434,7 @@ function draw() {
             <t-card
               ><span slot="heading">06 / Disclosure</span>
               <div class="stack">
-                <t-accordion label="What is Terminal Kit?" open
+                <t-accordion label="What is Hullframe?" open
                   >A collection of reusable, terminal-inspired controls built with Lit and standard
                   browser APIs.</t-accordion
                 ><t-accordion label="Can I use it without a framework?"
@@ -471,7 +475,7 @@ function draw() {
           </div>
           ${library(draw, action)} ${extensions(draw, action)} ${dockDemo(action)}
           <footer class="page-footer">
-            <span>TERMINAL KIT / V0.1.0</span><span>MODERN PRIMITIVES. ANALOG CHARACTER.</span
+            <span>HULLFRAME / V0.1.0</span><span>MODERN PRIMITIVES. ANALOG CHARACTER.</span
             ><a href=${storybookUrl} target="_blank" rel="noreferrer"
               >Explore the documentation ↗</a
             >

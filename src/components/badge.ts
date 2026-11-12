@@ -1,5 +1,5 @@
 import { css, html } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 /**
  * Compact status text. Always include a text label so meaning does not depend on color.
  * @slot - Main content.
@@ -7,7 +7,7 @@ import { baseStyles, TerminalElement } from '../internal/base';
  * @slot end - Non-interactive icon or content after the status text.
  * @csspart badge - badge element.
  */
-export class TBadge extends TerminalElement {
+export class TBadge extends HullframeElement {
   static properties = { variant: { reflect: true } };
   variant = 'neutral';
   static styles = [

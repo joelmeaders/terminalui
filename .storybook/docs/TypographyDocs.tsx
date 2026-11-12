@@ -9,16 +9,16 @@ import appearanceGuide from '../../docs/appearance.md?raw';
 export function TypographyDocs() {
   const [framework, updateFramework] = useFramework();
   return (
-    <article className="tk-docs" data-docs-framework={framework}>
-      <div className="tk-docs-topline">
-        <span>TERMINAL / KIT · TYPOGRAPHY</span>
+    <article className="hf-docs" data-docs-framework={framework}>
+      <div className="hf-docs-topline">
+        <span>HULLFRAME · TYPOGRAPHY</span>
         <FrameworkSelector framework={framework} onChange={updateFramework} />
       </div>
-      <header className="tk-docs-hero">
+      <header className="hf-docs-hero">
         <Title />
-        <p className="tk-docs-lead">Native text. Clear hierarchy. Every palette.</p>
+        <p className="hf-docs-lead">Native text. Clear hierarchy. Every palette.</p>
       </header>
-      <nav className="tk-docs-nav" aria-label="On this documentation page">
+      <nav className="hf-docs-nav" aria-label="On this documentation page">
         <a href="#getting-started" target="_self">
           Get started
         </a>
@@ -67,11 +67,11 @@ export function TypographyDocs() {
           effects.
         </p>
         <Primary />
-        <p className="tk-docs-controls-hint">
+        <p className="hf-docs-controls-hint">
           Scroll the controls table sideways to reach every column.
         </p>
         <div
-          className="tk-docs-controls"
+          className="hf-docs-controls"
           role="region"
           aria-label="Typography controls"
           tabIndex={0}

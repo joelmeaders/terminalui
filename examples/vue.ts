@@ -1,21 +1,21 @@
 import { createApp, h, ref } from 'vue';
-import { useTerminalModel } from '@joelmeaders/terminalui/vue';
-import '@joelmeaders/terminalui/components/input';
-import '@joelmeaders/terminalui/components/button';
-import '@joelmeaders/terminalui/components/checkbox';
-import '@joelmeaders/terminalui/themes.css';
+import { useHullframeModel } from '@joelmeaders/hullframe/vue';
+import '@joelmeaders/hullframe/components/input';
+import '@joelmeaders/hullframe/components/button';
+import '@joelmeaders/hullframe/components/checkbox';
+import '@joelmeaders/hullframe/themes.css';
 import './shared.css';
-import type { TInput } from '@joelmeaders/terminalui/components/input';
-import type { TCheckbox } from '@joelmeaders/terminalui/components/checkbox';
+import type { TInput } from '@joelmeaders/hullframe/components/input';
+import type { TCheckbox } from '@joelmeaders/hullframe/components/checkbox';
 createApp({
   setup() {
     const value = ref('Initial');
     const control = ref<TInput | null>(null);
-    useTerminalModel(control, value, 'value');
+    useHullframeModel(control, value, 'value');
     const checked = ref(false);
     const checkbox = ref<TCheckbox | null>(null);
     const disabled = ref(false);
-    useTerminalModel(checkbox, checked, 'checked');
+    useHullframeModel(checkbox, checked, 'checked');
     return () =>
       h('div', [
         h('h1', 'Vue'),

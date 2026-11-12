@@ -1,5 +1,5 @@
 {
-  "name": "@joelmeaders/terminalui",
+  "name": "@joelmeaders/hullframe",
   "version": "0.1.3",
   "type": "module",
   "description": "Terminal-inspired Lit components for the everyday web.",
@@ -22,6 +22,7 @@
     "**/*.css",
     "**/components/*",
     "**/index.*",
+    "**/hullframe.js",
     "**/terminal.js"
   ],
   "exports": {
@@ -53,9 +54,13 @@
       "types": "./dist/effects/ascii.d.ts",
       "import": "./dist/effects/ascii.js"
     },
+    "./hullframe.js": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/hullframe.js"
+    },
     "./terminal.js": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/terminal.js"
+      "import": "./dist/hullframe.js"
     },
     "./react": {
       "types": "./dist/adapters/react.d.ts",

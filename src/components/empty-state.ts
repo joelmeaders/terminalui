@@ -1,5 +1,5 @@
 import { css, html } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import './icon';
 /**
  * Empty content guidance.
@@ -8,7 +8,7 @@ import './icon';
  * @slot icon - Decorative illustration.
  * @csspart body - Container.
  */
-export class TEmptyState extends TerminalElement {
+export class TEmptyState extends HullframeElement {
   static properties = { heading: {} };
   heading = 'Nothing here yet';
   static styles = [

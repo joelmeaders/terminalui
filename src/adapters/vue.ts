@@ -1,7 +1,7 @@
 import { onBeforeUnmount, watch, type Ref } from 'vue';
 
 /** Bind a Vue ref to a custom element property. Call within setup(). */
-export function useTerminalModel<E extends HTMLElement, K extends keyof E>(
+export function useHullframeModel<E extends HTMLElement, K extends keyof E>(
   element: Ref<E | null>,
   model: Ref<E[K]>,
   property: K,
@@ -36,3 +36,6 @@ export function useTerminalModel<E extends HTMLElement, K extends keyof E>(
     stopModel();
   });
 }
+
+/** @deprecated Use useHullframeModel. */
+export { useHullframeModel as useTerminalModel };

@@ -1,5 +1,5 @@
 import { css, html, type PropertyValues, type PropertyDeclarations } from 'lit';
-import { TerminalElement, baseStyles } from './base';
+import { HullframeElement, baseStyles } from './base';
 
 export const fieldStyles = [
   baseStyles,
@@ -76,9 +76,9 @@ export const fieldStyles = [
   `,
 ];
 
-export abstract class FormControl extends TerminalElement {
+export abstract class FormControl extends HullframeElement {
   static formAssociated = true;
-  static shadowRootOptions = { ...TerminalElement.shadowRootOptions, delegatesFocus: true };
+  static shadowRootOptions = { ...HullframeElement.shadowRootOptions, delegatesFocus: true };
   static properties: PropertyDeclarations = {
     name: { reflect: true },
     value: {},

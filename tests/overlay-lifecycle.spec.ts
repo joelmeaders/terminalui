@@ -96,7 +96,7 @@ test('popover restores native and programmatic openers for slotted shadow contro
   );
   const trigger = page.getByRole('button', { name: 'Settings' });
   await trigger.click();
-  await page.getByRole('textbox', { name: 'Workspace' }).fill('Terminal');
+  await page.getByRole('textbox', { name: 'Workspace' }).fill('Hullframe');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(trigger).toBeFocused();

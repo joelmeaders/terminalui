@@ -1,12 +1,12 @@
 import { css, html } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 /**
  * Responsive flex layout. Gap follows --t-space or --t-stack-gap.
  * @slot - Items.
  * @csspart layout - Flex container.
  * @cssprop --t-stack-gap - Gap between items. Defaults to --t-space (16px in comfortable density, 12px in compact).
  */
-export class TStack extends TerminalElement {
+export class TStack extends HullframeElement {
   static properties = {
     direction: { reflect: true },
     align: { reflect: true },

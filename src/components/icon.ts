@@ -1,5 +1,5 @@
 import { css, html, svg, nothing } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { getRegisteredIcon, subscribeIcons } from '../internal/icon-registry';
 
@@ -7,7 +7,7 @@ import { getRegisteredIcon, subscribeIcons } from '../internal/icon-registry';
  * Built-in or registered provider icon. Supply a label for meaningful icons. Omit it for decoration.
  * @csspart svg - Vector artwork.
  */
-export class TIcon extends TerminalElement {
+export class TIcon extends HullframeElement {
   static properties = { name: {}, label: {}, size: { type: Number } };
   name: string = 'info';
   label = '';

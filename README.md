@@ -1,25 +1,46 @@
-# Terminal Kit
+# Hullframe
 
-Terminal Kit is a library of 57 browser components built with Lit. They share six terminal-inspired color palettes. Use them with plain HTML, React, Vue, or Angular.
+Hullframe is a library of 57 browser components built with Lit. They share six terminal-inspired color palettes. Use them with plain HTML, React, Vue, or Angular.
 
 Storybook is the component guide. It shows how to use each component, lets you try its controls, and includes browser interaction tests. The package also includes typed framework adapters, editor metadata, and optional icon providers. You can install it from a local tarball.
 
 ## License
 
-Terminal Kit uses the [MIT License](LICENSE). The source is public on [GitHub](https://github.com/joelmeaders/terminalui). See [license guidance](docs/licensing.md). Third-party assets keep their own licenses in [icon credits](docs/icons.md).
+Hullframe uses the [MIT License](LICENSE). The source is public on [GitHub](https://github.com/joelmeaders/terminalui). See [license guidance](docs/licensing.md). Third-party assets keep their own licenses in [icon credits](docs/icons.md).
 
 Read the live [Storybook guide](https://joelmeaders.github.io/terminalui/). Changes to `main` deploy after the GitHub Actions checks pass.
 
 ## Install from GitHub Packages
 
-The package name is `@joelmeaders/terminalui`. GitHub Packages requires authentication even for public packages. Use your GitHub username and a classic personal access token with `read:packages` permission when npm asks you to sign in:
+The package name is `@joelmeaders/hullframe`. Registry installation requires a published release under this name. Before the first Hullframe release, use the local package archive described below.
+
+GitHub Packages requires authentication even for public packages. Use your GitHub username and a classic personal access token with `read:packages` permission when npm asks you to sign in:
 
 ```sh
 npm login --scope=@joelmeaders --auth-type=legacy --registry=https://npm.pkg.github.com
-npm install @joelmeaders/terminalui
+npm install @joelmeaders/hullframe
 ```
 
 Keep tokens out of project files and Git commits. You can also install a local package archive as described below.
+
+## Migrating to Hullframe
+
+Hullframe replaces the Terminal Kit and Terminal UI product names. Update existing integrations as follows:
+
+| Item                      | Previous name             | New name                 |
+| ------------------------- | ------------------------- | ------------------------ |
+| Package and import prefix | `@joelmeaders/terminalui` | `@joelmeaders/hullframe` |
+| Standalone browser bundle | `dist/terminal.js`        | `dist/hullframe.js`      |
+| Vue binding helper        | `useTerminalModel`        | `useHullframeModel`      |
+| Angular value accessor    | `TerminalValueAccessor`   | `HullframeValueAccessor` |
+
+Update dependency declarations, package subpath imports, and copied browser script URLs. Remove the old package dependency when installing Hullframe; both packages register the same elements.
+
+The previous Vue and Angular helper names remain aliases of the new exports, and the legacy `dist/terminal.js` filename remains supported. Use the Hullframe names for new integrations and load only one library distribution per page.
+
+The public `t-*` element and event names, `T*` component and React wrapper names, `--t-*` CSS properties, and `.t-*` classes remain unchanged. Existing markup, styling, and event handlers still apply.
+
+The GitHub repository and live Storybook still use the `terminalui` URLs linked above. Their rename is a separate follow-up.
 
 ## Run locally
 
@@ -63,8 +84,8 @@ With individual imports, register both Button and Icon. Field slots also accept 
 Import the optional CSS layer for native headings, paragraphs, anchors, lists, quotes, code, and inline text. It adds about 1.4 kB gzip and no JavaScript:
 
 ```js
-import '@joelmeaders/terminalui/themes.css';
-import '@joelmeaders/terminalui/typography.css';
+import '@joelmeaders/hullframe/themes.css';
+import '@joelmeaders/hullframe/typography.css';
 ```
 
 ```html
@@ -159,7 +180,7 @@ Serve this markup over HTTP:
 
 ```html
 <link rel="stylesheet" href="./dist/themes.css" />
-<script type="module" src="./dist/terminal.js"></script>
+<script type="module" src="./dist/hullframe.js"></script>
 
 <section data-theme="phosphor">
   <t-button variant="secondary">Initialize</t-button>
@@ -172,12 +193,12 @@ The browser bundle includes Lit. You can use it without an import map or a build
 For a bundler, import individual components and the theme CSS:
 
 ```ts
-import '@joelmeaders/terminalui/components/input';
-import '@joelmeaders/terminalui/components/button';
-import '@joelmeaders/terminalui/themes.css';
+import '@joelmeaders/hullframe/components/input';
+import '@joelmeaders/hullframe/components/button';
+import '@joelmeaders/hullframe/themes.css';
 ```
 
-The current version is `0.1.3`. To install a local copy in another repository, run `npm pack` here. This creates a tarball, an archive of the package. Then run `npm install /path/to/joelmeaders-terminalui-0.1.3.tgz` in the other repository. Importing the package root registers all 57 elements. Individual imports include only their component dependencies. Use one distribution path per page. Do not load the standalone bundle and ESM package together.
+The current version is `0.1.3`. To install a local copy in another repository, run `npm pack` here. This creates a tarball, an archive of the package. Then run `npm install /path/to/joelmeaders-hullframe-0.1.3.tgz` in the other repository. Importing the package root registers all 57 elements. Individual imports include only their component dependencies. Use one distribution path per page. Do not load the standalone bundle and ESM package together.
 
 The build also creates TypeScript declarations, a Custom Elements Manifest, a component catalog, and VS Code HTML metadata. Storybook reads the generated manifest. See [framework integration](docs/frameworks.md) for editor configuration and [release preparation](docs/releasing.md) for package verification and publication boundaries.
 
@@ -185,7 +206,7 @@ The build also creates TypeScript declarations, a Custom Elements Manifest, a co
 
 All 19 form controls work with HTML forms through `ElementInternals`. This means they support FormData, browser validation, disabled fieldsets, and reset. Give each field a `name` for submission and a `label` for its internal native control. Reset restores the initial value or checked state and clears file selection. Set initial property values before the first render when using framework bindings. Tags and multi-select expose a `values` array and a JSON string `value`. FormData contains one entry per selected item under the same name. Multi-select uses labeled native checkboxes and can filter choices without clearing selection. Number and rating values are strings. Date-range values use one `START/END` ISO string.
 
-Use Terminal Kit or native submit and reset buttons:
+Use Hullframe or native submit and reset buttons:
 
 ```html
 <form>
@@ -253,11 +274,11 @@ Run `npm run build`, then `npm run dev` to try these examples:
 
 The examples consume the built package. Browser tests check property updates, input events, checked state, disabled state, and application reset. Angular tests also check touched state. Framework dependencies are optional peers and development dependencies. They remain outside the core and standalone bundles.
 
-React 19 uses per-component typed wrappers such as `@joelmeaders/terminalui/react/input`, generated for every catalog element with `@lit/react`. These imports include only the chosen wrapper and its element dependencies. The existing `@joelmeaders/terminalui/react` barrel remains compatible and supports removal of unused wrappers in bundlers that honor package side-effect metadata. The wrappers forward properties, refs, and native events. Custom events use names such as `onTSelect` and `onTClose`.
+React 19 uses per-component typed wrappers such as `@joelmeaders/hullframe/react/input`, generated for every catalog element with `@lit/react`. These imports include only the chosen wrapper and its element dependencies. The existing `@joelmeaders/hullframe/react` barrel remains compatible and supports removal of unused wrappers in bundlers that honor package side-effect metadata. The wrappers forward properties, refs, and native events. Custom events use names such as `onTSelect` and `onTClose`.
 
-Vue 3 uses `useTerminalModel` from `@joelmeaders/terminalui/vue` to bind typed refs to element properties and events. For Vue SFC templates, configure `isCustomElement` for tags starting with `t-`. Use property binding for arrays and objects.
+Vue 3 uses `useHullframeModel` from `@joelmeaders/hullframe/vue` to bind typed refs to element properties and events. For Vue SFC templates, configure `isCustomElement` for tags starting with `t-`. Use property binding for arrays and objects.
 
-Angular 22 uses `CUSTOM_ELEMENTS_SCHEMA` and the compiled `TerminalValueAccessor` from `@joelmeaders/terminalui/angular`. The accessor supports reactive and template-driven bindings for all 16 controls. The package check compiles an external Angular AOT consumer. The included Vite application uses JIT for its application template. Angular validators and browser validation remain separate concerns. See [framework integration](docs/frameworks.md) for complete setup and examples.
+Angular 22 uses `CUSTOM_ELEMENTS_SCHEMA` and the compiled `HullframeValueAccessor` from `@joelmeaders/hullframe/angular`. The accessor supports reactive and template-driven bindings for all 16 controls. The package check compiles an external Angular AOT consumer. The included Vite application uses JIT for its application template. Angular validators and browser validation remain separate concerns. See [framework integration](docs/frameworks.md) for complete setup and examples.
 
 ## Themes and styling
 
@@ -335,8 +356,8 @@ The demo exposes **Bold lines** beside the palettes and **Display effects** belo
 Use built-in icons or register selected icons from Ionicons, Font Awesome Free, Lucide, Bootstrap Icons, Tabler, Heroicons, and Material Symbols. The registry accepts SVG, Ionicons data URIs, Font Awesome definitions, Lucide nodes, and Iconify sets. It validates static SVG and rejects scripts, external resources, and animation elements. It performs no network loading. Provider packages are optional consumer dependencies; the core does not include those packs.
 
 ```ts
-import '@joelmeaders/terminalui/components/icon';
-import { registerIcon } from '@joelmeaders/terminalui/icons';
+import '@joelmeaders/hullframe/components/icon';
+import { registerIcon } from '@joelmeaders/hullframe/icons';
 import { rocketOutline } from 'ionicons/icons';
 
 registerIcon('ion:rocket', rocketOutline);
@@ -392,4 +413,4 @@ Accessibility requirements are part of [AGENTS.md](AGENTS.md). The [accessibilit
 - Tooltips provide short, noninteractive help. Tooltips and popovers use viewport-aware placement with flipping and bounds adjustment during scrolling and resizing. Use a popover for interactive content.
 - Tables support local sorting, filtering, paging, loading, empty states, and row selection. The library does not provide a virtualized data grid, cell editing, or a rich-text editor.
 - The theme choice in the demo persists locally. The component package itself does not write to storage.
-- GitHub Actions publishes version tags such as `v0.1.3` to GitHub Packages after the checks pass. See [release preparation](docs/releasing.md).
+- GitHub Actions publishes version tags to GitHub Packages after the checks pass. See [release preparation](docs/releasing.md).

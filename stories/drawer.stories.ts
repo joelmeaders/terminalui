@@ -12,7 +12,7 @@ const renderDrawer = (placement: 'start' | 'end') =>
       Open details</button
     ><t-drawer heading="Project details" placement=${placement}
       ><p>A modal side panel for settings, details, and task forms.</p>
-      <label>Project name <input value="Terminal Kit" /></label
+      <label>Project name <input value="Hullframe" /></label
       ><button
         slot="footer"
         @click=${(event: Event) => (event.currentTarget as HTMLElement).closest('t-drawer')!.close()}

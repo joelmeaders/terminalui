@@ -1,6 +1,6 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { observeFloating, recoverFocus } from '../internal/floating';
 import { inlineSlotStyles } from '../internal/slots';
 
@@ -26,7 +26,7 @@ export interface MenuOption {
  *
  * @csspart item - Action button.
  */
-export class TMenu extends TerminalElement {
+export class TMenu extends HullframeElement {
   static properties = {
     label: {},
     options: { attribute: false },

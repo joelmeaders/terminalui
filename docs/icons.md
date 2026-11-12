@@ -5,9 +5,9 @@
 When possible, register icons before your application displays them. Registration also updates icons already on the page when their names match. Use names such as `app:save` or `lucide:camera` to avoid duplicate names. These names are registry keys, not remote addresses.
 
 ```ts
-import { registerIcon, unregisterIcon } from '@joelmeaders/terminalui/icons';
-import '@joelmeaders/terminalui/components/icon';
-import '@joelmeaders/terminalui/components/icon-button';
+import { registerIcon, unregisterIcon } from '@joelmeaders/hullframe/icons';
+import '@joelmeaders/hullframe/components/icon';
+import '@joelmeaders/hullframe/components/icon-button';
 
 registerIcon('app:check', {
   width: 24,
@@ -43,11 +43,11 @@ Invalid dimensions, malformed SVG, unsupported markup, and external references c
 
 ## Ionicons
 
-Ionicons publishes SVG data and a separate web component. Import the icon data when using Terminal Kit. Its web component has its own loading behavior and is unnecessary here. See the [official Ionicons repository](https://github.com/ionic-team/ionicons/blob/main/readme.md).
+Ionicons publishes SVG data and a separate web component. Import the icon data when using Hullframe. Its web component has its own loading behavior and is unnecessary here. See the [official Ionicons repository](https://github.com/ionic-team/ionicons/blob/main/readme.md).
 
 ```ts
 import { homeOutline } from 'ionicons/icons';
-import { registerIcon } from '@joelmeaders/terminalui/icons';
+import { registerIcon } from '@joelmeaders/hullframe/icons';
 
 registerIcon('ion:home-outline', homeOutline);
 ```
@@ -60,7 +60,7 @@ Import individual definitions from a Free SVG package. No Font Awesome DOM repla
 
 ```ts
 import { faHouse } from '@fortawesome/free-solid-svg-icons';
-import { registerFontAwesomeIcon } from '@joelmeaders/terminalui/icons';
+import { registerFontAwesomeIcon } from '@joelmeaders/hullframe/icons';
 
 registerFontAwesomeIcon('fa:house', faHouse);
 ```
@@ -75,7 +75,7 @@ Use the vanilla package's icon nodes, not React or Vue component functions.
 
 ```ts
 import { Camera } from 'lucide';
-import { registerLucideIcon } from '@joelmeaders/terminalui/icons';
+import { registerLucideIcon } from '@joelmeaders/hullframe/icons';
 
 registerLucideIcon('lucide:camera', Camera);
 ```
@@ -90,7 +90,7 @@ This example uses Vite's `?raw` loader. Other bundlers need their equivalent tex
 
 ```ts
 import checkSvg from 'bootstrap-icons/icons/check.svg?raw';
-import { registerIcon } from '@joelmeaders/terminalui/icons';
+import { registerIcon } from '@joelmeaders/hullframe/icons';
 
 registerIcon('bi:check', checkSvg);
 ```
@@ -105,7 +105,7 @@ For a small local set:
 
 ```ts
 import selectedIcons from './generated/app-icons.json';
-import { registerIconSet } from '@joelmeaders/terminalui/icons';
+import { registerIconSet } from '@joelmeaders/hullframe/icons';
 
 registerIconSet(selectedIcons, ['check', 'arrow-right']);
 // With prefix "bi", the names become "bi:check" and "bi:arrow-right".
@@ -133,7 +133,7 @@ For plain HTML, register the generated data from your own local module after imp
 ```html
 <link rel="stylesheet" href="./dist/themes.css" />
 <script type="module">
-  import { registerIconSet } from './dist/terminal.js';
+  import { registerIconSet } from './dist/hullframe.js';
   import selectedIcons from './app-icons.js';
   registerIconSet(selectedIcons);
 </script>
@@ -161,7 +161,7 @@ Provider research was checked on 2026-09-23. Pin package versions and preserve t
 
 Maintain an application attribution file or credits page listing each included provider, exact package version, source URL, license, and modifications. Copy the relevant license and copyright notices into the distributed application. For Font Awesome icon data, retain the CC BY attribution information and identify changes. For Apache assets, retain applicable license and notice information. Keep Lucide's Feather notices when they apply. These steps should follow the actual installed licenses rather than a blanket “all icons are MIT” statement.
 
-Keep icon attribution when an optimizer strips SVG comments. Review brand and trademark usage separately from the artwork license. Registry registration does not transfer ownership or change license terms. Terminal Kit uses the [MIT License](../LICENSE). The third-party icon licenses listed above remain separate.
+Keep icon attribution when an optimizer strips SVG comments. Review brand and trademark usage separately from the artwork license. Registry registration does not transfer ownership or change license terms. Hullframe uses the [MIT License](../LICENSE). The third-party icon licenses listed above remain separate.
 
 The demonstration includes three Ionicons, Font Awesome Free solid/regular/brand samples, two Lucide icons, and selected Iconify data. Its pinned package versions, selected names, conversion notes, and upstream license copies are recorded here:
 

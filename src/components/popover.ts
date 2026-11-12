@@ -1,5 +1,5 @@
 import { css, html, type PropertyValues } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { activeElement, observeFloating, type Placement } from '../internal/floating';
 import { inlineSlotStyles } from '../internal/slots';
 
@@ -19,7 +19,7 @@ import { inlineSlotStyles } from '../internal/slots';
  * @csspart panel - Non-modal panel.
  * @cssprop --t-popover-width - Preferred panel width. Defaults to 320px; floating placement limits the panel to the available viewport.
  */
-export class TPopover extends TerminalElement {
+export class TPopover extends HullframeElement {
   static properties = {
     label: {},
     heading: {},

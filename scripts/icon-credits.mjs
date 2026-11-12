@@ -38,7 +38,7 @@ const html = await format(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Terminal Kit icon credits</title>
+  <title>Hullframe icon credits</title>
   <style>
     :root { color-scheme: dark; font: 16px/1.6 system-ui, sans-serif; }
     body { max-width: 52rem; margin: auto; padding: 2rem 1.25rem; background: #101318; color: #edf1f5; }
@@ -51,12 +51,12 @@ const html = await format(
 <body>
   <main>
     <h1>Icon credits</h1>
-    <p>The Terminal Kit demonstration uses selected icons from these providers. Each notice includes package versions, sample names, conversion notes, and the upstream license text.</p>
+    <p>The Hullframe demonstration uses selected icons from these providers. Each notice includes package versions, sample names, conversion notes, and the upstream license text.</p>
     <ul>
       ${providers.map((provider) => `<li><a href="${encodeURIComponent(provider)}/NOTICE">${escapeHtml(labels[provider] ?? provider)}</a></li>`).join('\n      ')}
     </ul>
     <p>Font Awesome SVG and JavaScript icon data uses CC BY 4.0. Lucide includes ISC and applicable Feather MIT notices. The other notices describe their individual licenses.</p>
-    <p>Names and marks belong to their respective owners. These notices cover the included icon assets, not the Terminal Kit application code.</p>
+    <p>Names and marks belong to their respective owners. These notices cover the included icon assets, not the Hullframe application code.</p>
     <p><a href="../">Return to the demonstration</a></p>
   </main>
 </body>

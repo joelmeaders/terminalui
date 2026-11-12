@@ -1,5 +1,5 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 
 export type MeterVariant = 'solid' | 'segmented-thin' | 'segmented-thick';
 export type MeterSize = 'small' | 'medium' | 'large';
@@ -12,7 +12,7 @@ export type MeterSize = 'small' | 'medium' | 'large';
  * @csspart fill - Decorative fill used by segmented, enlarged, or animated meters.
  * @cssprop --t-meter-duration - Entrance duration. Defaults to three times --t-motion-slow (720ms).
  */
-export class TMeter extends TerminalElement {
+export class TMeter extends HullframeElement {
   static properties = {
     value: { type: Number },
     min: { type: Number },

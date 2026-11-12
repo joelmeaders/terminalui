@@ -1,6 +1,6 @@
 import { css, html } from 'lit';
 import { styleMap } from 'lit/directives/style-map.js';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 /**
  * Auto-fitting grid. Set columns for a fixed maximum; it collapses at narrow container widths.
  * @slot - Cells.
@@ -8,7 +8,7 @@ import { baseStyles, TerminalElement } from '../internal/base';
  * @cssprop --t-grid-min - Minimum automatic column width, capped by the container width. Defaults to 240px. Does not apply when columns is set.
  * @cssprop --t-grid-gap - Gap between rows and columns. Defaults to --t-space (16px in comfortable density, 12px in compact).
  */
-export class TGrid extends TerminalElement {
+export class TGrid extends HullframeElement {
   static properties = { columns: { type: Number } };
   /** Zero selects automatic columns using --t-grid-min (default 240px). */
   columns = 0;

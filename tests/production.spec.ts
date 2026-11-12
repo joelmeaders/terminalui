@@ -7,13 +7,13 @@ for (const width of [1440, 390]) {
   test(`default component appearance: ${width}`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto('/');
-    // Original base-components references remain in git history and this directory.
-    // These references include the intentional accessibility contrast corrections.
+    // Earlier component references remain as historical accessibility evidence.
+    // These references include the Hullframe branding and existing contrast corrections.
     await page.locator('.display-settings').evaluate((el: HTMLElement) => {
       el.style.display = 'none';
     });
     await expect(page.locator('.component-grid')).toHaveScreenshot(
-      `accessible-components-${width}.png`,
+      `hullframe-components-${width}.png`,
       {
         animations: 'disabled',
         maxDiffPixelRatio: 0.002,
@@ -216,7 +216,7 @@ test('built spinner styles work in the demo selector and Storybook gallery', asy
     await expect(item).toHaveCSS('animation-name', 'none');
 });
 
-// Previous catalog references remain alongside the reviewed dock addition.
+// Previous catalog references remain alongside the Hullframe branding references.
 for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {
   test(`visual reference: ${theme}`, async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
@@ -224,7 +224,7 @@ for (const theme of ['amber', 'phosphor', 'ice', 'lunar', 'signal', 'paper']) {
     await page
       .getByRole('button', { name: theme[0].toUpperCase() + theme.slice(1), exact: true })
       .click();
-    await expect(page).toHaveScreenshot(`dock-catalog-${theme}-desktop.png`, {
+    await expect(page).toHaveScreenshot(`hullframe-catalog-${theme}-desktop.png`, {
       fullPage: true,
       animations: 'disabled',
       maxDiffPixelRatio: 0.002,
@@ -236,14 +236,14 @@ test('visual reference: mobile and dialog', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await expect(page.getByRole('button', { name: 'Save configuration', exact: true })).toBeVisible();
-  await expect(page).toHaveScreenshot('dock-catalog-amber-mobile.png', {
+  await expect(page).toHaveScreenshot('hullframe-catalog-amber-mobile.png', {
     fullPage: true,
     animations: 'disabled',
     maxDiffPixelRatio: 0.002,
   });
   await page.getByRole('button', { name: 'Open dialog' }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
-  await expect(page).toHaveScreenshot('amber-dialog.png', {
+  await expect(page).toHaveScreenshot('hullframe-dialog.png', {
     animations: 'disabled',
     maxDiffPixelRatio: 0.002,
   });
@@ -281,7 +281,7 @@ for (const profile of [
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
-    await expect(page).toHaveScreenshot(`dock-catalog-${profile.name}.png`, {
+    await expect(page).toHaveScreenshot(`hullframe-catalog-${profile.name}.png`, {
       fullPage: true,
       animations: 'disabled',
       maxDiffPixelRatio: 0.002,

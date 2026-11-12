@@ -34,7 +34,7 @@ for (const realZoom of [false, true]) {
         expect(zoomFactor).toBeCloseTo(4, 4);
         await expect.poll(() => page.evaluate(() => innerWidth)).toBe(320);
       }
-      await expect(page.locator('.tk-docs-hero')).toContainText(
+      await expect(page.locator('.hf-docs-hero')).toContainText(
         `${entries.length} components and six themes`,
       );
       await page.getByRole('link', { name: 'Manual accessibility review', exact: true }).click();
@@ -132,7 +132,7 @@ test('appearance inheritance guide is available in introductions and component s
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
       true,
     );
-    const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
+    const report = await new AxeBuilder({ page }).include('.hf-docs').analyze();
     await writeFile(
       testInfo.outputPath(`${id}-appearance-axe-review.json`),
       JSON.stringify({ violations: report.violations, incomplete: report.incomplete }, null, 2),
@@ -160,7 +160,7 @@ test('typography docs share the framework selector and include complete native C
     ['vue', '<script setup lang="ts">'],
   ]) {
     await select.selectOption(value);
-    await expect(frame.locator('.tk-docs')).toHaveAttribute('data-docs-framework', value);
+    await expect(frame.locator('.hf-docs')).toHaveAttribute('data-docs-framework', value);
     await expect(frame.getByTestId('typography-example')).toContainText(snippet);
     await expect(frame.getByTestId('typography-example')).toContainText('typography.css');
   }
@@ -178,7 +178,7 @@ test('typography docs share the framework selector and include complete native C
   await expect(nativeLink).toHaveCSS('outline-color', 'rgb(48, 79, 148)');
   await page.getByRole('button', { name: 'Button', exact: true }).click();
   await page.locator('a#components-button--docs').click();
-  await expect(frame.locator('.tk-docs-tag')).toHaveText('<t-button>');
+  await expect(frame.locator('.hf-docs-tag')).toHaveText('<t-button>');
   await expect(select).toHaveValue('vue');
 });
 
@@ -196,7 +196,7 @@ test('image effects docs explain optional imports in each framework at narrow wi
     ['vue', 'onBeforeUnmount'],
   ]) {
     await select.selectOption(value);
-    await expect(frame.locator('.tk-docs')).toHaveAttribute('data-docs-framework', value);
+    await expect(frame.locator('.hf-docs')).toHaveAttribute('data-docs-framework', value);
     await expect(frame.getByTestId('image-example')).toContainText(snippet);
     await expect(frame.getByTestId('image-example')).toContainText('image-effects.css');
   }
@@ -208,11 +208,11 @@ test('image effects docs explain optional imports in each framework at narrow wi
       .getByRole('img', { name: 'Dark square and gray circle on a light background' }),
   ).toHaveCount(1);
   await page.goto('/storybook/iframe.html?id=introduction-image-effects--docs&viewMode=docs');
-  await expect(page.locator('.tk-docs')).toBeVisible();
+  await expect(page.locator('.hf-docs')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
     true,
   );
-  const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
+  const report = await new AxeBuilder({ page }).include('.hf-docs').analyze();
   await writeFile(
     testInfo.outputPath('image-effects-documentation-axe-review.json'),
     JSON.stringify({ violations: report.violations, incomplete: report.incomplete }, null, 2),
@@ -229,14 +229,14 @@ test('typography documentation stays usable at 320 CSS pixels', async ({ page },
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
     true,
   );
-  await expect(page.locator('.tk-docs-controls-hint')).toBeVisible();
+  await expect(page.locator('.hf-docs-controls-hint')).toBeVisible();
   const typographyControls = page.getByRole('region', { name: 'Typography controls' });
   await typographyControls.focus();
   await page.keyboard.press('ArrowRight');
   await expect
     .poll(() => typographyControls.evaluate((element) => element.scrollLeft))
     .toBeGreaterThan(0);
-  const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
+  const report = await new AxeBuilder({ page }).include('.hf-docs').analyze();
   await writeFile(
     testInfo.outputPath('typography-documentation-axe-review.json'),
     JSON.stringify({ violations: report.violations, incomplete: report.incomplete }, null, 2),
@@ -250,13 +250,13 @@ for (const { tag, id } of entries) {
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
     await page.goto(`/storybook/iframe.html?id=${id}&viewMode=docs`);
-    const article = page.locator('.tk-docs');
+    const article = page.locator('.hf-docs');
     await expect(article).toHaveAttribute('data-docs-framework', 'html');
     await expect(
       article.getByRole('heading', { name: 'API reference', exact: true }),
     ).toBeVisible();
-    await expect(article.locator('.tk-docs-lead')).toHaveText(guides[tag].purpose);
-    await expect(article.getByTestId('framework-example')).toContainText('/assets/terminal.js');
+    await expect(article.locator('.hf-docs-lead')).toHaveText(guides[tag].purpose);
+    await expect(article.getByTestId('framework-example')).toContainText('/assets/hullframe.js');
     await expect(article.locator('#styling')).toContainText('CSS');
     if (tag === 't-split-pane') {
       const properties = article.getByRole('region', {
@@ -279,10 +279,10 @@ for (const { tag, id } of entries) {
     await expect(article.locator('#states')).toContainText('States and examples');
     await expect(article.locator('h1,h2,h3,h4').filter({ hasText: /^$/ })).toHaveCount(0);
     await expect(article.locator('#live-preview')).not.toContainText('unsubscribe');
-    await expect(article.locator('.tk-docs-controls label[aria-label]')).toHaveCount(0);
+    await expect(article.locator('.hf-docs-controls label[aria-label]')).toHaveCount(0);
     expect(
       await article
-        .locator('.tk-docs-controls input[type="radio"]')
+        .locator('.hf-docs-controls input[type="radio"]')
         .evaluateAll((inputs) =>
           inputs.every(
             (input) => !!input.closest('fieldset')?.querySelector('legend')?.textContent?.trim(),
@@ -314,7 +314,7 @@ test('API and Controls table text stays readable in every built component manual
   }[] = [];
   for (const { tag, id } of entries) {
     await page.goto(`/storybook/iframe.html?id=${id}&viewMode=docs`);
-    const pairs = await page.locator('.tk-docs').evaluate((article) => {
+    const pairs = await page.locator('.hf-docs').evaluate((article) => {
       type RGB = [number, number, number];
       type RGBA = [number, number, number, number];
       const rgba = (value: string): RGBA => {
@@ -345,8 +345,8 @@ test('API and Controls table text stays readable in every built component manual
         effects: string[];
       }[] = [];
       const regions: { source: 'api' | 'controls'; selector: string }[] = [
-        { source: 'api', selector: '#api-reference .tk-docs-table' },
-        { source: 'controls', selector: '.tk-docs-controls' },
+        { source: 'api', selector: '#api-reference .hf-docs-table' },
+        { source: 'controls', selector: '.hf-docs-controls' },
       ];
       for (const { source, selector } of regions) {
         for (const region of article.querySelectorAll<HTMLElement>(selector)) {
@@ -438,12 +438,12 @@ test('global framework selection changes code and survives navigation and reload
   const select = frame.getByRole('combobox', { name: 'Documentation framework' });
   for (const [value, snippet] of [
     ['react', 'useState'],
-    ['vue', 'useTerminalModel'],
-    ['angular', 'TerminalValueAccessor'],
-    ['html', '/assets/terminal.js'],
+    ['vue', 'useHullframeModel'],
+    ['angular', 'HullframeValueAccessor'],
+    ['html', '/assets/hullframe.js'],
   ]) {
     await select.selectOption(value);
-    await expect(frame.locator('.tk-docs')).toHaveAttribute('data-docs-framework', value);
+    await expect(frame.locator('.hf-docs')).toHaveAttribute('data-docs-framework', value);
     await expect(frame.getByTestId('framework-example')).toContainText(snippet);
     await expect(frame.getByTestId('framework-example')).toContainText('slot="start"');
     if (value !== 'html') await expect(page).toHaveURL(new RegExp(`globals=.*framework:${value}`));
@@ -452,10 +452,10 @@ test('global framework selection changes code and survives navigation and reload
   await select.selectOption('react');
   await page.getByRole('button', { name: 'Icon', exact: true }).click();
   await page.locator('a#components-icon--docs').click();
-  await expect(frame.locator('.tk-docs-tag')).toHaveText('<t-icon>');
+  await expect(frame.locator('.hf-docs-tag')).toHaveText('<t-icon>');
   await expect(select).toHaveValue('react');
   await expect(frame.getByTestId('framework-example')).toContainText(
-    "from '@joelmeaders/terminalui/react/icon'",
+    "from '@joelmeaders/hullframe/react/icon'",
   );
   await page.reload();
   await expect(select).toHaveValue('react');
@@ -500,13 +500,13 @@ test('slot API tables and the shared composition guide work in built documentati
       .locator('details')
       .filter({ has: page.getByText('Composing with slots and icons', { exact: true }) });
     await expect(guide).toHaveAttribute('open', '');
-    await expect(guide).toContainText('@joelmeaders/terminalui/components/icon');
+    await expect(guide).toContainText('@joelmeaders/hullframe/components/icon');
     await expect(guide).toContainText('slot="start"');
     await expect(guide).toContainText('read-only');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
       true,
     );
-    const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
+    const report = await new AxeBuilder({ page }).include('.hf-docs').analyze();
     await writeFile(
       testInfo.outputPath(`${id}-slots-axe-review.json`),
       JSON.stringify({ violations: report.violations, incomplete: report.incomplete }, null, 2),
@@ -528,15 +528,15 @@ test('both icon docs include complete registration and import instructions', asy
       'ionicons/icons',
       'registerFontAwesomeIcon',
       'registerLucideIcon',
-      '@joelmeaders/terminalui/icons',
+      '@joelmeaders/hullframe/icons',
     ]) {
       await expect(guide).toContainText(text);
     }
     await guide
       .getByText('Built-in icon names · no provider registration needed', { exact: true })
       .click();
-    await expect(guide.locator('.tk-docs-icon-names')).toContainText('search');
-    await expect(page.locator('.tk-docs-controls')).not.toContainText(/css shadow parts/i);
+    await expect(guide.locator('.hf-docs-icon-names')).toContainText('search');
+    await expect(page.locator('.hf-docs-controls')).not.toContainText(/css shadow parts/i);
     await expect(page.getByRole('region', { name: 'CSS parts', exact: true })).toContainText(
       id.includes('button') ? 'button' : 'svg',
     );
@@ -555,12 +555,12 @@ for (const id of ['components-icon--docs', 'components-input--docs', 'components
     await select.press('Enter');
     await expect(select).toHaveValue('angular');
     await page.getByText('Project setup for Angular', { exact: true }).click();
-    await expect(page.locator('#getting-started .tk-docs-setup')).toHaveAttribute('open', '');
+    await expect(page.locator('#getting-started .hf-docs-setup')).toHaveAttribute('open', '');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
       true,
     );
     const controls = page.getByRole('region', { name: 'Live preview controls' });
-    await expect(page.locator('.tk-docs-controls-hint')).toBeVisible();
+    await expect(page.locator('.hf-docs-controls-hint')).toBeVisible();
     const tableWidth = await controls
       .locator('table')
       .first()
@@ -644,7 +644,7 @@ for (const id of ['components-icon--docs', 'components-input--docs', 'components
       await page.keyboard.press('Enter');
       await expect(toggle).toBeFocused();
     }
-    const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
+    const report = await new AxeBuilder({ page }).include('.hf-docs').analyze();
     const reportPath = testInfo.outputPath('documentation-axe-review.json');
     await writeFile(
       reportPath,
@@ -716,13 +716,13 @@ test('Input documentation stays usable at actual 400% Chromium browser zoom', as
       contentType: 'image/png',
     });
     const controls = page.getByRole('region', { name: 'Live preview controls' });
-    await expect(page.locator('.tk-docs-controls-hint')).toBeVisible();
+    await expect(page.locator('.hf-docs-controls-hint')).toBeVisible();
     await controls.focus();
     await page.keyboard.press('ArrowRight');
     await expect.poll(() => controls.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
     await controls.scrollIntoViewIfNeeded();
     await expect(controls).toBeInViewport();
-    const report = await new AxeBuilder({ page }).include('.tk-docs').analyze();
+    const report = await new AxeBuilder({ page }).include('.hf-docs').analyze();
     const reportPath = testInfo.outputPath('documentation-browser-zoom-axe-review.json');
     await writeFile(
       reportPath,
@@ -774,7 +774,7 @@ test('all component manuals reflow at actual 400% Chromium browser zoom', async 
   }[] = [];
   try {
     await page.goto(`/storybook/iframe.html?id=${entries[0].id}&viewMode=docs`);
-    await expect(page.locator('.tk-docs')).toBeVisible();
+    await expect(page.locator('.hf-docs')).toBeVisible();
     const zoom = await zoomBrowser.setZoom(4);
     expect(zoom).toBeCloseTo(4, 3);
     for (const { tag, id } of entries) {
@@ -794,7 +794,7 @@ test('all component manuals reflow at actual 400% Chromium browser zoom', async 
         await expect(select).toHaveValue(framework);
         if (framework === 'angular') {
           await page.getByText('Project setup for Angular', { exact: true }).click();
-          await expect(page.locator('#getting-started .tk-docs-setup')).toHaveAttribute('open', '');
+          await expect(page.locator('#getting-started .hf-docs-setup')).toHaveAttribute('open', '');
         }
         const layout = await page.evaluate(() => ({
           viewport: innerWidth,

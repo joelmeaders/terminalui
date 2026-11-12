@@ -1,5 +1,5 @@
 import { css, html, type PropertyValues } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { containModalTab } from '../internal/modal-focus';
 import { ModalScrollController } from '../internal/modal-scroll';
 import { activeElement } from '../internal/floating';
@@ -11,7 +11,7 @@ import { activeElement } from '../internal/floating';
  * @csspart body - Scrollable dialog content.
  * @fires {CustomEvent<null>} t-close - The dialog closed. No detail payload.
  */
-export class TDialog extends TerminalElement {
+export class TDialog extends HullframeElement {
   static properties = { open: { type: Boolean, reflect: true }, heading: {} };
   open = false;
   heading = 'Dialog';

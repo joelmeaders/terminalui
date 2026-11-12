@@ -1,5 +1,5 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 export interface TabItem {
   id: string;
   label: string;
@@ -13,7 +13,7 @@ export interface TabItem {
  * @csspart panel - panel element.
  * @fires {CustomEvent<{ value: string }>} t-change - Selection changed. detail.value is the selected tab ID.
  */
-export class TTabs extends TerminalElement {
+export class TTabs extends HullframeElement {
   static properties = {
     tabs: { attribute: false },
     active: { reflect: true },

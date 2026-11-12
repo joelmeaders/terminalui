@@ -1,5 +1,5 @@
 import { css, html, nothing } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 /**
  * Inline notice. Emits t-dismiss. Set urgent only for messages that need immediate announcement.
  * @slot - Main content.
@@ -7,7 +7,7 @@ import { baseStyles, TerminalElement } from '../internal/base';
  * @csspart notice - notice element.
  * @fires {CustomEvent<null>} t-dismiss - The notice was dismissed. No detail payload.
  */
-export class TAlert extends TerminalElement {
+export class TAlert extends HullframeElement {
   static properties = {
     variant: { reflect: true },
     dismissible: { type: Boolean },

@@ -1,5 +1,5 @@
 import { css, html, nothing } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 
 export interface TimelineItem {
   id: string;
@@ -16,7 +16,7 @@ export interface TimelineItem {
  *
  * @csspart item - History entry.
  */
-export class TTimeline extends TerminalElement {
+export class TTimeline extends HullframeElement {
   static properties = {
     items: { attribute: false },
     label: {},

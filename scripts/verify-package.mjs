@@ -7,7 +7,7 @@ import { build } from 'esbuild';
 import { chromium } from '@playwright/test';
 
 const root = process.cwd();
-const consumer = await mkdtemp(join(tmpdir(), 'terminal-kit-consumer-'));
+const consumer = await mkdtemp(join(tmpdir(), 'hullframe-consumer-'));
 const npm = process.env.npm_execpath;
 if (!npm) throw new Error('Run this verification with npm run test:package.');
 function npmRun(args, cwd = root) {
@@ -20,6 +20,7 @@ function npmRun(args, cwd = root) {
 const pack = JSON.parse(
   npmRun(['pack', '--ignore-scripts', '--json', '--pack-destination', consumer]),
 )[0];
+assert.equal(pack.name, '@joelmeaders/hullframe');
 assert(
   pack.files.some((file) => file.path === 'LICENSE'),
   'Packed license must exist.',
@@ -40,6 +41,7 @@ for (const directory of noticeDirectories) {
 }
 assert(!pack.files.some((file) => file.path.startsWith('src/')));
 const pkg = JSON.parse(await readFile('package.json', 'utf8'));
+assert.equal(pkg.name, pack.name);
 assert.equal(pkg.license, 'MIT');
 assert.deepEqual(
   Object.keys(pkg.dependencies),
@@ -48,7 +50,7 @@ assert.deepEqual(
 );
 await writeFile(
   join(consumer, 'package.json'),
-  JSON.stringify({ name: 'terminal-kit-external-consumer', private: true, type: 'module' }),
+  JSON.stringify({ name: 'hullframe-external-consumer', private: true, type: 'module' }),
 );
 npmRun(
   [
@@ -73,18 +75,35 @@ npmRun(
   consumer,
 );
 assert.equal(
-  await readFile(join(consumer, 'node_modules/@joelmeaders/terminalui/LICENSE'), 'utf8'),
+  await readFile(join(consumer, 'node_modules/@joelmeaders/hullframe/LICENSE'), 'utf8'),
   await readFile('LICENSE', 'utf8'),
   'Installed license differs from the repository license.',
 );
 for (const directory of noticeDirectories) {
   const path = `docs/icon-licenses/${directory.name}/NOTICE`;
   assert.equal(
-    await readFile(join(consumer, 'node_modules/@joelmeaders/terminalui', path), 'utf8'),
+    await readFile(join(consumer, 'node_modules/@joelmeaders/hullframe', path), 'utf8'),
     await readFile(path, 'utf8'),
     `Installed notice differs: ${directory.name}`,
   );
 }
+assert.equal(
+  await readFile(join(consumer, 'node_modules/@joelmeaders/hullframe/dist/terminal.js'), 'utf8'),
+  await readFile(join(consumer, 'node_modules/@joelmeaders/hullframe/dist/hullframe.js'), 'utf8'),
+  'The legacy standalone file must remain self-contained and match the canonical bundle.',
+);
+const standaloneAliases = await build({
+  absWorkingDir: consumer,
+  stdin: {
+    contents: `import { TButton } from '@joelmeaders/hullframe/hullframe.js';
+import { TButton as LegacyButton } from '@joelmeaders/hullframe/terminal.js';
+globalThis.standaloneAliasesMatch = TButton === LegacyButton;`,
+    resolveDir: consumer,
+  },
+  bundle: true,
+  format: 'iife',
+  write: false,
+});
 const catalog = JSON.parse(await readFile('dist/catalog.json', 'utf8'));
 const componentSources = (await readdir('src/components')).filter((file) => file.endsWith('.ts'));
 assert.equal(
@@ -104,21 +123,21 @@ const manifestTags = manifest.modules.flatMap((module) =>
 assert.deepEqual(manifestTags.sort(), catalog.map((item) => item.tagName).sort());
 const coreBundle = await build({
   absWorkingDir: consumer,
-  stdin: { contents: "import '@joelmeaders/terminalui';", resolveDir: consumer },
+  stdin: { contents: "import '@joelmeaders/hullframe';", resolveDir: consumer },
   bundle: true,
   write: false,
   metafile: true,
 });
 const buttonBundle = await build({
   absWorkingDir: consumer,
-  stdin: { contents: "import '@joelmeaders/terminalui/components/button';", resolveDir: consumer },
+  stdin: { contents: "import '@joelmeaders/hullframe/components/button';", resolveDir: consumer },
   bundle: true,
   write: false,
   metafile: true,
 });
 const dockBundle = await build({
   absWorkingDir: consumer,
-  stdin: { contents: "import '@joelmeaders/terminalui/components/dock';", resolveDir: consumer },
+  stdin: { contents: "import '@joelmeaders/hullframe/components/dock';", resolveDir: consumer },
   bundle: true,
   minify: true,
   format: 'iife',
@@ -131,7 +150,7 @@ const dockInputs = Object.values(dockBundle.metafile.outputs)
   .map(([file]) => file.replaceAll('\\', '/'));
 assert.deepEqual(
   dockInputs
-    .filter((file) => file.includes('@joelmeaders/terminalui/dist/components/'))
+    .filter((file) => file.includes('@joelmeaders/hullframe/dist/components/'))
     .map((file) => file.split('/').at(-1)),
   ['dock.js'],
   'A dock subpath must retain only its own component.',
@@ -155,7 +174,7 @@ for (const [entry, symbol, expected, excluded] of [
   const effectBundle = await build({
     absWorkingDir: consumer,
     stdin: {
-      contents: `import { ${symbol} } from '@joelmeaders/terminalui/${entry}'; globalThis.effectFactory = ${symbol};`,
+      contents: `import { ${symbol} } from '@joelmeaders/hullframe/${entry}'; globalThis.effectFactory = ${symbol};`,
       resolveDir: consumer,
     },
     bundle: true,
@@ -181,13 +200,13 @@ const buttonInputs = Object.keys(buttonBundle.metafile.inputs).map((file) =>
 );
 assert.deepEqual(
   buttonInputs
-    .filter((file) => file.includes('@joelmeaders/terminalui/dist/components/'))
+    .filter((file) => file.includes('@joelmeaders/hullframe/dist/components/'))
     .map((file) => file.split('/').at(-1)),
   ['button.js'],
   'A button subpath must not pull in other components.',
 );
 assert(
-  !buttonInputs.some((file) => file.endsWith('@joelmeaders/terminalui/dist/index.js')),
+  !buttonInputs.some((file) => file.endsWith('@joelmeaders/hullframe/dist/index.js')),
   'A button subpath must not register the complete catalog.',
 );
 assert(
@@ -228,7 +247,7 @@ for (const { name: symbol, tagName } of catalog) {
     const result = await build({
       absWorkingDir: consumer,
       stdin: {
-        contents: `import { ${symbol} } from '@joelmeaders/terminalui/${entry}'; globalThis.exampleComponent = ${symbol};`,
+        contents: `import { ${symbol} } from '@joelmeaders/hullframe/${entry}'; globalThis.exampleComponent = ${symbol};`,
         resolveDir: consumer,
       },
       bundle: true,
@@ -245,7 +264,7 @@ for (const { name: symbol, tagName } of catalog) {
       .map(([file]) => file.replaceAll('\\', '/'));
     assert.deepEqual(
       included
-        .filter((file) => file.includes('@joelmeaders/terminalui/dist/components/'))
+        .filter((file) => file.includes('@joelmeaders/hullframe/dist/components/'))
         .map((file) => file.split('/').at(-1))
         .sort(),
       expected,
@@ -253,7 +272,7 @@ for (const { name: symbol, tagName } of catalog) {
     );
     assert.deepEqual(
       included
-        .filter((file) => file.includes('@joelmeaders/terminalui/dist/adapters/react/'))
+        .filter((file) => file.includes('@joelmeaders/hullframe/dist/adapters/react/'))
         .map((file) => file.split('/').at(-1))
         .sort(),
       isReact ? [`${component}.js`] : [],
@@ -283,31 +302,31 @@ for (const { name: symbol, tagName } of catalog) {
 const reactImports = catalog
   .map(
     ({ name, tagName }) =>
-      `import { ${name} as ${name}ReactSubpath } from '@joelmeaders/terminalui/react/${tagName.slice(2)}';`,
+      `import { ${name} as ${name}ReactSubpath } from '@joelmeaders/hullframe/react/${tagName.slice(2)}';`,
   )
   .join('\n');
 const imports = catalog
   .map(
     ({ name, path }) =>
-      `import { ${name} } from '@joelmeaders/terminalui/${path.replace(/\.js$/, '')}';`,
+      `import { ${name} } from '@joelmeaders/hullframe/${path.replace(/\.js$/, '')}';`,
   )
   .join('\n');
 await writeFile(
   join(consumer, 'consumer.ts'),
   `${imports}
 ${reactImports}
-import '@joelmeaders/terminalui';
-import '@joelmeaders/terminalui/themes.css';
-import '@joelmeaders/terminalui/typography.css';
-import '@joelmeaders/terminalui/image-effects.css';
-import { mountPixelation, type PixelationOptions } from '@joelmeaders/terminalui/image-pixelate';
-import { mountAscii, type AsciiOptions, type ImageEffectController } from '@joelmeaders/terminalui/image-ascii';
-import { TInput as ReactInput } from '@joelmeaders/terminalui/react';
-import * as ReactComponents from '@joelmeaders/terminalui/react';
-import { useTerminalModel } from '@joelmeaders/terminalui/vue';
+import '@joelmeaders/hullframe';
+import '@joelmeaders/hullframe/themes.css';
+import '@joelmeaders/hullframe/typography.css';
+import '@joelmeaders/hullframe/image-effects.css';
+import { mountPixelation, type PixelationOptions } from '@joelmeaders/hullframe/image-pixelate';
+import { mountAscii, type AsciiOptions, type ImageEffectController } from '@joelmeaders/hullframe/image-ascii';
+import { TInput as ReactInput } from '@joelmeaders/hullframe/react';
+import * as ReactComponents from '@joelmeaders/hullframe/react';
+import { useHullframeModel, useTerminalModel } from '@joelmeaders/hullframe/vue';
 import '@angular/compiler';
-import { TerminalValueAccessor } from '@joelmeaders/terminalui/angular';
-import { registerIcon, unregisterIcon, registerFontAwesomeIcon, registerLucideIcon, registerIconSet, type IconData } from '@joelmeaders/terminalui/icons';
+import { HullframeValueAccessor, TerminalValueAccessor } from '@joelmeaders/hullframe/angular';
+import { registerIcon, unregisterIcon, registerFontAwesomeIcon, registerLucideIcon, registerIconSet, type IconData } from '@joelmeaders/hullframe/icons';
 const testIcon: IconData = { width: 16, height: 16, body: '<path d="M2 2h12v12H2z"/>' };
 const imageEffectTypes: [typeof mountPixelation, typeof mountAscii, PixelationOptions, AsciiOptions, ImageEffectController<AsciiOptions> | undefined] = [mountPixelation, mountAscii, {pixelSize:8}, {cellSize:10,characters:' .#',invert:false}, undefined];
 void imageEffectTypes;
@@ -321,7 +340,7 @@ document.body.append(input);
 for (const name of ['package:sample','package:fa','package:lucide','package-set:box']) {
   const icon = new TIcon(); icon.name = name; icon.dataset.packageIcon = name; document.body.append(icon);
 }
-(globalThis as any).packageResult = { count: ${catalog.length}, value: input.value, react: !!ReactInput, reactWrappers: [${catalog.map(({ name }) => `ReactComponents.${name}`).join(',')}].filter(Boolean).length, reactSubpaths: [${catalog.map(({ name }) => `${name}ReactSubpath`).join(',')}].filter(Boolean).length, reactCompatibility: [${catalog.map(({ name }) => `${name}ReactSubpath === ReactComponents.${name}`).join(',')}].every(Boolean), vue: !!useTerminalModel, angular: !!TerminalValueAccessor };
+(globalThis as any).packageResult = { count: ${catalog.length}, value: input.value, react: !!ReactInput, reactWrappers: [${catalog.map(({ name }) => `ReactComponents.${name}`).join(',')}].filter(Boolean).length, reactSubpaths: [${catalog.map(({ name }) => `${name}ReactSubpath`).join(',')}].filter(Boolean).length, reactCompatibility: [${catalog.map(({ name }) => `${name}ReactSubpath === ReactComponents.${name}`).join(',')}].every(Boolean), vue: !!useHullframeModel, angular: !!HullframeValueAccessor, vueCompatibility: useHullframeModel === useTerminalModel, angularCompatibility: HullframeValueAccessor === TerminalValueAccessor };
 `,
 );
 const config = {
@@ -353,8 +372,8 @@ await writeFile(
   `
 import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { TerminalValueAccessor } from '@joelmeaders/terminalui/angular';
-@Component({selector:'consumer-app',standalone:true,schemas:[CUSTOM_ELEMENTS_SCHEMA],imports:[ReactiveFormsModule,TerminalValueAccessor],template:
+import { HullframeValueAccessor, TerminalValueAccessor } from '@joelmeaders/hullframe/angular';
+@Component({selector:'consumer-app',standalone:true,schemas:[CUSTOM_ELEMENTS_SCHEMA],imports:[ReactiveFormsModule,HullframeValueAccessor,TerminalValueAccessor],template:
   '<t-input label="Name" [formControl]="name"></t-input>' +
   '<t-password-input label="Password" [formControl]="password"></t-password-input>' +
   '<t-number-input label="Quantity" [formControl]="quantity"></t-number-input>' +
@@ -409,7 +428,7 @@ await writeFile(
   join(consumer, 'angular-runner.js'),
   `
 import '@angular/compiler';
-import '@joelmeaders/terminalui';
+import '@joelmeaders/hullframe';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { ConsumerApp } from './aot/angular-consumer.js';
 document.body.append(document.createElement('consumer-app'));
@@ -439,6 +458,13 @@ try {
   const page = await browser.newPage();
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('about:blank');
+  await page.addScriptTag({ content: standaloneAliases.outputFiles[0].text });
+  assert.equal(
+    await page.evaluate(() => globalThis.standaloneAliasesMatch),
+    true,
+    'Both standalone package subpaths must resolve to the same module.',
+  );
   await page.goto('about:blank');
   await page.addScriptTag({ content: dockBundle.outputFiles[0].text });
   const isolatedDock = await page.evaluate(
@@ -493,6 +519,8 @@ try {
     reactCompatibility: true,
     vue: true,
     angular: true,
+    vueCompatibility: true,
+    angularCompatibility: true,
   });
   const registered = await page.evaluate(
     (tags) => tags.every((tag) => !!customElements.get(tag)),
@@ -591,7 +619,7 @@ try {
         URL.revokeObjectURL(url);
       }
     },
-    await readFile(join(consumer, 'node_modules/@joelmeaders/terminalui/dist/terminal.js'), 'utf8'),
+    await readFile(join(consumer, 'node_modules/@joelmeaders/hullframe/dist/hullframe.js'), 'utf8'),
   );
   await page.waitForFunction(() => !!customElements.get('t-input'));
   assert.equal(await page.locator('t-icon path').getAttribute('d'), 'M2 12l6 6L22 4');
@@ -607,7 +635,7 @@ try {
   );
   for (const name of ['themes', 'typography']) {
     const installed = await readFile(
-      join(consumer, `node_modules/@joelmeaders/terminalui/dist/${name}.css`),
+      join(consumer, `node_modules/@joelmeaders/hullframe/dist/${name}.css`),
       'utf8',
     );
     assert.equal(

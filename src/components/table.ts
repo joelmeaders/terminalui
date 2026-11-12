@@ -1,6 +1,6 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 
 export interface TableColumn {
   key: string;
@@ -26,7 +26,7 @@ export type TableRow = Record<string, unknown>;
  *
  * @csspart row - Body row.
  */
-export class TTable extends TerminalElement {
+export class TTable extends HullframeElement {
   static properties = {
     caption: {},
     columns: { attribute: false },

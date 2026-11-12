@@ -1,7 +1,7 @@
 import { css, html, type PropertyValues } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { activeElement, observeFloating, recoverFocus } from '../internal/floating';
 
 export type DockPlacement = 'inline' | 'top' | 'bottom' | 'left' | 'right';
@@ -97,7 +97,7 @@ const observeItems: MutationObserverInit = {
  * @cssprop --t-dock-padding - Strip padding. Defaults to 8px.
  * @cssprop --t-dock-editor-width - Preferred editor width. Defaults to 320px, limited by the viewport.
  */
-export class TDock extends TerminalElement {
+export class TDock extends HullframeElement {
   static properties = {
     label: {},
     orientation: { reflect: true },

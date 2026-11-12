@@ -16,7 +16,7 @@ const meta = {
   },
   render: () =>
     html`<t-breadcrumb
-      .items=${[{ label: 'Home', href: '#home' }, { label: 'Projects', href: '#projects' }, { label: 'Terminal Kit' }]}
+      .items=${[{ label: 'Home', href: '#home' }, { label: 'Projects', href: '#projects' }, { label: 'Hullframe' }]}
     ></t-breadcrumb>`,
 } satisfies Meta;
 export default meta;

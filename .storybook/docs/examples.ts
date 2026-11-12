@@ -146,7 +146,7 @@ export function exampleFor(tag: string, framework: Framework): string {
   const node = { tag, ...guide.example };
   const imports = componentImports(node);
   const type = className(tag);
-  const module = `@joelmeaders/terminalui/components/${tag.slice(2)}`;
+  const module = `@joelmeaders/hullframe/components/${tag.slice(2)}`;
   const data = Object.entries(node.props ?? {}).filter(([, value]) => isData(value));
   const form = guide.form;
   const initial =
@@ -176,11 +176,11 @@ export function exampleFor(tag: string, framework: Framework): string {
         : `event.${event?.read ?? 'type'}`;
   const showArgs = (opener: string) => (tag === 't-toast' ? `undefined, ${opener}` : opener);
   const registration = imports
-    .map((name) => `import '@joelmeaders/terminalui/components/${name.slice(2)}';`)
+    .map((name) => `import '@joelmeaders/hullframe/components/${name.slice(2)}';`)
     .join('\n');
   if (framework === 'html') {
     const setup = [
-      `import '/assets/terminal.js';`,
+      `import '/assets/hullframe.js';`,
       ...(event || data.length || guide.action
         ? [`const element = document.querySelector('${tag}');`]
         : []),
@@ -196,7 +196,7 @@ export function exampleFor(tag: string, framework: Framework): string {
           ]
         : []),
     ].join('\n\n');
-    return `<!-- Copy dist/terminal.js and dist/themes.css to your public /assets directory. -->\n<link rel="stylesheet" href="/assets/themes.css">\n<style>\n${exampleCss}\n</style>\n<main class="example" data-theme="amber">\n${guide.action ? `  <button id="open-example" type="button">${guide.action.label}</button>\n` : ''}${markup(
+    return `<!-- Copy dist/hullframe.js and dist/themes.css to your public /assets directory. -->\n<link rel="stylesheet" href="/assets/themes.css">\n<style>\n${exampleCss}\n</style>\n<main class="example" data-theme="amber">\n${guide.action ? `  <button id="open-example" type="button">${guide.action.label}</button>\n` : ''}${markup(
       node,
       framework,
       true,
@@ -233,10 +233,10 @@ export function exampleFor(tag: string, framework: Framework): string {
     const wrappers = imports
       .map(
         (tag) =>
-          `import { ${className(tag)} as ${className(tag)}View } from '@joelmeaders/terminalui/react/${tag.slice(2)}';`,
+          `import { ${className(tag)} as ${className(tag)}View } from '@joelmeaders/hullframe/react/${tag.slice(2)}';`,
       )
       .join('\n');
-    return `${hooks.length ? `import { ${hooks.join(', ')} } from 'react';\n` : ''}${JSON.stringify(node).includes('style') ? "import type * as React from 'react';\n" : ''}${wrappers}\n${typeImport}import '@joelmeaders/terminalui/themes.css';\nimport './example.css';\n\nexport function Example() {\n  ${declarations}\n  return (\n    <main className="example" data-theme="amber">\n      ${guide.action ? `<button type="button" onClick={(event) => element.current?.show(${showArgs('event.currentTarget')})}>${guide.action.label}</button>\n      ` : ''}${markup(node, framework, true, additions, omitted).replace(/<(\/?)(T\w+)/g, '<$1$2View')}\n    </main>\n  );\n}`;
+    return `${hooks.length ? `import { ${hooks.join(', ')} } from 'react';\n` : ''}${JSON.stringify(node).includes('style') ? "import type * as React from 'react';\n" : ''}${wrappers}\n${typeImport}import '@joelmeaders/hullframe/themes.css';\nimport './example.css';\n\nexport function Example() {\n  ${declarations}\n  return (\n    <main className="example" data-theme="amber">\n      ${guide.action ? `<button type="button" onClick={(event) => element.current?.show(${showArgs('event.currentTarget')})}>${guide.action.label}</button>\n      ` : ''}${markup(node, framework, true, additions, omitted).replace(/<(\/?)(T\w+)/g, '<$1$2View')}\n    </main>\n  );\n}`;
   }
   if (framework === 'vue') {
     const usesRef = form || guide.action;
@@ -248,14 +248,14 @@ export function exampleFor(tag: string, framework: Framework): string {
         .map(([key, value]) => `const ${key} = ${json(value)};`),
       usesRef && `const element = ref<${type} | null>(null);`,
       form &&
-        `const value = ref${form === 'files' ? '<FileList | null>' : ''}(${json(initial)});\nuseTerminalModel(element, value, '${form}');`,
+        `const value = ref${form === 'files' ? '<FileList | null>' : ''}(${json(initial)});\nuseHullframeModel(element, value, '${form}');`,
       event && !form && `function onEvent(event: Event) { console.log(${eventRead}); }`,
       guide.action &&
         `function show(event: Event) { element.value?.show(${showArgs('event.currentTarget as HTMLElement')}); }`,
     ]
       .filter(Boolean)
       .join('\n');
-    return `<script setup lang="ts">\n${usesRef ? "import { ref } from 'vue';\n" : ''}${form ? "import { useTerminalModel } from '@joelmeaders/terminalui/vue';\n" : ''}${registration}\n${typeImport}import '@joelmeaders/terminalui/themes.css';\n${declarations}\n</script>\n\n<template>\n  <main class="example" data-theme="amber">\n    ${guide.action ? `<button type="button" @click="show">${guide.action.label}</button>\n    ` : ''}${markup(node, framework, true, additions, omitted)}\n  </main>\n</template>\n\n<style>\n${exampleCss}\n</style>`;
+    return `<script setup lang="ts">\n${usesRef ? "import { ref } from 'vue';\n" : ''}${form ? "import { useHullframeModel } from '@joelmeaders/hullframe/vue';\n" : ''}${registration}\n${typeImport}import '@joelmeaders/hullframe/themes.css';\n${declarations}\n</script>\n\n<template>\n  <main class="example" data-theme="amber">\n    ${guide.action ? `<button type="button" @click="show">${guide.action.label}</button>\n    ` : ''}${markup(node, framework, true, additions, omitted)}\n  </main>\n</template>\n\n<style>\n${exampleCss}\n</style>`;
   }
   const additions = form ? ['[formControl]="control"'] : [];
   if (event && !form) additions.push(`(${event.name})="onEvent($event)"`);
@@ -272,5 +272,5 @@ export function exampleFor(tag: string, framework: Framework): string {
   ]
     .filter(Boolean)
     .join('\n  ');
-  return `import { Component, CUSTOM_ELEMENTS_SCHEMA${guide.action ? ', ElementRef, ViewChild' : ''} } from '@angular/core';\n${form ? "import { FormControl, ReactiveFormsModule } from '@angular/forms';\nimport { TerminalValueAccessor } from '@joelmeaders/terminalui/angular';\n" : ''}${registration}\n${typeImport}\n@Component({\n  selector: 'app-example',\n  standalone: true,\n  schemas: [CUSTOM_ELEMENTS_SCHEMA],\n  ${form ? 'imports: [ReactiveFormsModule, TerminalValueAccessor],\n  ' : ''}template: \`\n    <main class="example" data-theme="amber">\n      ${guide.action ? `<button type="button" (click)="show($event)">${guide.action.label}</button>\n      ` : ''}${markup(node, framework, true, additions, omitted)}\n    </main>\n  \`,\n  styles: [\`${exampleCss}\`],\n})\nexport class Example {\n  ${declarations}\n}`;
+  return `import { Component, CUSTOM_ELEMENTS_SCHEMA${guide.action ? ', ElementRef, ViewChild' : ''} } from '@angular/core';\n${form ? "import { FormControl, ReactiveFormsModule } from '@angular/forms';\nimport { HullframeValueAccessor } from '@joelmeaders/hullframe/angular';\n" : ''}${registration}\n${typeImport}\n@Component({\n  selector: 'app-example',\n  standalone: true,\n  schemas: [CUSTOM_ELEMENTS_SCHEMA],\n  ${form ? 'imports: [ReactiveFormsModule, HullframeValueAccessor],\n  ' : ''}template: \`\n    <main class="example" data-theme="amber">\n      ${guide.action ? `<button type="button" (click)="show($event)">${guide.action.label}</button>\n      ` : ''}${markup(node, framework, true, additions, omitted)}\n    </main>\n  \`,\n  styles: [\`${exampleCss}\`],\n})\nexport class Example {\n  ${declarations}\n}`;
 }

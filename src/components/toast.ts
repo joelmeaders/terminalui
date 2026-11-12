@@ -1,5 +1,5 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { activeElement, recoverFocus } from '../internal/floating';
 import { optionalSlotStyles, syncSlot } from '../internal/slots';
 /**
@@ -23,7 +23,7 @@ import { optionalSlotStyles, syncSlot } from '../internal/slots';
  *
  * @csspart countdown-value - Remaining time inside the spinner.
  */
-export class TToast extends TerminalElement {
+export class TToast extends HullframeElement {
   static properties = {
     message: {},
     open: { type: Boolean, reflect: true },

@@ -1,11 +1,11 @@
 import { css, html } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 /**
  * Themed separator.
  * @csspart line - Separator.
  * @cssprop --t-divider-width - Line thickness in either orientation. Standard lines use 1px; bold lines use 2px.
  */
-export class TDivider extends TerminalElement {
+export class TDivider extends HullframeElement {
   static properties = { vertical: { type: Boolean, reflect: true } };
   vertical = false;
   static styles = [

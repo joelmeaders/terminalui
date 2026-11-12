@@ -3,10 +3,16 @@
 - Do nothing destructive without the user's express written consent. E2E tests may remove their own test data.
 - Always apply the Simplified Technical English skill. Do not announce it.
 - Place worktrees under `{RepositoryName}-worktrees/{WorktreeName}`.
-- Preserve the terminal design, public APIs, and unrelated changes.
+- Preserve Hullframe's terminal-inspired design, public APIs, and unrelated changes.
 - Commit each completed request after its required validation passes. Include only changes for that request.
 - Preserve component features. Use size measurements to find unnecessary complexity, not to remove features to meet a fixed budget.
 - Keep per-component imports for native elements and React wrappers. Verify retained bundle modules from an installed package, including required component dependencies. A small import must not retain unrelated components.
+
+## Product identity
+
+- Use Hullframe for the product name and `@joelmeaders/hullframe` for package imports.
+- Preserve public `t-*` element and event names, `T*` component and React wrapper names, `--t-*` CSS properties, and `.t-*` classes. Keep compatibility aliases when renaming other public symbols.
+- Keep the GitHub repository and GitHub Pages URLs at `terminalui` until their separate rename.
 
 ## Accessibility is a requirement
 

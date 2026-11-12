@@ -1,5 +1,5 @@
 import { css, html } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 
 export type SpinnerType =
   | 'ring'
@@ -22,7 +22,7 @@ export type SpinnerType =
  *
  * @cssprop --t-spinner-color - Indicator color. Defaults to the theme accent.
  */
-export class TSpinner extends TerminalElement {
+export class TSpinner extends HullframeElement {
   static properties = {
     label: {},
     size: { reflect: true },
