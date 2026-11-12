@@ -1,6 +1,6 @@
 import { css, html } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { activeElement } from '../internal/floating';
 
 /**
@@ -14,7 +14,7 @@ import { activeElement } from '../internal/floating';
  *
  * @csspart button - Page and previous/next buttons.
  */
-export class TPagination extends TerminalElement {
+export class TPagination extends HullframeElement {
   static properties = {
     page: { type: Number },
     total: { type: Number },

@@ -1,7 +1,15 @@
 # Release preparation
 
-The [GitHub repository](https://github.com/joelmeaders/terminalui) is public. Terminal Kit uses the [MIT License](../LICENSE). Third-party assets retain their own terms in [icon credits](icons.md).
-The package name is `@joelmeaders/terminalui`. Version tags publish to GitHub Packages after CI passes.
+The [GitHub repository](https://github.com/joelmeaders/terminalui) is public. Hullframe uses the [MIT License](../LICENSE). Third-party assets retain their own terms in [icon credits](icons.md).
+The package name is `@joelmeaders/hullframe`. Version tags publish to GitHub Packages after CI passes.
+
+## Hullframe publication
+
+Hullframe replaces the Terminal Kit and Terminal UI product names. The package name changes from `@joelmeaders/terminalui` to `@joelmeaders/hullframe`, and the preferred standalone browser bundle changes from `dist/terminal.js` to `dist/hullframe.js`. The build also retains the previous standalone filename for compatibility. Public `t-*` APIs remain unchanged. See the [migration notes](https://github.com/joelmeaders/terminalui#migrating-to-hullframe) for the new framework helper names and their compatibility aliases.
+
+Changing the source does not publish the new package or redirect installations of the old package. Use a local package archive until a Hullframe release is published. For the first publication, follow the version-release steps below with a new version and tag; do not reuse an existing tag.
+
+The repository metadata and GitHub Pages location still use `terminalui`. Update those locations when the repository is renamed in a separate follow-up.
 
 ## Local verification
 
@@ -37,7 +45,7 @@ On `main`, all browser jobs and the Windows job must pass before the built Story
 1. Update the version in `package.json` and `package-lock.json`.
 2. Run `npm run check` and inspect `npm pack --dry-run`.
 3. Commit the version change and merge it into `main`.
-4. Create and push a matching version tag, such as `v0.1.3`.
+4. Create and push a new tag named `v<version>` that matches the package version.
 
 The tag workflow runs all checks again. The publish job checks that the tag matches the package version and belongs to `main` history. It then builds and publishes with the repository's `GITHUB_TOKEN`. No stored npm publishing token is needed.
 

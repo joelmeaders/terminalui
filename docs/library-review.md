@@ -124,7 +124,7 @@ The license and release findings in the table are historical. The owner later se
 
 The licensing distinction follows [the Open Source Definition](https://opensource.org/osd) and the [official Perimeter 1.0.1 terms](https://polyformproject.org/licenses/perimeter/1.0.1). Perimeter's restriction concerns competition, including free competing products; it is not a general noncommercial license. This review did not change the license or claim legal approval.
 
-After this review, the owner clarified that free forks and derived themes are allowed, paid applications are allowed, and charging for the toolkit itself is prohibited. The subsequent licensing request replaced Perimeter with a custom free-distribution draft. Terminal Kit now uses the MIT License. See [license guidance](licensing.md) for the current terms. The table above records the original audit finding.
+After this review, the owner clarified that free forks and derived themes are allowed, paid applications are allowed, and charging for the toolkit itself is prohibited. The subsequent licensing request replaced Perimeter with a custom free-distribution draft. Hullframe now uses the MIT License. See [license guidance](licensing.md) for the current terms. The table above records the original audit finding.
 
 ## Validation record
 

@@ -26,14 +26,14 @@ class ImageEffectDemo extends HTMLElement {
     this.controller = undefined;
   }
 }
-if (!customElements.get('tk-image-effect-demo'))
-  customElements.define('tk-image-effect-demo', ImageEffectDemo);
+if (!customElements.get('hf-image-effect-demo'))
+  customElements.define('hf-image-effect-demo', ImageEffectDemo);
 
 const meta = {
   title: 'Introduction/Image Effects',
   tags: ['autodocs'],
   parameters: { docs: { page: ImageEffectsDocs } },
-  render: () => html`<tk-image-effect-demo mode="scanlines"></tk-image-effect-demo>`,
+  render: () => html`<hf-image-effect-demo mode="scanlines"></hf-image-effect-demo>`,
 } satisfies Meta;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -41,7 +41,7 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {};
 export const ScanlinesAndTint: Story = {};
 export const Pixelation: Story = {
-  render: () => html`<tk-image-effect-demo mode="pixelate"></tk-image-effect-demo>`,
+  render: () => html`<hf-image-effect-demo mode="pixelate"></hf-image-effect-demo>`,
   play: async ({ canvasElement }) => {
     const image = within(canvasElement).getByRole('img', {
       name: 'Dark square and gray circle on a light background',
@@ -53,7 +53,7 @@ export const Pixelation: Story = {
   },
 };
 export const Ascii: Story = {
-  render: () => html`<tk-image-effect-demo mode="ascii"></tk-image-effect-demo>`,
+  render: () => html`<hf-image-effect-demo mode="ascii"></hf-image-effect-demo>`,
   play: async ({ canvasElement }) => {
     const image = within(canvasElement).getByRole('img', {
       name: 'Dark square and gray circle on a light background',

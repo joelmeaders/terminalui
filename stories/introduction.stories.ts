@@ -7,12 +7,12 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Terminal Kit is a Lit component library with ${catalog.length} components and six themes. Choose palette, density, line weight, glow, scanlines, and motion from the toolbar. The Appearance stories show presets and local overrides. Each component Docs page includes setup, complete integration code, API tables, styling, accessibility guidance, live controls, and state examples. Use the global framework selector for HTML / JS / CSS, Angular, Vue, or React. The Icon pages include registration and provider imports. The manual accessibility review below shows test procedures and unresolved results.`,
+        component: `Hullframe is a Lit component library with ${catalog.length} components and six themes. Choose palette, density, line weight, glow, scanlines, and motion from the toolbar. The Appearance stories show presets and local overrides. Each component Docs page includes setup, complete integration code, API tables, styling, accessibility guidance, live controls, and state examples. Use the global framework selector for HTML / JS / CSS, Angular, Vue, or React. The Icon pages include registration and provider imports. The manual accessibility review below shows test procedures and unresolved results.`,
       },
     },
   },
   render: () =>
-    html`<h1 style="color:var(--t-accent);font-size:32px;font-weight:400">TERMINAL / KIT</h1>
+    html`<h1 style="color:var(--t-accent);font-size:32px;font-weight:400">HULLFRAME</h1>
       <p>Modern controls. Analog character.</p>
       <p>${catalog.length} components · 6 themes · Lit 3 · standard HTML forms</p>
       <t-alert
@@ -22,7 +22,7 @@ const meta = {
       <h2 style="font-size:18px;margin-top:32px">Browser usage</h2>
       <pre style="white-space:pre-wrap">
 &lt;link rel="stylesheet" href="./dist/themes.css"&gt;
-&lt;script type="module" src="./dist/terminal.js"&gt;&lt;/script&gt;
+&lt;script type="module" src="./dist/hullframe.js"&gt;&lt;/script&gt;
 &lt;t-button&gt;Initialize&lt;/t-button&gt;</pre>
       <h2 style="font-size:18px">Accessibility</h2>
       <p>

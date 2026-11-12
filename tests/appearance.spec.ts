@@ -142,17 +142,26 @@ test('CRT remains a convenience preset with explicit overrides and forced-colors
   ).toBe('none');
 });
 
-test('demo style settings persist, migrate CRT preferences, and reset independently of palette and density', async ({
+test('demo style settings migrate legacy storage and CRT preferences, persist, and reset independently', async ({
   page,
 }) => {
   await page.goto('/');
-  await page.evaluate(() =>
+  await page.evaluate(() => {
+    localStorage.removeItem('hullframe');
     localStorage.setItem(
       'terminal-kit',
       JSON.stringify({ theme: 'phosphor', compact: true, effects: true }),
-    ),
-  );
+    );
+  });
   await page.reload();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('hullframe')!))).toEqual({
+    theme: 'phosphor',
+    compact: true,
+    lines: 'standard',
+    glow: 'subtle',
+    scanlines: 'subtle',
+    motion: 'auto',
+  });
   await expect(page.locator('html')).toHaveAttribute('data-glow', 'subtle');
   await expect(page.locator('.event-console')).toHaveAttribute('data-scanlines', 'subtle');
   await page.getByRole('checkbox', { name: 'Bold lines', exact: true }).check();
@@ -175,4 +184,28 @@ test('demo style settings persist, migrate CRT preferences, and reset independen
   await expect(page.locator('.event-console')).toHaveAttribute('data-scanlines', 'off');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'phosphor');
   await expect(page.locator('html')).toHaveAttribute('data-density', 'compact');
+});
+
+test('demo prefers Hullframe settings and restores legacy settings if the new entry is invalid', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.evaluate(() => {
+    localStorage.setItem('terminal-kit', JSON.stringify({ theme: 'phosphor', effects: true }));
+    localStorage.setItem('hullframe', JSON.stringify({ theme: 'ice', lines: 'bold' }));
+  });
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'ice');
+  await expect(page.locator('html')).toHaveAttribute('data-lines', 'bold');
+  await expect(page.locator('html')).toHaveAttribute('data-glow', 'off');
+  for (const invalid of ['{', 'null', '[]']) {
+    await page.evaluate((value) => localStorage.setItem('hullframe', value), invalid);
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'phosphor');
+    await expect(page.locator('html')).toHaveAttribute('data-glow', 'subtle');
+  }
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('terminal-kit')!))).toEqual({
+    theme: 'phosphor',
+    effects: true,
+  });
 });

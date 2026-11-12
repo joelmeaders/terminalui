@@ -1,14 +1,14 @@
 import { useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { TMenu } from '@joelmeaders/terminalui/react/menu';
-import { TChip } from '@joelmeaders/terminalui/react/chip';
-import { TTable } from '@joelmeaders/terminalui/react/table';
-import { TSplitPane } from '@joelmeaders/terminalui/react/split-pane';
-import { TDialog } from '@joelmeaders/terminalui/react/dialog';
-import { TToast } from '@joelmeaders/terminalui/react/toast';
-import type { TDialog as DialogElement } from '@joelmeaders/terminalui/components/dialog';
-import type { TToast as ToastElement } from '@joelmeaders/terminalui/components/toast';
-import '@joelmeaders/terminalui/themes.css';
+import { TMenu } from '@joelmeaders/hullframe/react/menu';
+import { TChip } from '@joelmeaders/hullframe/react/chip';
+import { TTable } from '@joelmeaders/hullframe/react/table';
+import { TSplitPane } from '@joelmeaders/hullframe/react/split-pane';
+import { TDialog } from '@joelmeaders/hullframe/react/dialog';
+import { TToast } from '@joelmeaders/hullframe/react/toast';
+import type { TDialog as DialogElement } from '@joelmeaders/hullframe/components/dialog';
+import type { TToast as ToastElement } from '@joelmeaders/hullframe/components/toast';
+import '@joelmeaders/hullframe/themes.css';
 
 function EventFixture() {
   const [events, setEvents] = useState<Record<string, unknown>>({});

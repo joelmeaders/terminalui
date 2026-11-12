@@ -1,10 +1,10 @@
 import { css, html, nothing } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 /**
  * Native progress indicator. Omit value for an indeterminate task.
  * @csspart progress - progress element.
  */
-export class TProgress extends TerminalElement {
+export class TProgress extends HullframeElement {
   static properties = { value: { type: Number }, max: { type: Number }, label: {} };
   value: number | undefined;
   max = 100;

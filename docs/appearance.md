@@ -2,7 +2,7 @@
 
 ## Set a page default, then override a region
 
-Import `@joelmeaders/terminalui/themes.css` once. Set appearance attributes on `html`, `body`, a container, or a component. Each setting inherits independently through ordinary elements, slots, and component shadow roots. The nearest explicit setting wins for that region and its descendants. Removing an attribute restores inheritance.
+Import `@joelmeaders/hullframe/themes.css` once. Set appearance attributes on `html`, `body`, a container, or a component. Each setting inherits independently through ordinary elements, slots, and component shadow roots. The nearest explicit setting wins for that region and its descendants. Removing an attribute restores inheritance.
 
 ```html
 <html

@@ -125,7 +125,7 @@ export const ListsAndQuotes: Story = {
       </dl>
       <blockquote>
         <p>Keep the information clear, even when the interface has character.</p>
-        <footer>— <cite>Terminal Kit design notes</cite></footer>
+        <footer>— <cite>Hullframe design notes</cite></footer>
       </blockquote>
       <figure>
         <p>▁ ▂ ▄ ▃ ▆ ▅ ▇ <span class="t-muted">Signal rising</span></p>

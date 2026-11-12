@@ -1,5 +1,5 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { parseDate } from '../internal/date';
 import { activeElement, recoverFocus } from '../internal/floating';
 const isoDate = (date: Date) =>
@@ -50,7 +50,7 @@ const today = () => {
  * @csspart grid - Scrollable calendar grid.
  * @csspart day - Day button.
  */
-export class TCalendar extends TerminalElement {
+export class TCalendar extends HullframeElement {
   static properties = {
     label: {},
     value: {},

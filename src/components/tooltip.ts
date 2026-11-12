@@ -1,12 +1,12 @@
 import { css, html, type PropertyValues } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { observeFloating, type Placement } from '../internal/floating';
 /**
  * Help tooltip with its own named button. Opens on hover/focus/click, dismisses on Escape.
  * @csspart trigger - trigger element.
  * @csspart tooltip - tooltip element.
  */
-export class TTooltip extends TerminalElement {
+export class TTooltip extends HullframeElement {
   static properties = { label: {}, message: {}, placement: {}, open: { state: true } };
   label = 'More information';
   message = '';

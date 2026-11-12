@@ -1,6 +1,6 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { recoverFocus } from '../internal/floating';
 
 export interface StepItem {
@@ -19,7 +19,7 @@ export interface StepItem {
  *
  * @csspart step - Native step button.
  */
-export class TSteps extends TerminalElement {
+export class TSteps extends HullframeElement {
   static properties = {
     items: { attribute: false },
     value: {},

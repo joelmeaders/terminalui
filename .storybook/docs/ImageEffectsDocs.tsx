@@ -17,10 +17,10 @@ const examples = {
   const effect = mountAscii(document.querySelector('#portrait'));
   // Call effect.destroy() when this view is removed.
 </script>`,
-  angular: `// Add @import '@joelmeaders/terminalui/themes.css'; and
-// @import '@joelmeaders/terminalui/image-effects.css'; to src/styles.css.
+  angular: `// Add @import '@joelmeaders/hullframe/themes.css'; and
+// @import '@joelmeaders/hullframe/image-effects.css'; to src/styles.css.
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
-import { mountAscii, type ImageEffectController, type AsciiOptions } from '@joelmeaders/terminalui/image-ascii';
+import { mountAscii, type ImageEffectController, type AsciiOptions } from '@joelmeaders/hullframe/image-ascii';
 
 @Component({
   selector: 'app-portrait',
@@ -37,9 +37,9 @@ export class Portrait implements AfterViewInit, OnDestroy {
 }`,
   vue: `<script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue';
-import '@joelmeaders/terminalui/themes.css';
-import '@joelmeaders/terminalui/image-effects.css';
-import { mountAscii } from '@joelmeaders/terminalui/image-ascii';
+import '@joelmeaders/hullframe/themes.css';
+import '@joelmeaders/hullframe/image-effects.css';
+import { mountAscii } from '@joelmeaders/hullframe/image-ascii';
 
 const portrait = ref<HTMLImageElement | null>(null);
 let effect: ReturnType<typeof mountAscii> | undefined;
@@ -52,9 +52,9 @@ onBeforeUnmount(() => effect?.destroy());
   </span>
 </template>`,
   react: `import { useEffect, useRef } from 'react';
-import '@joelmeaders/terminalui/themes.css';
-import '@joelmeaders/terminalui/image-effects.css';
-import { mountAscii } from '@joelmeaders/terminalui/image-ascii';
+import '@joelmeaders/hullframe/themes.css';
+import '@joelmeaders/hullframe/image-effects.css';
+import { mountAscii } from '@joelmeaders/hullframe/image-ascii';
 
 export function Portrait() {
   const image = useRef<HTMLImageElement>(null);
@@ -72,16 +72,16 @@ export function Portrait() {
 export function ImageEffectsDocs() {
   const [framework, updateFramework] = useFramework();
   return (
-    <article className="tk-docs" data-docs-framework={framework}>
-      <div className="tk-docs-topline">
-        <span>TERMINAL / KIT · IMAGE EFFECTS</span>
+    <article className="hf-docs" data-docs-framework={framework}>
+      <div className="hf-docs-topline">
+        <span>HULLFRAME · IMAGE EFFECTS</span>
         <FrameworkSelector framework={framework} onChange={updateFramework} />
       </div>
-      <header className="tk-docs-hero">
+      <header className="hf-docs-hero">
         <Title />
-        <p className="tk-docs-lead">Optional terminal treatments for native images.</p>
+        <p className="hf-docs-lead">Optional terminal treatments for native images.</p>
       </header>
-      <nav className="tk-docs-nav" aria-label="On this documentation page">
+      <nav className="hf-docs-nav" aria-label="On this documentation page">
         <a href="#getting-started" target="_self">
           Get started
         </a>

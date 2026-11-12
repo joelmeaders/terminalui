@@ -3,8 +3,8 @@
 Image effects work on native `<img>` elements. Import the optional stylesheet once. Place an image directly inside `.t-image-effect`. The image remains the accessible source. Generated pixels and ASCII are decorative.
 
 ```js
-import '@joelmeaders/terminalui/themes.css';
-import '@joelmeaders/terminalui/image-effects.css';
+import '@joelmeaders/hullframe/themes.css';
+import '@joelmeaders/hullframe/image-effects.css';
 ```
 
 ```html
@@ -18,7 +18,7 @@ Set `data-image-scanlines` to `subtle` or `pronounced`. Add or remove `data-imag
 CSS `image-rendering: pixelated` only changes how an image scales. For actual pixel blocks at the image's current size, import the optional Canvas module:
 
 ```js
-import { mountPixelation } from '@joelmeaders/terminalui/image-pixelate';
+import { mountPixelation } from '@joelmeaders/hullframe/image-pixelate';
 
 const image = document.querySelector('#portrait');
 const pixelation = mountPixelation(image, { pixelSize: 8 });
@@ -30,7 +30,7 @@ pixelation.destroy(); // Use when the view is removed.
 For ASCII art, which uses text characters to represent an image, import only its module:
 
 ```js
-import { mountAscii } from '@joelmeaders/terminalui/image-ascii';
+import { mountAscii } from '@joelmeaders/hullframe/image-ascii';
 
 const ascii = mountAscii(image, { cellSize: 10, characters: ' .:-=+*#%@' });
 ascii.update({ invert: true });

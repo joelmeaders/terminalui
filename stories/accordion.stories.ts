@@ -6,7 +6,7 @@ const meta = {
   title: 'Components/Accordion',
   component: 't-accordion',
   tags: ['autodocs'],
-  args: { label: 'What is Terminal Kit?', open: false },
+  args: { label: 'What is Hullframe?', open: false },
   parameters: {
     docs: {
       description: {

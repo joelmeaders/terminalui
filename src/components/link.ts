@@ -1,5 +1,5 @@
 import { css, html, nothing } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { inlineSlotStyles } from '../internal/slots';
 /**
  * Native anchor with safe URL schemes and external-window protection.
@@ -10,7 +10,7 @@ import { inlineSlotStyles } from '../internal/slots';
  *
  * @csspart link - Native anchor.
  */
-export class TLink extends TerminalElement {
+export class TLink extends HullframeElement {
   static properties = {
     href: {},
     target: {},

@@ -3,7 +3,7 @@ import { create } from 'storybook/theming';
 addons.setConfig({
   theme: create({
     base: 'dark',
-    brandTitle: 'TERMINAL / KIT',
+    brandTitle: 'HULLFRAME',
     colorPrimary: '#f5ba5b',
     colorSecondary: '#f5ba5b',
     appBg: '#121411',

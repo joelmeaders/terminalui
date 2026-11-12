@@ -1,6 +1,6 @@
 import { css, html, type PropertyValues } from 'lit';
 import { styleMap } from 'lit/directives/style-map.js';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { activeElement } from '../internal/floating';
 
 export interface SplitPaneChange {
@@ -28,7 +28,7 @@ export interface SplitPaneChange {
  * @csspart separator - Keyboard and pointer resize handle.
  * @cssprop --t-split-height - Inner layout height. Defaults to 360px, with a minimum of 120px. Each pane scrolls within this height.
  */
-export class TSplitPane extends TerminalElement {
+export class TSplitPane extends HullframeElement {
   static properties = {
     size: { type: Number, reflect: true },
     min: { type: Number },

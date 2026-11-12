@@ -1,55 +1,57 @@
 # Framework integration
 
 The core uses Lit and browser custom elements. The package also offers optional adapters for frameworks.
-Install `@joelmeaders/terminalui` from GitHub Packages. First sign in with your GitHub username and a classic personal access token with `read:packages` permission:
+Install `@joelmeaders/hullframe` from GitHub Packages. First sign in with your GitHub username and a classic personal access token with `read:packages` permission:
 
 ```sh
 npm login --scope=@joelmeaders --auth-type=legacy --registry=https://npm.pkg.github.com
-npm install @joelmeaders/terminalui
+npm install @joelmeaders/hullframe
 ```
 
-For local development, you can also install a tarball, an archive containing the package:
+Registry installation requires a published Hullframe release. Before the first publication, or for local development, install a tarball, an archive containing the package:
 
 ```sh
 npm run build
 npm pack
-npm install /path/to/joelmeaders-terminalui-0.1.3.tgz
+npm install /path/to/joelmeaders-hullframe-0.1.3.tgz
 ```
+
+When migrating from `@joelmeaders/terminalui`, replace the dependency and all import prefixes. The `t-*` elements and events, `T*` component and React wrapper names, and CSS names remain unchanged. See the [rename and migration notes](https://github.com/joelmeaders/terminalui#migrating-to-hullframe).
 
 Import the theme stylesheet once. Apply `data-theme="amber"` to `html` or a parent container.
 Import component modules before rendering their elements. Choose either the standalone bundle or component imports for a page. Both register the same element names, so do not use them together.
 
 ## Plain HTML
 
-Copy `dist/terminal.js` and `dist/themes.css` to your public assets.
+Copy `dist/hullframe.js` and `dist/themes.css` to your public assets.
 No package manager, framework, or import map is required in the browser.
 
 ```html
 <link rel="stylesheet" href="/assets/themes.css" />
-<script type="module" src="/assets/terminal.js"></script>
+<script type="module" src="/assets/hullframe.js"></script>
 <form>
   <t-input name="name" label="Name" required></t-input>
   <t-button type="submit">Save</t-button>
 </form>
 ```
 
-With a bundler, use `import '@joelmeaders/terminalui/components/input'` for individual elements.
-Use `import '@joelmeaders/terminalui'` for the entire catalog. Both imports include element registration.
+With a bundler, use `import '@joelmeaders/hullframe/components/input'` for individual elements.
+Use `import '@joelmeaders/hullframe'` for the entire catalog. Both imports include element registration.
 Set object and array properties with JavaScript. A boolean HTML attribute is true when it is present. For example, `disabled="false"` still disables a control.
 
 ## React 19
 
-Install `react` and `@lit/react`. Import typed wrappers from per-component paths such as `@joelmeaders/terminalui/react/input`.
+Install `react` and `@lit/react`. Import typed wrappers from per-component paths such as `@joelmeaders/hullframe/react/input`.
 Each path includes that wrapper and the elements it needs. The wrapper passes properties, refs, children, and native event listeners to the element.
-The existing `@joelmeaders/terminalui/react` barrel remains compatible. Bundlers that honor package side-effect metadata can also remove its unused wrappers.
-Per-component paths keep the module graph focused in development and native ESM as well. Use `@joelmeaders/terminalui` when you need to register the complete element catalog.
+The existing `@joelmeaders/hullframe/react` barrel remains compatible. Bundlers that honor package side-effect metadata can also remove its unused wrappers.
+Per-component paths keep the module graph focused in development and native ESM as well. Use `@joelmeaders/hullframe` when you need to register the complete element catalog.
 The official [Lit React adapter](https://lit.dev/docs/frameworks/react/) supplies this behavior.
 
 ```tsx
 import { useState } from 'react';
-import { TInput } from '@joelmeaders/terminalui/react/input';
-import type { TInput as InputElement } from '@joelmeaders/terminalui/components/input';
-import '@joelmeaders/terminalui/themes.css';
+import { TInput } from '@joelmeaders/hullframe/react/input';
+import type { TInput as InputElement } from '@joelmeaders/hullframe/components/input';
+import '@joelmeaders/hullframe/themes.css';
 
 export function Settings() {
   const [name, setName] = useState('Operator');
@@ -67,7 +69,7 @@ Use `checked` for checkbox and switch state. Use `onTSelect`, `onTChange`, `onTC
 Custom event handlers infer the types of the event data described in the component guide. Nested menu options, tree items, commands, numeric values, and literal states retain their types. Events without a payload have `detail: null`. Native `input` and `change` handlers receive `Event`; read the value from their typed element target.
 
 ```tsx
-import { TMenu } from '@joelmeaders/terminalui/react/menu';
+import { TMenu } from '@joelmeaders/hullframe/react/menu';
 
 export function FileActions() {
   return (
@@ -92,17 +94,17 @@ Register the required component imports. In Vue's compiler configuration, identi
 `isCustomElement: (tag) => tag.startsWith('t-')`. For Vite, set this option under
 `vue({ template: { compilerOptions: { isCustomElement } } })`.
 
-`useTerminalModel` binds a typed Vue ref to an element property. It removes listeners when the element changes or the component unmounts.
+`useHullframeModel` binds a typed Vue ref to an element property. It removes listeners when the element changes or the component unmounts.
 
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useTerminalModel } from '@joelmeaders/terminalui/vue';
-import { TInput } from '@joelmeaders/terminalui/components/input';
-import '@joelmeaders/terminalui/themes.css';
+import { useHullframeModel } from '@joelmeaders/hullframe/vue';
+import { TInput } from '@joelmeaders/hullframe/components/input';
+import '@joelmeaders/hullframe/themes.css';
 const element = ref<TInput | null>(null);
 const name = ref('Operator');
-useTerminalModel(element, name, 'value');
+useHullframeModel(element, name, 'value');
 </script>
 <template><t-input ref="element" label="Name" /></template>
 ```
@@ -114,20 +116,20 @@ Use `.prop` for array/object values such as options, columns, and rows.
 
 ## Angular 22
 
-Import `TerminalValueAccessor` from `@joelmeaders/terminalui/angular`, your forms module, and `CUSTOM_ELEMENTS_SCHEMA`.
+Import `HullframeValueAccessor` from `@joelmeaders/hullframe/angular`, your forms module, and `CUSTOM_ELEMENTS_SCHEMA`.
 The adapter uses Angular partial compilation. An Angular AOT consumer can link it through normal Angular tooling.
 The package check compiles an external consumer with `ngc` and verifies generated component definitions.
 
 ```ts
 import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { TerminalValueAccessor } from '@joelmeaders/terminalui/angular';
-import '@joelmeaders/terminalui/components/input';
+import { HullframeValueAccessor } from '@joelmeaders/hullframe/angular';
+import '@joelmeaders/hullframe/components/input';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [ReactiveFormsModule, TerminalValueAccessor],
+  imports: [ReactiveFormsModule, HullframeValueAccessor],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: '<t-input label="Name" [formControl]="name"></t-input>',
 })
@@ -177,7 +179,7 @@ The build generates `custom-elements.json`, `catalog.json`, and `vscode.html-cus
 Storybook reads the manifest for component metadata. Configure VS Code with:
 
 ```json
-{ "html.customData": ["./node_modules/@joelmeaders/terminalui/dist/vscode.html-custom-data.json"] }
+{ "html.customData": ["./node_modules/@joelmeaders/hullframe/dist/vscode.html-custom-data.json"] }
 ```
 
 Run `npm run build` after component API changes. The metadata and React exports derive from the component source.

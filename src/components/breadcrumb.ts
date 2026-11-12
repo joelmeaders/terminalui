@@ -1,5 +1,5 @@
 import { css, html } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 
 export interface BreadcrumbItem {
   label: string;
@@ -14,7 +14,7 @@ export interface BreadcrumbItem {
  *
  * @csspart link - Navigation links.
  */
-export class TBreadcrumb extends TerminalElement {
+export class TBreadcrumb extends HullframeElement {
   static properties = { label: {}, items: { attribute: false } };
   /** Navigation landmark name. */
   label = 'Breadcrumb';

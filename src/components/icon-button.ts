@@ -1,12 +1,12 @@
 import { css, html, nothing } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import './icon';
 /**
  * Named native icon button.
  * @slot - Optional replacement icon.
  * @csspart button - Native button.
  */
-export class TIconButton extends TerminalElement {
+export class TIconButton extends HullframeElement {
   static properties = {
     name: {},
     label: {},

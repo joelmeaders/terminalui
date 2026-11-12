@@ -1,11 +1,11 @@
 import { css, html, nothing, type PropertyValues } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 /**
  * Image or initials with an accessible name.
  * @csspart avatar - Outer frame.
  * @csspart image - Image.
  */
-export class TAvatar extends TerminalElement {
+export class TAvatar extends HullframeElement {
   static properties = { name: {}, src: {}, size: { reflect: true }, failed: { state: true } };
   name = '';
   src = '';

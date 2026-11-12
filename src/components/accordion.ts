@@ -1,5 +1,5 @@
 import { css, html } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 import { inlineSlotStyles } from '../internal/slots';
 /**
  * Native disclosure. Emits t-toggle with {open}.
@@ -10,7 +10,7 @@ import { inlineSlotStyles } from '../internal/slots';
  * @csspart summary - summary element.
  * @csspart content - content element.
  */
-export class TAccordion extends TerminalElement {
+export class TAccordion extends HullframeElement {
   static properties = { label: {}, open: { type: Boolean, reflect: true } };
   label = '';
   open = false;

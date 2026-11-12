@@ -121,7 +121,7 @@ for (const component of components) {
 entries.push({ tag: 'typography', docsId: 'introduction-typography--docs' });
 // Keep the published recipes and their handlers intact. Only temporary consumer
 // copies expose the real framework model and setter to the browser verifier.
-const formProbe = '__terminalDocsFormProbe';
+const formProbe = '__hullframeDocsFormProbe';
 const formTags = components
   .filter((component) =>
     component.members.some((member) => member.inheritedFrom?.name === 'FormControl'),
@@ -153,11 +153,11 @@ for (const { tag } of entries) {
   }
   if (tag !== 'typography') {
     assert(
-      reactExample.includes(`from '@joelmeaders/terminalui/react/${tag.slice(2)}'`),
+      reactExample.includes(`from '@joelmeaders/hullframe/react/${tag.slice(2)}'`),
       `${tag}: React examples must import their component wrapper directly.`,
     );
     assert(
-      !reactExample.includes("from '@joelmeaders/terminalui/react'"),
+      !reactExample.includes("from '@joelmeaders/hullframe/react'"),
       `${tag}: React examples must not import the complete wrapper barrel.`,
     );
   }
@@ -275,7 +275,7 @@ for (const framework of ['react', 'vue', 'angular']) {
         : `import '@angular/compiler'; import { bootstrapApplication } from '@angular/platform-browser'; const app = await bootstrapApplication(Example); const instance = app.components[0].instance; if (instance.control) Object.assign(globalThis, { ${formProbe}: { read: () => instance.control.value, set: (next) => instance.control.setValue(next) } });`;
   await build({
     stdin: {
-      contents: `${framework === 'angular' ? "import '@angular/compiler';\n" : ''}${imports}\nimport '@joelmeaders/terminalui/themes.css';\nimport '@joelmeaders/terminalui/typography.css';\nconst Example = ({${map}})[new URLSearchParams(location.search).get('component')];\n${boot}`,
+      contents: `${framework === 'angular' ? "import '@angular/compiler';\n" : ''}${imports}\nimport '@joelmeaders/hullframe/themes.css';\nimport '@joelmeaders/hullframe/typography.css';\nconst Example = ({${map}})[new URLSearchParams(location.search).get('component')];\n${boot}`,
       resolveDir: out,
       loader: 'ts',
     },
@@ -295,8 +295,8 @@ const server = createServer(async (request, response) => {
   try {
     const path = new URL(request.url, 'http://localhost').pathname;
     const file =
-      path === '/assets/terminal.js'
-        ? resolve('dist/terminal.js')
+      path === '/assets/hullframe.js'
+        ? resolve('dist/hullframe.js')
         : path === '/assets/themes.css'
           ? resolve('dist/themes.css')
           : path === '/assets/typography.css'

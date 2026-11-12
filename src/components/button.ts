@@ -1,5 +1,5 @@
 import { css, html } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 
 /**
  * An action, submit, or reset button. Submit uses a temporary native submitter.
@@ -8,7 +8,7 @@ import { baseStyles, TerminalElement } from '../internal/base';
  * @slot end - Non-interactive icon or content after the label.
  * @csspart button - button element.
  */
-export class TButton extends TerminalElement {
+export class TButton extends HullframeElement {
   static formAssociated = true;
   static properties = {
     variant: { reflect: true },

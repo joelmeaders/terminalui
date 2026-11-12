@@ -1,5 +1,5 @@
 import { css, html } from 'lit';
-import { baseStyles, TerminalElement } from '../internal/base';
+import { baseStyles, HullframeElement } from '../internal/base';
 /**
  * Bordered content panel.
  * @slot heading - Panel title.
@@ -9,7 +9,7 @@ import { baseStyles, TerminalElement } from '../internal/base';
  * @csspart body - body element.
  * @csspart footer - footer element.
  */
-export class TCard extends TerminalElement {
+export class TCard extends HullframeElement {
   static styles = [
     baseStyles,
     css`

@@ -137,10 +137,10 @@ function ApiTable({
   rows: React.ReactNode[][];
 }) {
   if (!rows.length)
-    return <p className="tk-docs-empty">No component-specific {title.toLowerCase()}.</p>;
+    return <p className="hf-docs-empty">No component-specific {title.toLowerCase()}.</p>;
   return (
     <div
-      className="tk-docs-table"
+      className="hf-docs-table"
       role="region"
       aria-label={title}
       aria-describedby="api-table-scroll-help"
@@ -181,7 +181,7 @@ function ApiReference({ api }: { api: ComponentApi }) {
         This reference is generated from the component source, including inherited form behavior.
         Attribute names and JavaScript properties can differ.
       </p>
-      <p id="api-table-scroll-help" className="tk-docs-table-hint">
+      <p id="api-table-scroll-help" className="hf-docs-table-hint">
         At narrow widths, focus a table and use the left and right arrow keys to read every column.
       </p>
       <ApiTable
@@ -263,7 +263,7 @@ function ApiReference({ api }: { api: ComponentApi }) {
         <p>Tab panels use dynamic slot names: each panel slot must match a tabs item ID.</p>
       )}
       {api.slots.length > 0 && (
-        <details className="tk-docs-setup">
+        <details className="hf-docs-setup">
           <summary>Composing with slots and icons</summary>
           <Markdown>{slotGuide.replace(/^# .+\n/, '')}</Markdown>
         </details>
@@ -283,7 +283,7 @@ function FrameworkSetup({ framework }: { framework: Framework }) {
   const start = frameworkGuide.indexOf(`## ${heading}`);
   const next = frameworkGuide.indexOf('\n## ', start + 1);
   return (
-    <details className="tk-docs-setup">
+    <details className="hf-docs-setup">
       <summary>Project setup for {frameworks[framework]}</summary>
       <Markdown>{intro + frameworkGuide.slice(start, next < 0 ? undefined : next)}</Markdown>
       {framework === 'angular' && (
@@ -292,7 +292,7 @@ function FrameworkSetup({ framework }: { framework: Framework }) {
             Load the shared theme in the application entry point or global stylesheet, not in
             component-scoped styles:
           </p>
-          <Source code="import '@joelmeaders/terminalui/themes.css';" language="typescript" />
+          <Source code="import '@joelmeaders/hullframe/themes.css';" language="typescript" />
         </>
       )}
     </details>
@@ -311,17 +311,17 @@ export function ComponentDocs() {
   const example = guide ? exampleFor(tag, framework) : undefined;
   const languages = { html: 'html', react: 'tsx', vue: 'html', angular: 'typescript' } as const;
   return (
-    <article className="tk-docs" data-docs-framework={framework}>
-      <div className="tk-docs-topline">
-        <span>TERMINAL / KIT · COMPONENT MANUAL</span>
+    <article className="hf-docs" data-docs-framework={framework}>
+      <div className="hf-docs-topline">
+        <span>HULLFRAME · COMPONENT MANUAL</span>
         <FrameworkSelector framework={framework} onChange={updateFramework} />
       </div>
-      <header className="tk-docs-hero">
+      <header className="hf-docs-hero">
         <Title />
-        {api && <code className="tk-docs-tag">&lt;{api.tagName}&gt;</code>}
-        {guide ? <p className="tk-docs-lead">{guide.purpose}</p> : <Description />}
+        {api && <code className="hf-docs-tag">&lt;{api.tagName}&gt;</code>}
+        {guide ? <p className="hf-docs-lead">{guide.purpose}</p> : <Description />}
       </header>
-      <nav className="tk-docs-nav" aria-label="On this documentation page">
+      <nav className="hf-docs-nav" aria-label="On this documentation page">
         <a href="#getting-started" target="_self">
           Get started
         </a>
@@ -386,12 +386,12 @@ export function ComponentDocs() {
               </>
             )}
             {guide.event && (
-              <p className="tk-docs-note">
+              <p className="hf-docs-note">
                 <strong>Handle the result.</strong> {guide.event.description}
               </p>
             )}
             {guide.form && (
-              <p className="tk-docs-note">
+              <p className="hf-docs-note">
                 Native forms submit this field under its name. React and Vue examples bind component
                 state. Angular examples use the value accessor. Browser validity and framework
                 validation are separate; configure both when your application requires both.
@@ -426,7 +426,7 @@ export function ComponentDocs() {
             <summary>Results and unresolved review items</summary>
             <Markdown>{manualEvidence[0]}</Markdown>
             <div
-              className="tk-docs-table"
+              className="hf-docs-table"
               role="region"
               aria-label="Manual accessibility evidence and review items"
               tabIndex={0}
@@ -447,7 +447,7 @@ export function ComponentDocs() {
           </p>
           <details>
             <summary>Built-in icon names · no provider registration needed</summary>
-            <p className="tk-docs-icon-names">
+            <p className="hf-docs-icon-names">
               {Object.keys(icons).map((name) => (
                 <code key={name}>{name}</code>
               ))}
@@ -469,11 +469,11 @@ export function ComponentDocs() {
           example above remains a complete integration recipe.
         </p>
         <Primary />
-        <p className="tk-docs-controls-hint">
+        <p className="hf-docs-controls-hint">
           Scroll the controls table sideways to reach every column.
         </p>
         <div
-          className="tk-docs-controls"
+          className="hf-docs-controls"
           role="region"
           aria-label="Live preview controls"
           tabIndex={0}

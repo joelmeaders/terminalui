@@ -1,7 +1,7 @@
 import { Directive, ElementRef, forwardRef, inject } from '@angular/core';
 import { NG_VALUE_ACCESSOR, type ControlValueAccessor } from '@angular/forms';
 
-type TerminalControl = HTMLElement & {
+type HullframeControl = HTMLElement & {
   value: string;
   disabled: boolean;
   checked?: boolean;
@@ -9,7 +9,7 @@ type TerminalControl = HTMLElement & {
   values?: string[];
 };
 
-/** Angular reactive and template-driven forms adapter for Terminal Kit controls. */
+/** Angular reactive and template-driven forms adapter for Hullframe controls. */
 @Directive({
   selector:
     't-input[formControl],t-input[formControlName],t-input[ngModel],t-textarea[formControl],t-textarea[formControlName],t-textarea[ngModel],t-select[formControl],t-select[formControlName],t-select[ngModel],t-multi-select[formControl],t-multi-select[formControlName],t-multi-select[ngModel],t-checkbox[formControl],t-checkbox[formControlName],t-checkbox[ngModel],t-switch[formControl],t-switch[formControlName],t-switch[ngModel],t-range[formControl],t-range[formControlName],t-range[ngModel],t-radio-group[formControl],t-radio-group[formControlName],t-radio-group[ngModel],t-combobox[formControl],t-combobox[formControlName],t-combobox[ngModel],t-file-input[formControl],t-file-input[formControlName],t-file-input[ngModel],t-password-input[formControl],t-password-input[formControlName],t-password-input[ngModel],t-number-input[formControl],t-number-input[formControlName],t-number-input[ngModel],t-segmented-control[formControl],t-segmented-control[formControlName],t-segmented-control[ngModel],t-rating[formControl],t-rating[formControlName],t-rating[ngModel],t-tags-input[formControl],t-tags-input[formControlName],t-tags-input[ngModel],t-color-picker[formControl],t-color-picker[formControlName],t-color-picker[ngModel],t-date-picker[formControl],t-date-picker[formControlName],t-date-picker[ngModel],t-date-range-picker[formControl],t-date-range-picker[formControlName],t-date-range-picker[ngModel],t-time-picker[formControl],t-time-picker[formControlName],t-time-picker[ngModel]',
@@ -18,13 +18,13 @@ type TerminalControl = HTMLElement & {
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => TerminalValueAccessor),
+      useExisting: forwardRef(() => HullframeValueAccessor),
       multi: true,
     },
   ],
 })
-export class TerminalValueAccessor implements ControlValueAccessor {
-  private readonly element = inject<ElementRef<TerminalControl>>(ElementRef);
+export class HullframeValueAccessor implements ControlValueAccessor {
+  private readonly element = inject<ElementRef<HullframeControl>>(ElementRef);
   private onChange: (value: unknown) => void = () => {};
   onTouched: () => void = () => {};
   private get property(): 'value' | 'checked' | 'files' | 'values' {
@@ -58,3 +58,6 @@ export class TerminalValueAccessor implements ControlValueAccessor {
     this.onChange(this.element.nativeElement[this.property]);
   }
 }
+
+/** @deprecated Use HullframeValueAccessor. */
+export { HullframeValueAccessor as TerminalValueAccessor };

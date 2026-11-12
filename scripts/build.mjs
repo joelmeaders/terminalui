@@ -52,7 +52,7 @@ for (const source of sources) {
 // Browser build is self-contained: one module script, with no import map required.
 await build({
   entryPoints: ['src/index.ts'],
-  outfile: 'dist/terminal.js',
+  outfile: 'dist/hullframe.js',
   bundle: true,
   minify: true,
   format: 'esm',
@@ -61,6 +61,9 @@ await build({
 }).then(async (result) =>
   writeFile('dist/metafile.json', JSON.stringify(result.metafile, null, 2)),
 );
+// Preserve the legacy filename for consumers who copy one standalone script.
+// Package imports of either filename resolve to hullframe.js to share one module.
+await copyFile('dist/hullframe.js', 'dist/terminal.js');
 execFileSync(
   process.execPath,
   ['node_modules/typescript/bin/tsc', '--project', 'tsconfig.build.json'],

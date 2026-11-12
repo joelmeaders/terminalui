@@ -26,8 +26,8 @@ for (const module of manifest.modules) {
       (event) =>
         !(
           event.name === 'name' &&
-          (event.inheritedFrom?.name === 'TerminalElement' ||
-            declaration.name === 'TerminalElement')
+          (event.inheritedFrom?.name === 'HullframeElement' ||
+            declaration.name === 'HullframeElement')
         ),
     );
     if (declaration.tagName)
